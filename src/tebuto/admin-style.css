@@ -1,0 +1,12 @@
+#adminmenu #toplevel_page_tebuto-integration div.wp-menu-image img {
+  width: 18px;
+  height: 18px;
+}
+
+#adminmenu
+  #toplevel_page_tebuto-integration:not(.current):hover
+  div.wp-menu-image
+  img {
+  filter: brightness(0) saturate(100%) invert(50%) sepia(50%) saturate(500%)
+    hue-rotate(180deg) brightness(90%);
+}
