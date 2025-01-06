@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "tebuto/terminbuchung",
+  "version": "1.0.0",
+  "title": "Tebuto",
+  "category": "widgets",
+  "description": "Mit diesem Block können Sie Termine mit Tebuto anbieten.",
+  "example": {},
+  "attributes": {
+    "backgroundColor": {
+      "type": "string",
+      "default": "#ffffff"
+    },
+    "border": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "supports": {
+    "html": false
+  },
+  "textdomain": "block",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "viewScript": "file:./view.js"
+}
