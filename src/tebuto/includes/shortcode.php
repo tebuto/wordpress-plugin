@@ -15,7 +15,7 @@ function tebuto_widget_shortcode()
         $attributes .= ' data-background-color="' . esc_attr($background_color) . '"';
     }
 
-    return '<div id="tebuto-widget"></div>' .
-           '<script src="https://tebuto.dev/widget/booking.js" ' . $attributes . '></script>';
+    return '<div id="tebuto-booking-widget"></div>' .
+        '<script src="https://tebuto.de/widget/booking.js" ' . $attributes . '></script>';
 }
 add_shortcode('tebuto_widget', 'tebuto_widget_shortcode');

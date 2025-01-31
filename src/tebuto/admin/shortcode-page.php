@@ -8,7 +8,7 @@ function tebuto_shortcode_page()
     $border = get_user_meta($current_user_id, 'tebuto_border', true) ?: 'false';
 
     echo '<div class="wrap">';
-    echo '<h1>' . __('Shortcode für das Widget', 'tebuto') . '</h1>';
+    echo '<h1>' . __('Shortcode', 'tebuto') . '</h1>';
 
     if (!$therapist_uuid) {
         echo '<p>' . __('Sie müssen sich zuerst mit Tebuto verbinden, um den Shortcode zu generieren.', 'tebuto') . '</p>';
@@ -16,23 +16,27 @@ function tebuto_shortcode_page()
         // Shortcode generieren
         $shortcode = '[tebuto_widget]';
 
-        // HTML-Code generieren
-        $attributes = 'data-therapist-uuid="' . esc_attr($therapist_uuid) . '"';
-        if ($border === 'true') {
-            $attributes .= ' data-border="true"';
-        }
-        if ($background_color !== '#ffffff') {
-            $attributes .= ' data-background-color="' . esc_attr($background_color) . '"';
-        }
+        // Widget-Einstellungen anzeigen
+        $background_color = get_user_meta($current_user_id, 'tebuto_background_color', true) ?: '#ffffff';
+        $border = get_user_meta($current_user_id, 'tebuto_border', true) ?: 'false';
 
-        $html_code = '<div id="tebuto-widget"></div>' .
-                     '<script src="https://tebuto.dev/widget/booking.js" ' . $attributes . '></script>';
-
-        echo '<h2>' . __('Shortcode', 'tebuto') . '</h2>';
+        echo '<p>Fügen Sie diesen Shortcode in eine Seite ein, um die Tebuto Terminbuchung zu verwenden. Alternativ können Sie das Widget auch in den Gutenberg Blocks finden.</p>';
         echo '<pre style="background: #f4f4f4; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">' . esc_html($shortcode) . '</pre>';
-
-        echo '<h2>' . __('Manueller Code', 'tebuto') . '</h2>';
-        echo '<pre style="background: #f4f4f4; padding: 10px; border: 1px solid #ddd; border-radius: 5px; white-space: pre-wrap;">' . esc_html($html_code) . '</pre>';
+        echo '<form method="post">';
+        echo '<h2 style="margin-top: 35px">' . __('Shortcode-Widget-Einstellungen', 'tebuto') . '</h2>';
+        echo '<table class="form-table">';
+        echo '<tr>';
+        echo '<th><label for="background_color">' . __('Hintergrundfarbe', 'tebuto') . '</label></th>';
+        echo '<td><input type="text" name="background_color" id="background_color" value="' . esc_attr($background_color) . '" class="tebuto-color-picker"></td>';
+        echo '</tr>';
+        echo '<tr>';
+        echo '<th><label for="border">' . __('Rahmen anzeigen', 'tebuto') . '</label></th>';
+        echo '<td><input type="checkbox" name="border" id="border" value="true" ' . checked($border, 'true', false) . '></td>';
+        echo '</tr>';
+        echo '</table>';
+        echo '<input type="hidden" name="tebuto_save_settings" value="1">';
+        echo '<button class="button button-primary" style="margin-top: 20px" type="submit">' . __('Speichern', 'tebuto') . '</button>';
+        echo '</form>';
     }
 
     echo '</div>';
