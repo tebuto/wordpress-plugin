@@ -8,9 +8,6 @@ export default function Edit({ attributes, setAttributes }) {
 	const { backgroundColor, border } = attributes;
 	const [bgcolor, setBgColor] = useState(backgroundColor || "#ffffff");
 
-	// UUID aus lokalisierten PHP-Daten holen
-	const uuid = tebutoData?.uuid || "";
-
 	const blockProps = useBlockProps({
 		style: {
 			backgroundColor: backgroundColor || "ffffff",
@@ -33,7 +30,7 @@ export default function Edit({ attributes, setAttributes }) {
 							setAttributes({ backgroundColor: color });
 						}}
 						enableAlpha
-						defaultValue="#ffffff"
+						defaultValue={bgcolor}
 					/>
 					<ToggleControl
 						label={__("Rahmen anzeigen", "tebuto")}
@@ -47,7 +44,7 @@ export default function Edit({ attributes, setAttributes }) {
 					{__("Tebuto Terminbuchung Widget", "tebuto")}
 				</p>
 				<small style={{ padding: 0, margin: 0 }}>
-					{__("Ihre UUID:", "tebuto")} {uuid}
+					Hier werden Ihre öffentlichen Termine angezeigt
 				</small>
 			</div>
 		</>

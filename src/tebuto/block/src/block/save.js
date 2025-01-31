@@ -1,26 +1,22 @@
 export default function save({ attributes }) {
-    const { backgroundColor, border } = attributes;
+	const { backgroundColor, border } = attributes;
 
-    const uuid = tebutoData?.uuid || '';
+	const uuid = tebutoData?.uuid || "";
 
-    const widgetAttributes = {
-        'data-therapist-uuid': uuid,
-    };
+	const widgetAttributes = {
+		"data-therapist-uuid": uuid,
+	};
 
-    if (border) {
-        widgetAttributes['data-border'] = 'true';
-    }
-    if (backgroundColor && backgroundColor !== '#ffffff') {
-        widgetAttributes['data-background-color'] = backgroundColor;
-    }
+	widgetAttributes["data-border"] = border;
 
-    return (
-        <>
-            <div id="tebuto-booking-widget"/>
-            <script
-                src="https://tebuto.de/widget/booking.js"
-                {...widgetAttributes}
-            />
-        </>
-    );
+	if (backgroundColor && backgroundColor !== "#ffffff") {
+		widgetAttributes["data-background-color"] = backgroundColor;
+	}
+
+	return (
+		<>
+			<div id="tebuto-booking-widget" />
+			<script src="https://tebuto.de/widget/booking.js" {...widgetAttributes} />
+		</>
+	);
 }
