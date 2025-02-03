@@ -32,7 +32,7 @@ function tebuto_admin_page()
         echo 'Mit Tebuto verbunden';
         echo '</h2>';
         echo '<p style="color: white; margin-top: 8px;">';
-        echo 'Du hast dich erfolgreich mit Tebuto verbunden. Du kannst das Plugin nun verwenden.';
+        echo 'Du hast dich erfolgreich mit Tebuto verbunden. Du kannst das Plugin jetzt verwenden.';
         echo '</p>';
         echo '</div>';
         echo '</div>';
