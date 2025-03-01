@@ -15,7 +15,13 @@ function tebuto_widget_shortcode()
         $attributes .= ' data-background-color="' . esc_attr($background_color) . '"';
     }
 
-    return '<div id="tebuto-booking-widget"></div>' .
-        '<script src="https://tebuto.de/widget/booking.js" ' . $attributes . '></script>';
+    // Enqueue the script if it's not already enqueued
+    if (!is_admin()) {
+        // Using file modification time or version number as a cache buster
+        $script_version = '1.0.0'; // You can change this to the actual version number or a timestamp
+        wp_enqueue_script('tebuto-booking-widget', 'https://tebuto.de/widget/booking.js', array(), $script_version, true);
+    }
+
+    return '<div id="tebuto-booking-widget" ' . $attributes . '></div>';
 }
 add_shortcode('tebuto_widget', 'tebuto_widget_shortcode');

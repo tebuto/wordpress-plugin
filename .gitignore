@@ -1,4 +1,4 @@
 plugin/src/*
 !tebuto
 wordpress
-node_modules
+node_modules/*

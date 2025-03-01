@@ -4,20 +4,20 @@ function tebuto_add_admin_menu()
 {
     // Hauptmenü für Tebuto
     add_menu_page(
-        __('Tebuto - Online-Terminbuchung', 'tebuto'),
-        __('Tebuto', 'tebuto'),
+        esc_html__('Tebuto - Online-Terminbuchung', 'tebuto'), 
+        esc_html__('Tebuto', 'tebuto'), 
         'manage_options',
         'tebuto-main',
-        'tebuto_admin_page', // Die Funktion für die Standardseite (Einstellungen)
-        TEBUTO_PLUGIN_URL . 'assets/tebuto_icon.png',
+        'tebuto_admin_page',
+        esc_url(TEBUTO_PLUGIN_URL . 'assets/tebuto_icon.png'),
         100
     );
 
     // Untermenü: Einstellungen
     add_submenu_page(
         'tebuto-main',
-        __('Einstellungen', 'tebuto'),
-        __('Einstellungen', 'tebuto'),
+        esc_html__('Einstellungen', 'tebuto'), 
+        esc_html__('Einstellungen', 'tebuto'), 
         'manage_options',
         'tebuto-integration',
         'tebuto_admin_page'
@@ -26,8 +26,8 @@ function tebuto_add_admin_menu()
     // Untermenü: Shortcode
     add_submenu_page(
         'tebuto-main',
-        __('Shortcode', 'tebuto'),
-        __('Shortcode', 'tebuto'),
+        esc_html__('Shortcode', 'tebuto'), 
+        esc_html__('Shortcode', 'tebuto'), 
         'manage_options',
         'tebuto-shortcode',
         'tebuto_shortcode_page'
