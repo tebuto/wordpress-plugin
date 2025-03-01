@@ -1,5 +1,4 @@
 <?php
-
 function tebuto_widget_shortcode()
 {
     // Get user data

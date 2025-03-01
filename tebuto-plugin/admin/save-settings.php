@@ -43,7 +43,7 @@ function tebuto_save_settings()
         update_user_meta($current_user_id, 'tebuto_border', $border);
 
         // Safe redirection after saving settings
-        wp_safe_redirect(admin_url('admin.php?page=tebuto-integration'));
+        wp_safe_redirect(admin_url('admin.php?page=tebuto-shortcode'));
         exit;
     }
 }

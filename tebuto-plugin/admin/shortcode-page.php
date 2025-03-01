@@ -20,6 +20,9 @@ function tebuto_shortcode_page()
         echo '<pre style="background: #f4f4f4; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">' . esc_html($shortcode) . '</pre>';
         
         echo '<form method="post">';
+        // Add nonce field here for form validation
+        wp_nonce_field('tebuto_save_settings', 'tebuto_nonce');
+        
         echo '<h2 style="margin-top: 35px">' . esc_html__('Shortcode-Widget-Einstellungen', 'tebuto') . '</h2>';
         echo '<table class="form-table">';
         

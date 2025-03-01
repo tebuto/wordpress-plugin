@@ -11,7 +11,7 @@ function tebuto_enqueue_admin_assets()
         'tebuto-admin-style',
         $style_url,
         [],
-        filemtime(plugin_dir_path(__FILE__) . 'css/admin-style.css') // Auto-update version on file change
+        filemtime(TEBUTO_PLUGIN_PATH . 'css/admin-style.css') // Auto-update version on file change
     );
 
     // Enqueue WordPress color picker styles
@@ -22,7 +22,7 @@ function tebuto_enqueue_admin_assets()
         'tebuto-admin-script',
         $script_url,
         ['wp-color-picker'],
-        filemtime(plugin_dir_path(__FILE__) . 'js/admin-script.js'), // Auto-update version
+        filemtime(TEBUTO_PLUGIN_PATH . 'js/admin-script.js'), // Auto-update version
         true
     );
 }
