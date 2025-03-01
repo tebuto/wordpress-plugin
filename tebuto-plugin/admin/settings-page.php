@@ -44,7 +44,7 @@ function tebuto_admin_page()
         echo '<h2 style="margin-top: 40px;">' . esc_html__('Deine nächsten Schritte:', 'tebuto') . '</h2>';
         echo '<ol style="list-style-type: decimal; margin-left: 20px;">';
         echo '<li>' . esc_html__('Erstelle deine', 'tebuto') . ' <a href="' . esc_url('https://app.tebuto.de/einstellungen/termine') . '">' . esc_html__('Terminkategorien', 'tebuto') . '</a></li>';
-        echo '<li>' . esc_html__('Erstelle ein paar', 'tebuto') . ' <a href="' . esc_url('https://app.tebuto.de/kalender') . '">' . esc_html__('Terminserien oder Einzeltermine', 'tebuto') . '</a></li>';
+        echo '<li>' . esc_html__('Erstelle ein paar', 'tebuto') . ' <a href="' . esc_url('https://app.tebuto.de/termin') . '">' . esc_html__('Terminserien oder Einzeltermine', 'tebuto') . '</a></li>';
         echo '<li>' . esc_html__('Verwende den', 'tebuto') . ' <a href="' . esc_url('?page=tebuto-shortcode') . '">' . esc_html__('Shortcode', 'tebuto') . '</a> ' . esc_html__('oder den Tebuto-Gutenberg-Block, um die Terminbuchung auf deiner Website anzuzeigen. Mehr dazu findest du in unserer', 'tebuto') . ' <a href="' . esc_url('https://tebuto.de/dokumentation/oeffentliche-termine') . '">' . esc_html__('Dokumentation', 'tebuto') . '</a>.</li>';
         echo '</ol>';
     }
