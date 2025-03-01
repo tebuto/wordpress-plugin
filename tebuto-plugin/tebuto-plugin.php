@@ -5,6 +5,7 @@ Description: Dieses Plugin integriert die Online-Terminbuchung von Tebuto in Ihr
 Version: 1.0
 Author: Tebuto GmbH
 Author URI: https://tebuto.de?utm_source=wordpress_plugin
+License: GPLv2 or later
 */
 
 if (!defined('ABSPATH')) {

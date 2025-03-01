@@ -1,0 +1,12 @@
+{
+  "name": "wordpress-plugin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "pack": "cd plugin/src/tebuto && zip -r ../../../tebuto.zip . -x \"block/node_modules/*\" -x \"block/src/*\" -x \"block/src/*\" && cd -"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

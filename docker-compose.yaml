@@ -8,7 +8,6 @@ services:
       - "8000:80"
     volumes:
       - ./wordpress:/var/www/html
-      - ./src:/var/www/html/wp-content/plugins
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: root
