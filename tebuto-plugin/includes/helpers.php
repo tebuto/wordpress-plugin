@@ -1,5 +1,9 @@
 <?php
 
+if (! defined('ABSPATH')) {
+	exit; // Exit if accessed directly.
+}
+
 function tebuto_get_base_url()
 {
     return 'https://auth.tebuto.de';
@@ -13,13 +17,13 @@ function tebuto_get_authorize_url()
     $client_id = 'wordpress-plugin';
     $state = wp_create_nonce('tebuto_auth');
 
-    list($code_verifier, $code_challenge) = generate_pkce_challenge();
+    list($code_verifier, $code_challenge) = tebuto_generate_pkce_challenge();
     set_transient('tebuto_pkce_' . get_current_user_id(), $code_verifier, 300);
 
     return "$auth_url?client_id=$client_id&scope=openid offline_access&response_type=code&redirect_uri=$redirect_uri&state=$state&code_challenge=$code_challenge&code_challenge_method=S256";
 }
 
-function generate_pkce_challenge()
+function tebuto_generate_pkce_challenge()
 {
     $code_verifier = wp_generate_password(64, false);
     $code_challenge = rtrim(strtr(base64_encode(hash('sha256', $code_verifier, true)), '+/', '-_'), '=');

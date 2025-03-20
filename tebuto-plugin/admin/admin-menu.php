@@ -1,11 +1,15 @@
 <?php
 
+if (! defined('ABSPATH')) {
+    exit; // Exit if accessed directly.
+}
+
 function tebuto_add_admin_menu()
 {
     // Hauptmenü für Tebuto
     add_menu_page(
-        esc_html__('Tebuto - Online-Terminbuchung', 'tebuto'), 
-        esc_html__('Tebuto', 'tebuto'), 
+        esc_html__('Tebuto - Online-Terminbuchung', 'tebuto-online-terminbuchung'),
+        esc_html__('Tebuto', 'tebuto-online-terminbuchung'),
         'manage_options',
         'tebuto-main',
         'tebuto_admin_page',
@@ -16,8 +20,8 @@ function tebuto_add_admin_menu()
     // Untermenü: Einstellungen
     add_submenu_page(
         'tebuto-main',
-        esc_html__('Einstellungen', 'tebuto'), 
-        esc_html__('Einstellungen', 'tebuto'), 
+        esc_html__('Einstellungen', 'tebuto-online-terminbuchung'),
+        esc_html__('Einstellungen', 'tebuto-online-terminbuchung'),
         'manage_options',
         'tebuto-integration',
         'tebuto_admin_page'
@@ -26,14 +30,14 @@ function tebuto_add_admin_menu()
     // Untermenü: Shortcode
     add_submenu_page(
         'tebuto-main',
-        esc_html__('Shortcode', 'tebuto'), 
-        esc_html__('Shortcode', 'tebuto'), 
+        esc_html__('Shortcode', 'tebuto-online-terminbuchung'),
+        esc_html__('Shortcode', 'tebuto-online-terminbuchung'),
         'manage_options',
         'tebuto-shortcode',
         'tebuto_shortcode_page'
     );
 
-    // Entferne das Duplikat der Hauptseite im Submenü
+    // Entfernt das Duplikat der Hauptseite im Submenü
     remove_submenu_page('tebuto-main', 'tebuto-main');
 }
 add_action('admin_menu', 'tebuto_add_admin_menu');

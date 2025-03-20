@@ -1,4 +1,9 @@
 <?php
+
+if (! defined('ABSPATH')) {
+	exit; // Exit if accessed directly.
+}
+
 function tebuto_widget_shortcode()
 {
     // Get user data

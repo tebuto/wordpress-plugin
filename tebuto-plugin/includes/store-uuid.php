@@ -1,5 +1,9 @@
 <?php
 
+if (! defined('ABSPATH')) {
+    exit; // Exit if accessed directly.
+}
+
 function tebuto_store_therapist_uuid($user_id, $access_token)
 {
     $whoami_url = 'https://therapists.api.tebuto.de/who-am-i';

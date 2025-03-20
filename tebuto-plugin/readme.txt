@@ -1,5 +1,5 @@
 === Tebuto - Online-Terminbuchung ===
-Contributors: deinname  
+Contributors: tebuto  
 Tags: integration, Tebuto, Terminbuchung, online booking  
 Requires at least: 5.0  
 Tested up to: 6.7  
@@ -18,7 +18,23 @@ Mit dem Plugin **Tebuto - Online-Terminbuchung** kannst du die öffentlichen Ter
 - Anzeige öffentlicher Termine mit Shortcode oder Gutenberg-Block
 - Anpassbare Widget-Einstellungen direkt im Dashboard
 
-**Hinweis:** Für die Nutzung des Plugins ist ein kostenloser oder kostenpflichtiger Tebuto-Account erforderlich. Anmeldung unter: [Tebuto Website](https://tebuto.com).
+**Hinweis:** Für die Nutzung des Plugins ist ein kostenloser oder kostenpflichtiger Tebuto-Account erforderlich. Anmeldung unter: [Tebuto Website](https://tebuto.de).
+
+== Externe Services ==
+
+Dieses Plugin verbindet sich mit den APIs von Tebuto (*.tebuto.de), um die Online-Terminbuchungen zu ermöglichen.
+
+Bei der Nutzung des Plugins werden folgende Daten an Tebuto übermittelt:
+
+Benutzerinformationen: Daten wie Name und E-Mail-Adresse, die für die Terminbuchung erforderlich sind.​
+
+Terminangaben: Details zum gebuchten Termin, einschließlich Datum, Uhrzeit und Art des Termins.​
+
+Kommunikationsdaten: Informationen, die für Benachrichtigungen und Erinnerungen notwendig sind.​
+
+Diese Datenübermittlung ist notwendig, um die Funktionen des Plugins bereitzustellen und einen reibungslosen Ablauf der Terminbuchungen zu gewährleisten.​
+
+Tebuto legt großen Wert auf Datenschutz und erfüllt alle Anforderungen der DSGVO. Ihre Daten werden ausschließlich innerhalb der EU gespeichert und verarbeitet. Weitere Informationen finden Sie in den [Datenschutzrichtlinien](https://tebuto.de/datenschutzerklaerung) und [AGB](https://tebuto.de/agb) von Tebuto.
 
 == Installation ==
 1. Lade das Plugin herunter und installiere es über den Plugin-Manager.

@@ -1,5 +1,9 @@
 <?php
 
+if (! defined('ABSPATH')) {
+	exit; // Exit if accessed directly.
+}
+
 function tebuto_save_settings()
 {
     $current_user_id = get_current_user_id();
@@ -10,7 +14,7 @@ function tebuto_save_settings()
         // Entschärfen und Verifizieren des Nonces
         $tebuto_nonce = isset($_POST['tebuto_nonce']) ? wp_unslash($_POST['tebuto_nonce']) : ''; // wp_unslash()
         if (!isset($tebuto_nonce) || !wp_verify_nonce($tebuto_nonce, 'tebuto_disconnect')) {
-            wp_die(esc_html__('Ungültige Anfrage. Bitte versuche es erneut.', 'tebuto'));
+            wp_die(esc_html__('Ungültige Anfrage. Bitte versuche es erneut.', 'tebuto-online-terminbuchung'));
         }
 
         // Safely delete user meta
@@ -31,7 +35,7 @@ function tebuto_save_settings()
         // Entschärfen und Verifizieren des Nonces
         $tebuto_nonce = isset($_POST['tebuto_nonce']) ? wp_unslash($_POST['tebuto_nonce']) : ''; // wp_unslash()
         if (!isset($tebuto_nonce) || !wp_verify_nonce($tebuto_nonce, 'tebuto_save_settings')) {
-            wp_die(esc_html__('Ungültige Anfrage. Bitte versuche es erneut.', 'tebuto'));
+            wp_die(esc_html__('Ungültige Anfrage. Bitte versuche es erneut.', 'tebuto-online-terminbuchung'));
         }
 
         // Sanitize und validiere Eingabewerte

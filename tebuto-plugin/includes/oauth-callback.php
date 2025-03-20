@@ -1,5 +1,9 @@
 <?php
 
+if (! defined('ABSPATH')) {
+	exit; // Exit if accessed directly.
+}
+
 function tebuto_handle_oauth_callback()
 {
     if (!isset($_GET['page']) || sanitize_text_field(wp_unslash($_GET['page'])) !== 'tebuto-integration') {
@@ -12,7 +16,7 @@ function tebuto_handle_oauth_callback()
 
     $state = sanitize_text_field(wp_unslash($_GET['state']));
     if (!wp_verify_nonce($state, 'tebuto_auth')) {
-        wp_die(esc_html__('Ungültiger State-Wert. Authentifizierung fehlgeschlagen.', 'tebuto'));
+        wp_die(esc_html__('Ungültiger State-Wert. Authentifizierung fehlgeschlagen.', 'tebuto-online-terminbuchung'));
     }
 
     $code = sanitize_text_field(wp_unslash($_GET['code']));
@@ -25,7 +29,7 @@ function tebuto_handle_oauth_callback()
     $code_verifier = sanitize_text_field(get_transient('tebuto_pkce_' . $current_user_id));
 
     if (!$code_verifier) {
-        wp_die(esc_html__('PKCE Code Verifier nicht gefunden. Authentifizierung fehlgeschlagen.', 'tebuto'));
+        wp_die(esc_html__('PKCE Code Verifier nicht gefunden. Authentifizierung fehlgeschlagen.', 'tebuto-online-terminbuchung'));
     }
 
     $response = wp_remote_post($token_url, [
@@ -39,13 +43,13 @@ function tebuto_handle_oauth_callback()
     ]);
 
     if (is_wp_error($response)) {
-        wp_die(esc_html__('Fehler bei der Token-Anfrage.', 'tebuto'));
+        wp_die(esc_html__('Fehler bei der Token-Anfrage.', 'tebuto-online-terminbuchung'));
     }
 
     $response_body = json_decode(wp_remote_retrieve_body($response), true);
 
     if (!isset($response_body['access_token'], $response_body['refresh_token'])) {
-        wp_die(esc_html__('Fehler beim Abrufen der Tokens.', 'tebuto'));
+        wp_die(esc_html__('Fehler beim Abrufen der Tokens.', 'tebuto-online-terminbuchung'));
     }
 
     // Sanitize tokens before saving
