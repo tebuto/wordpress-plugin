@@ -1,10 +1,10 @@
 <?php
 
 if (! defined('ABSPATH')) {
-	exit; // Exit if accessed directly.
+    exit; // Exit if accessed directly.
 }
 
-function tebuto_enqueue_admin_assets()
+function tebuto_online_terminbuchung_enqueue_admin_assets()
 {
     // Define paths to assets
     $style_url = esc_url(TEBUTO_PLUGIN_URL . 'css/admin-style.css');
@@ -30,4 +30,4 @@ function tebuto_enqueue_admin_assets()
         true
     );
 }
-add_action('admin_enqueue_scripts', 'tebuto_enqueue_admin_assets');
+add_action('admin_enqueue_scripts', 'tebuto_online_terminbuchung_enqueue_admin_assets');

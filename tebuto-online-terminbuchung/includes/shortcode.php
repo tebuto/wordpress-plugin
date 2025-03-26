@@ -1,16 +1,16 @@
 <?php
 
 if (! defined('ABSPATH')) {
-	exit; // Exit if accessed directly.
+    exit; // Exit if accessed directly.
 }
 
-function tebuto_widget_shortcode()
+function tebuto_online_terminbuchung_widget_shortcode()
 {
     // Get user data
     $current_user_id = get_current_user_id();
-    $therapist_uuid = get_user_meta($current_user_id, 'tebuto_therapist_uuid', true);
-    $background_color = get_user_meta($current_user_id, 'tebuto_background_color', true) ?: '#ffffff';
-    $border = get_user_meta($current_user_id, 'tebuto_border', true) ?: 'false';
+    $therapist_uuid = get_user_meta($current_user_id, 'tebuto_online_terminbuchung_therapist_uuid', true);
+    $background_color = get_user_meta($current_user_id, 'tebuto_online_terminbuchung_background_color', true) ?: '#ffffff';
+    $border = get_user_meta($current_user_id, 'tebuto_online_terminbuchung_border', true) ?: 'false';
 
     // Prepare attributes for the script tag
     $attributes = array(
@@ -32,4 +32,4 @@ function tebuto_widget_shortcode()
 
     return '<div id="tebuto-booking-widget"></div>';
 }
-add_shortcode('tebuto_widget', 'tebuto_widget_shortcode');
+add_shortcode('tebuto_online_terminbuchung_widget', 'tebuto_online_terminbuchung_widget_shortcode');

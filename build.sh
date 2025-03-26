@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define variables
-PLUGIN_SLUG="tebuto"
+PLUGIN_SLUG="tebuto-online-terminbuchung"
 BUILD_DIR=".build"
 ZIP_FILE="${PLUGIN_SLUG}.zip"
 
@@ -16,23 +16,24 @@ mkdir $BUILD_DIR
 
 # Copy necessary plugin files
 echo "Copying plugin files..."
-cp tebuto-plugin/tebuto-plugin.php $BUILD_DIR
-cp -R tebuto-plugin/admin $BUILD_DIR
-cp -R tebuto-plugin/assets $BUILD_DIR
-cp -R tebuto-plugin/css $BUILD_DIR
-cp -R tebuto-plugin/includes $BUILD_DIR
-cp -R tebuto-plugin/js $BUILD_DIR
-cp -R tebuto-plugin/readme.txt $BUILD_DIR
+cp tebuto-online-terminbuchung/tebuto-plugin.php $BUILD_DIR
+cp -R tebuto-online-terminbuchung/admin $BUILD_DIR
+cp -R tebuto-online-terminbuchung/assets $BUILD_DIR
+cp -R tebuto-online-terminbuchung/css $BUILD_DIR
+cp -R tebuto-online-terminbuchung/includes $BUILD_DIR
+cp -R tebuto-online-terminbuchung/js $BUILD_DIR
+cp -R tebuto-online-terminbuchung/languages $BUILD_DIR
+cp -R tebuto-online-terminbuchung/readme.txt $BUILD_DIR
 
 # Build Gutenberg block
 echo "Building Gutenberg block..."
-cd tebuto-plugin/block
+cd tebuto-online-terminbuchung/block
 npm install
 npm run build
 cd ../..
 
 # Copy the build output to the build directory
-rsync -av --exclude='node_modules' --exclude='*.map' --exclude='.git' tebuto-plugin/block $BUILD_DIR
+rsync -av --exclude='node_modules' --exclude='*.map' --exclude='.git' tebuto-online-terminbuchung/block $BUILD_DIR
 
 
 # Create the zip archive

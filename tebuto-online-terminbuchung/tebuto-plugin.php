@@ -1,16 +1,24 @@
 <?php
 /*
-Plugin Name: Tebuto - Online-Terminbuchung
-Description: Dieses Plugin integriert die Online-Terminbuchung von Tebuto in Ihre WordPress-Website.
-Version: 1.0
-Author: Tebuto GmbH
-Author URI: https://tebuto.de?utm_source=wordpress_plugin
-License: GPLv2 or later
+* Plugin Name: Tebuto - Online-Terminbuchung
+* Text Domain: tebuto-online-terminbuchung
+* Description: Dieses Plugin integriert die Online-Terminbuchung von Tebuto in Ihre WordPress-Website.
+* Version: 1.0
+* Author: Tebuto GmbH
+* Author URI: https://tebuto.de?utm_source=wordpress_plugin
+* License: GPLv2 or later
 */
 
 if (!defined('ABSPATH')) {
     exit; // Sicherheitsmaßnahme: Verhindert direkten Zugriff auf die Datei.
 }
+
+// Sprachdateien laden
+function tebuto_online_terminbuchung_load_textdomain()
+{
+    load_plugin_textdomain('tebuto-online-terminbuchung', false, dirname(plugin_basename(__FILE__)) . '/languages/');
+}
+add_action('plugins_loaded', 'tebuto_online_terminbuchung_load_textdomain');
 
 // Konstanten definieren
 define('TEBUTO_PLUGIN_PATH', plugin_dir_path(__FILE__));

@@ -19,10 +19,10 @@ export default function Edit({ attributes, setAttributes }) {
 		<>
 			<InspectorControls>
 				<PanelBody
-					title={__("Widget-Einstellungen", "tebuto")}
+					title={__("Widget-Einstellungen", "tebuto-online-terminbuchung")}
 					initialOpen={true}
 				>
-					<label>{__("Hintergrundfarbe", "tebuto")}</label>
+					<label>{__("Hintergrundfarbe", "tebuto-online-terminbuchung")}</label>
 					<ColorPicker
 						value={bgcolor}
 						onChange={(color) => {
@@ -33,7 +33,7 @@ export default function Edit({ attributes, setAttributes }) {
 						defaultValue={bgcolor}
 					/>
 					<ToggleControl
-						label={__("Rahmen anzeigen", "tebuto")}
+						label={__("Rahmen anzeigen", "tebuto-online-terminbuchung")}
 						checked={border}
 						onChange={(value) => setAttributes({ border: value })}
 					/>
@@ -41,7 +41,7 @@ export default function Edit({ attributes, setAttributes }) {
 			</InspectorControls>
 			<div {...blockProps}>
 				<p style={{ fontWeight: "bold", padding: 0, margin: 0 }}>
-					{__("Tebuto Terminbuchung Widget", "tebuto")}
+					{__("Tebuto Terminbuchung Widget", "tebuto-online-terminbuchung")}
 				</p>
 				<small style={{ padding: 0, margin: 0 }}>
 					Hier werden Ihre öffentlichen Termine angezeigt
