@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  wordpress:
+    image: wordpress:latest
+    platform: linux/arm64 # Definiert die Plattform
+    ports:
+      - "8000:80"
+    volumes:
+      - ./wordpress:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: example
+      WORDPRESS_DB_NAME: wordpress
+
+  db:
+    image: mariadb:10.5
+    platform: linux/arm64 # Definiert die Plattform
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: wordpress
