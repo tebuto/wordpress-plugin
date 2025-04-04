@@ -18,7 +18,7 @@ Mit dem Plugin **Tebuto - Online-Terminbuchung** kannst du die öffentlichen Ter
 - Anzeige öffentlicher Termine mit Shortcode oder Gutenberg-Block
 - Anpassbare Widget-Einstellungen direkt im Dashboard
 
-**Hinweis:** Für die Nutzung des Plugins ist ein kostenloser oder kostenpflichtiger Tebuto-Account erforderlich. Anmeldung unter: [Tebuto Website](https://tebuto.de).
+**Hinweis:** Für die Nutzung des Plugins ist ein kostenloser oder kostenpflichtiger Tebuto-Account erforderlich. Anmeldung unter: [Tebuto Website](https://tebuto.de?utm_source=wordpress&utm_medium=social&utm_campaign=plugin).
 
 == Externe Services ==
 
@@ -34,19 +34,22 @@ Kommunikationsdaten: Informationen, die für Benachrichtigungen und Erinnerungen
 
 Diese Datenübermittlung ist notwendig, um die Funktionen des Plugins bereitzustellen und einen reibungslosen Ablauf der Terminbuchungen zu gewährleisten.​
 
-Tebuto legt großen Wert auf Datenschutz und erfüllt alle Anforderungen der DSGVO. Ihre Daten werden ausschließlich innerhalb der EU gespeichert und verarbeitet. Weitere Informationen finden Sie in den [Datenschutzrichtlinien](https://tebuto.de/datenschutzerklaerung) und [AGB](https://tebuto.de/agb) von Tebuto.
+Tebuto legt großen Wert auf Datenschutz und erfüllt alle Anforderungen der DSGVO. Ihre Daten werden ausschließlich innerhalb der EU gespeichert und verarbeitet. Weitere Informationen finden Sie in den [Datenschutzrichtlinien](https://tebuto.de/datenschutzerklaerung?utm_source=wordpress&utm_medium=social&utm_campaign=plugin) und [AGB](https://tebuto.de/agb?utm_source=wordpress&utm_medium=social&utm_campaign=plugin) von Tebuto.
 
 == Installation ==
 1. Lade das Plugin herunter und installiere es über den Plugin-Manager.
 2. Gehe zu den Plugin-Einstellungen und verbinde dein Tebuto-Konto.
 3. Konfiguriere die gewünschten Einstellungen und Funktionen.
 
-== Häufige Fragen ==
+== Screenshots ==
+
+== Frequently Asked Questions ==
+
 = Ist ein Tebuto-Account notwendig? =
 Ja, um dieses Plugin nutzen zu können, benötigst du einen Tebuto-Account. 
 
 = Ist das Plugin kostenlos? =
-Ja, das Plugin selbst ist kostenlos. Für einige Funktionen in Tebuto könnten Gebühren anfallen.
+Ja, das Plugin selbst ist kostenlos. Für einige Funktionen in Tebuto können Gebühren anfallen.
 
 == Changelog ==
 = 1.0 =
