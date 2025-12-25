@@ -1,4 +1,2 @@
-plugin/src/*
-!tebuto
 wordpress
 node_modules
