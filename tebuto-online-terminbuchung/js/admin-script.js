@@ -18,6 +18,7 @@
         initBookingActions();
         initModalHandlers();
         initViewBookingDetails();
+        initBookingFilters();
     }
 
     /**
@@ -180,6 +181,69 @@
 
             showBookingModal(booking);
         });
+    }
+
+    /**
+     * Initialize booking filter interactions
+     */
+    function initBookingFilters() {
+        const $form = $('#tebuto-bookings-filter-form');
+        if (!$form.length) {
+            return;
+        }
+
+        const $dateFrom = $('#date_from');
+        const $dateTo = $('#date_to');
+
+        // Date preset buttons
+        $('.tebuto-date-preset').on('click', function () {
+            const $btn = $(this);
+            const fromDate = $btn.data('from');
+            const toDate = $btn.data('to');
+
+            // Update inputs
+            $dateFrom.val(fromDate);
+            $dateTo.val(toDate);
+
+            // Update active state
+            $('.tebuto-date-preset').removeClass('active');
+            $btn.addClass('active');
+        });
+
+        // Remove preset active state when manually changing dates
+        $dateFrom.add($dateTo).on('change', function () {
+            updatePresetActiveState();
+        });
+
+        // Status chip selection
+        $('.tebuto-status-chip').on('click', function () {
+            $('.tebuto-status-chip').removeClass('active');
+            $(this).addClass('active');
+        });
+
+        /**
+         * Update preset button active state based on current date values
+         */
+        function updatePresetActiveState() {
+            const currentFrom = $dateFrom.val();
+            const currentTo = $dateTo.val();
+            let foundMatch = false;
+
+            $('.tebuto-date-preset').each(function () {
+                const $btn = $(this);
+                const presetFrom = $btn.data('from');
+                const presetTo = $btn.data('to');
+
+                if (currentFrom === presetFrom && currentTo === presetTo) {
+                    $btn.addClass('active');
+                    foundMatch = true;
+                } else {
+                    $btn.removeClass('active');
+                }
+            });
+
+            return foundMatch;
+        }
     }
 
     /**

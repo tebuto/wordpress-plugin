@@ -22,11 +22,10 @@ function tebuto_dashboard_page(): void {
 
     // Get data for dashboard
     $today = wp_date('Y-m-d\T00:00:00');
-    $week_end = wp_date('Y-m-d\T23:59:59', strtotime('+7 days'));
+    $today_end = wp_date('Y-m-d\T23:59:59');
     $month_start = wp_date('Y-m-01\T00:00:00');
-    $month_end = wp_date('Y-m-t\T23:59:59');
 
-    $upcoming_events = $api->get_events($today, $week_end);
+    $upcoming_events = $api->get_events($today, $today_end);
     $bookings_result = $api->get_bookings([
         'start' => $month_start,
         'page_size' => 100,
@@ -58,16 +57,6 @@ function tebuto_dashboard_page(): void {
             </div>
 
             <div class="tebuto-stat-card">
-                <div class="tebuto-stat-icon tebuto-stat-icon-warning">
-                    <span class="dashicons dashicons-clock"></span>
-                </div>
-                <div class="tebuto-stat-content">
-                    <span class="tebuto-stat-number"><?php echo esc_html($stats['pending_count']); ?></span>
-                    <span class="tebuto-stat-label"><?php esc_html_e('Ausstehende Bestätigungen', 'tebuto-online-terminbuchung'); ?></span>
-                </div>
-            </div>
-
-            <div class="tebuto-stat-card">
                 <div class="tebuto-stat-icon tebuto-stat-icon-success">
                     <span class="dashicons dashicons-yes-alt"></span>
                 </div>
@@ -92,20 +81,23 @@ function tebuto_dashboard_page(): void {
             <!-- Upcoming Appointments -->
             <div class="tebuto-card">
                 <div class="tebuto-card-header">
-                    <h2><?php esc_html_e('Kommende Termine (7 Tage)', 'tebuto-online-terminbuchung'); ?></h2>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=tebuto-calendar')); ?>" class="button button-small">
-                        <?php esc_html_e('Kalender öffnen', 'tebuto-online-terminbuchung'); ?>
+                    <h2><?php esc_html_e('Termine heute', 'tebuto-online-terminbuchung'); ?></h2>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=tebuto-bookings')); ?>" class="button button-small">
+                        <?php esc_html_e('Alle Buchungen', 'tebuto-online-terminbuchung'); ?>
                     </a>
                 </div>
                 <div class="tebuto-card-body">
-                    <?php if (is_wp_error($upcoming_events)) : ?>
-                        <p class="tebuto-error"><?php echo esc_html($api->get_last_error()); ?></p>
-                    <?php elseif (empty($upcoming_events['rules']) && empty($upcoming_events['standalone'])) : ?>
-                        <p class="tebuto-empty-state"><?php esc_html_e('Keine anstehenden Termine in den nächsten 7 Tagen.', 'tebuto-online-terminbuchung'); ?></p>
+                    <?php
+                    $all_events = [];
+                    if (!is_wp_error($upcoming_events) && is_array($upcoming_events)) {
+                        $all_events = tebuto_merge_events($upcoming_events);
+                    }
+                    ?>
+                    <?php if (empty($all_events)) : ?>
+                        <p class="tebuto-empty-state"><?php esc_html_e('Keine Termine für heute.', 'tebuto-online-terminbuchung'); ?></p>
                     <?php else : ?>
                         <ul class="tebuto-event-list">
                             <?php
-                            $all_events = tebuto_merge_events($upcoming_events);
                             $displayed = 0;
                             foreach ($all_events as $event) :
                                 if ($displayed >= 10) break;
@@ -129,83 +121,6 @@ function tebuto_dashboard_page(): void {
                             <?php endforeach; ?>
                         </ul>
                     <?php endif; ?>
-                </div>
-            </div>
-
-            <!-- Pending Confirmations -->
-            <div class="tebuto-card">
-                <div class="tebuto-card-header">
-                    <h2><?php esc_html_e('Ausstehende Bestätigungen', 'tebuto-online-terminbuchung'); ?></h2>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=tebuto-bookings&status=booked')); ?>" class="button button-small">
-                        <?php esc_html_e('Alle anzeigen', 'tebuto-online-terminbuchung'); ?>
-                    </a>
-                </div>
-                <div class="tebuto-card-body">
-                    <?php
-                    $pending_bookings = $api->get_bookings(['status' => 'booked', 'page_size' => 5]);
-                    if (is_wp_error($pending_bookings)) :
-                    ?>
-                        <p class="tebuto-error"><?php echo esc_html($api->get_last_error()); ?></p>
-                    <?php elseif (empty($pending_bookings['bookings'])) : ?>
-                        <p class="tebuto-empty-state"><?php esc_html_e('Keine ausstehenden Bestätigungen.', 'tebuto-online-terminbuchung'); ?></p>
-                    <?php else : ?>
-                        <ul class="tebuto-booking-list">
-                            <?php foreach ($pending_bookings['bookings'] as $booking) : ?>
-                                <li class="tebuto-booking-item">
-                                    <div class="tebuto-booking-info">
-                                        <span class="tebuto-booking-client">
-                                            <?php echo esc_html($booking['client']['firstName'] . ' ' . $booking['client']['lastName']); ?>
-                                        </span>
-                                        <span class="tebuto-booking-category">
-                                            <?php echo esc_html($booking['event']['category']['name'] ?? ''); ?>
-                                        </span>
-                                        <span class="tebuto-booking-time">
-                                            <?php echo esc_html(tebuto_format_event_datetime($booking['event']['start'], $booking['event']['end'])); ?>
-                                        </span>
-                                    </div>
-                                    <div class="tebuto-booking-actions">
-                                        <button type="button" class="button button-small button-primary tebuto-confirm-booking" data-booking-id="<?php echo esc_attr($booking['id']); ?>">
-                                            <?php esc_html_e('Bestätigen', 'tebuto-online-terminbuchung'); ?>
-                                        </button>
-                                        <button type="button" class="button button-small tebuto-reject-booking" data-booking-id="<?php echo esc_attr($booking['id']); ?>">
-                                            <?php esc_html_e('Ablehnen', 'tebuto-online-terminbuchung'); ?>
-                                        </button>
-                                    </div>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="tebuto-card">
-                <div class="tebuto-card-header">
-                    <h2><?php esc_html_e('Schnellzugriff', 'tebuto-online-terminbuchung'); ?></h2>
-                </div>
-                <div class="tebuto-card-body">
-                    <div class="tebuto-quick-actions">
-                        <a href="<?php echo esc_url(admin_url('admin.php?page=tebuto-calendar')); ?>" class="tebuto-quick-action">
-                            <span class="dashicons dashicons-calendar-alt"></span>
-                            <span><?php esc_html_e('Kalender', 'tebuto-online-terminbuchung'); ?></span>
-                        </a>
-                        <a href="<?php echo esc_url(admin_url('admin.php?page=tebuto-bookings')); ?>" class="tebuto-quick-action">
-                            <span class="dashicons dashicons-list-view"></span>
-                            <span><?php esc_html_e('Buchungen', 'tebuto-online-terminbuchung'); ?></span>
-                        </a>
-                        <a href="<?php echo esc_url(admin_url('admin.php?page=tebuto-categories')); ?>" class="tebuto-quick-action">
-                            <span class="dashicons dashicons-category"></span>
-                            <span><?php esc_html_e('Kategorien', 'tebuto-online-terminbuchung'); ?></span>
-                        </a>
-                        <a href="<?php echo esc_url(admin_url('admin.php?page=tebuto-shortcode')); ?>" class="tebuto-quick-action">
-                            <span class="dashicons dashicons-shortcode"></span>
-                            <span><?php esc_html_e('Shortcode', 'tebuto-online-terminbuchung'); ?></span>
-                        </a>
-                        <a href="https://app.tebuto.de" target="_blank" rel="noopener noreferrer" class="tebuto-quick-action">
-                            <span class="dashicons dashicons-external"></span>
-                            <span><?php esc_html_e('Tebuto öffnen', 'tebuto-online-terminbuchung'); ?></span>
-                        </a>
-                    </div>
                 </div>
             </div>
 
@@ -234,9 +149,14 @@ function tebuto_dashboard_page(): void {
                                             · <?php echo esc_html(number_format((float) $category['price'], 2, ',', '.')); ?> €
                                         </span>
                                     </div>
-                                    <?php if ($category['publicBookingEnabled']) : ?>
-                                        <span class="tebuto-badge tebuto-badge-info"><?php esc_html_e('Öffentlich', 'tebuto-online-terminbuchung'); ?></span>
-                                    <?php endif; ?>
+                                    <div class="tebuto-category-badges">
+                                        <?php if ($category['publicBookingEnabled']) : ?>
+                                            <span class="tebuto-badge tebuto-badge-success"><?php esc_html_e('Öffentlich', 'tebuto-online-terminbuchung'); ?></span>
+                                        <?php endif; ?>
+                                        <?php if ($category['privateBookingEnabled']) : ?>
+                                            <span class="tebuto-badge tebuto-badge-info"><?php esc_html_e('Privat', 'tebuto-online-terminbuchung'); ?></span>
+                                        <?php endif; ?>
+                                    </div>
                                 </li>
                             <?php endforeach; ?>
                         </ul>
@@ -258,7 +178,6 @@ function tebuto_dashboard_page(): void {
 function tebuto_calculate_dashboard_stats($bookings_result, $events_result): array {
     $stats = [
         'upcoming_count'  => 0,
-        'pending_count'   => 0,
         'confirmed_count' => 0,
     ];
 
@@ -272,9 +191,7 @@ function tebuto_calculate_dashboard_stats($bookings_result, $events_result): arr
     if (!is_wp_error($bookings_result) && !empty($bookings_result['bookings'])) {
         foreach ($bookings_result['bookings'] as $booking) {
             $status = $booking['event']['status'] ?? '';
-            if ($status === 'booked') {
-                $stats['pending_count']++;
-            } elseif ($status === 'approved') {
+            if ($status === 'approved') {
                 $stats['confirmed_count']++;
             }
         }

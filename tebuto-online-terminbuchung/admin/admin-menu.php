@@ -34,16 +34,6 @@ function tebuto_add_admin_menu(): void {
         'tebuto_dashboard_page'
     );
 
-    // Submenu: Calendar
-    add_submenu_page(
-        'tebuto-main',
-        __('Kalender', 'tebuto-online-terminbuchung'),
-        __('Kalender', 'tebuto-online-terminbuchung'),
-        'manage_options',
-        'tebuto-calendar',
-        'tebuto_calendar_page'
-    );
-
     // Submenu: Bookings
     add_submenu_page(
         'tebuto-main',
@@ -74,11 +64,11 @@ function tebuto_add_admin_menu(): void {
         'tebuto_shortcode_page'
     );
 
-    // Submenu: Settings (Connection)
+    // Submenu: Connection
     add_submenu_page(
         'tebuto-main',
-        __('Einstellungen', 'tebuto-online-terminbuchung'),
-        __('Einstellungen', 'tebuto-online-terminbuchung'),
+        __('Verbindung', 'tebuto-online-terminbuchung'),
+        __('Verbindung', 'tebuto-online-terminbuchung'),
         'manage_options',
         'tebuto-integration',
         'tebuto_admin_page'

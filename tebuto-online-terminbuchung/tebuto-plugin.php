@@ -51,7 +51,7 @@ define('TEBUTO_AUTH_URL', 'https://auth.tebuto.de');
 /**
  * Tebuto Widget URL.
  */
-define('TEBUTO_WIDGET_URL', 'https://app.tebuto.de/widget/booking-widget.iife.js');
+define('TEBUTO_WIDGET_URL', 'https://tebuto.de/widget/booking.js');
 
 /**
  * Tebuto OAuth Client ID.
@@ -83,7 +83,6 @@ require_once TEBUTO_PLUGIN_PATH . 'admin/enqueue-assets.php';
 // Admin pages
 require_once TEBUTO_PLUGIN_PATH . 'admin/pages/dashboard-page.php';
 require_once TEBUTO_PLUGIN_PATH . 'admin/pages/categories-page.php';
-require_once TEBUTO_PLUGIN_PATH . 'admin/pages/calendar-page.php';
 require_once TEBUTO_PLUGIN_PATH . 'admin/pages/bookings-page.php';
 
 // Block registration
@@ -186,11 +185,6 @@ add_action('admin_menu', 'tebuto_register_admin_menu');
  */
 function tebuto_admin_enqueue_scripts(string $hook_suffix): void {
     tebuto_enqueue_admin_assets($hook_suffix);
-    
-    // Load calendar assets on calendar page
-    if (strpos($hook_suffix, 'tebuto-calendar') !== false) {
-        tebuto_enqueue_calendar_assets();
-    }
 }
 add_action('admin_enqueue_scripts', 'tebuto_admin_enqueue_scripts');
 

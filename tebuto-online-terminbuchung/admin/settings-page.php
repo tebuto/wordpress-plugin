@@ -18,16 +18,10 @@ function tebuto_admin_page(): void {
     ?>
     <div class="wrap tebuto-admin-wrap">
         <div class="tebuto-header">
-            <h1><?php esc_html_e('Tebuto Online-Terminbuchung', 'tebuto-online-terminbuchung'); ?></h1>
-            <?php if ($is_connected) : ?>
-                <form method="post" class="tebuto-disconnect-form">
-                    <?php wp_nonce_field('tebuto_disconnect', 'tebuto_nonce'); ?>
-                    <input type="hidden" name="tebuto_disconnect" value="1">
-                    <button type="submit" class="button tebuto-btn-danger" onclick="return confirm('<?php echo esc_js(__('Möchtest du die Verbindung wirklich trennen?', 'tebuto-online-terminbuchung')); ?>');">
-                        <?php esc_html_e('Verbindung trennen', 'tebuto-online-terminbuchung'); ?>
-                    </button>
-                </form>
-            <?php endif; ?>
+            <h1><?php esc_html_e('Verbindung', 'tebuto-online-terminbuchung'); ?></h1>
+            <a href="<?php echo esc_url(admin_url('admin.php?page=tebuto-main')); ?>" class="button">
+                <?php esc_html_e('← Dashboard', 'tebuto-online-terminbuchung'); ?>
+            </a>
         </div>
 
         <?php if (! $is_connected) : ?>
@@ -54,15 +48,19 @@ function tebuto_admin_page(): void {
                 </div>
             </div>
 
-            <div class="tebuto-settings-actions">
-                <a href="<?php echo esc_url(admin_url('admin.php?page=tebuto-main')); ?>" class="button button-primary button-hero">
-                    <span class="dashicons dashicons-dashboard"></span>
-                    <?php esc_html_e('Zum Dashboard', 'tebuto-online-terminbuchung'); ?>
-                </a>
-                <a href="<?php echo esc_url(admin_url('admin.php?page=tebuto-shortcode')); ?>" class="button button-hero">
-                    <span class="dashicons dashicons-shortcode"></span>
-                    <?php esc_html_e('Widget einbinden', 'tebuto-online-terminbuchung'); ?>
-                </a>
+            <div class="tebuto-card" style="max-width: 500px;">
+                <div class="tebuto-card-body">
+                    <p style="margin: 0 0 16px; color: var(--tebuto-text-secondary);">
+                        <?php esc_html_e('Um die Verbindung zu trennen, klicke auf den Button unten. Du kannst dich jederzeit wieder verbinden.', 'tebuto-online-terminbuchung'); ?>
+                    </p>
+                    <form method="post" class="tebuto-disconnect-form">
+                        <?php wp_nonce_field('tebuto_disconnect', 'tebuto_nonce'); ?>
+                        <input type="hidden" name="tebuto_disconnect" value="1">
+                        <button type="submit" class="button tebuto-btn-danger" onclick="return confirm('<?php echo esc_js(__('Möchtest du die Verbindung wirklich trennen?', 'tebuto-online-terminbuchung')); ?>');">
+                            <?php esc_html_e('Verbindung trennen', 'tebuto-online-terminbuchung'); ?>
+                        </button>
+                    </form>
+                </div>
             </div>
         <?php endif; ?>
     </div>
