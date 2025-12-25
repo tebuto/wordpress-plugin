@@ -103,6 +103,20 @@ Unter **Tebuto → Shortcode** kannst du die Hintergrundfarbe ändern und einen 
 
 == Changelog ==
 
+= 2.0.0 =
+* **NEU: Dashboard** - Übersicht über anstehende Termine direkt im WordPress-Admin
+* **NEU: Terminverwaltung** - Termine einsehen, bestätigen und absagen
+* **NEU: Kategorienverwaltung** - Terminkategorien direkt im Plugin verwalten
+* **NEU: Theme Presets** - Vordefinierte Farbschemata für schnelle Anpassung
+* **NEU: Erweiterte Widget-Konfiguration** - Primärfarbe, Textfarben, Rahmenfarbe anpassbar
+* **NEU: Live-Vorschau** - Änderungen am Widget in Echtzeit sehen
+* **NEU: Kategorienfilter** - Widget auf bestimmte Kategorien einschränken (Multiselect)
+* **NEU: Schnellfilter** - Filter-Option für Multi-User-Konten
+* **NEU: Custom CSS** - Eigenes CSS für individuelle Anpassungen
+* **NEU: Schriftart übernehmen** - Option zur Übernahme der Website-Schriftart
+* **Verbesserung: Gutenberg-Block** - Alle Einstellungen direkt im Block-Editor verfügbar
+* **Verbesserung: Shortcode-Seite** - Komplett überarbeitete Oberfläche
+
 = 1.0.0 =
 * Erste stabile Version
 * OAuth-Integration mit Tebuto
@@ -112,6 +126,9 @@ Unter **Tebuto → Shortcode** kannst du die Hintergrundfarbe ändern und einen 
 * Professionelles Admin-Interface
 
 == Upgrade Notice ==
+
+= 2.0.0 =
+Großes Update mit Dashboard, Terminverwaltung, erweiterten Widget-Einstellungen und Live-Vorschau!
 
 = 1.0.0 =
 Erste stabile Version des Tebuto Plugins.
