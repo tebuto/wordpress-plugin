@@ -1,53 +1,97 @@
 <?php
+/**
+ * Tebuto shortcode settings page.
+ *
+ * @package Tebuto
+ */
 
-if (! defined('ABSPATH')) {
-    exit; // Exit if accessed directly.
-}
+defined('ABSPATH') || exit;
 
-function tebuto_online_terminbuchung_shortcode_page()
-{
-    $current_user_id = get_current_user_id();
-    $therapist_uuid = get_user_meta($current_user_id, 'tebuto_online_terminbuchung_therapist_uuid', true);
-    $background_color = get_user_meta($current_user_id, 'tebuto_online_terminbuchung_background_color', true) ?: '#ffffff';
-    $border = get_user_meta($current_user_id, 'tebuto_online_terminbuchung_border', true) ?: 'false';
+/**
+ * Render the shortcode settings page.
+ *
+ * @return void
+ */
+function tebuto_shortcode_page(): void {
+    $current_user_id  = get_current_user_id();
+    $therapist_uuid   = tebuto_get_user_meta($current_user_id, 'therapist_uuid');
+    $background_color = tebuto_get_user_meta($current_user_id, 'background_color', '#ffffff');
+    $border           = tebuto_get_user_meta($current_user_id, 'border', 'false');
 
-    echo '<div class="wrap">';
-    echo '<h1>' . esc_html__('Shortcode', 'tebuto-online-terminbuchung') . '</h1>';
+    ?>
+    <div class="wrap tebuto-admin-wrap">
+        <h1><?php esc_html_e('Shortcode', 'tebuto-online-terminbuchung'); ?></h1>
 
-    if (!$therapist_uuid) {
-        echo '<p>' . esc_html__('Sie müssen sich zuerst mit Tebuto verbinden, um den Shortcode zu generieren.', 'tebuto-online-terminbuchung') . '</p>';
-    } else {
-        // Shortcode generieren
-        $shortcode = '[tebuto_online_terminbuchung_widget]';
+        <?php if (empty($therapist_uuid)) : ?>
+            <div class="tebuto-card tebuto-card-warning">
+                <p><?php esc_html_e('Du musst dich zuerst mit Tebuto verbinden, um den Shortcode zu verwenden.', 'tebuto-online-terminbuchung'); ?></p>
+                <a href="<?php echo esc_url(admin_url('admin.php?page=tebuto-integration')); ?>" class="button button-primary">
+                    <?php esc_html_e('Zu den Einstellungen', 'tebuto-online-terminbuchung'); ?>
+                </a>
+            </div>
+        <?php else : ?>
+            <div class="tebuto-card">
+                <h2><?php esc_html_e('Shortcode kopieren', 'tebuto-online-terminbuchung'); ?></h2>
+                <p><?php esc_html_e('Füge diesen Shortcode in eine Seite oder einen Beitrag ein, um das Tebuto Buchungswidget anzuzeigen:', 'tebuto-online-terminbuchung'); ?></p>
+                <div class="tebuto-shortcode-display">
+                    <code id="tebuto-shortcode">[tebuto_online_terminbuchung_widget]</code>
+                    <button type="button" class="button tebuto-copy-btn" onclick="tebuto_copyShortcode()">
+                        <?php esc_html_e('Kopieren', 'tebuto-online-terminbuchung'); ?>
+                    </button>
+                </div>
+                <p class="description"><?php esc_html_e('Alternativ kannst du den Tebuto-Block im Gutenberg-Editor verwenden.', 'tebuto-online-terminbuchung'); ?></p>
+            </div>
 
-        echo '<p>' . esc_html__('Fügen Sie diesen Shortcode in eine Seite ein, um die Tebuto Terminbuchung zu verwenden. Alternativ können Sie das Widget auch in den Gutenberg Blocks finden.', 'tebuto-online-terminbuchung') . '</p>';
-        echo '<pre style="background: #f4f4f4; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">' . esc_html($shortcode) . '</pre>';
+            <div class="tebuto-card">
+                <h2><?php esc_html_e('Widget-Einstellungen', 'tebuto-online-terminbuchung'); ?></h2>
+                <form method="post">
+                    <?php wp_nonce_field('tebuto_save_settings', 'tebuto_nonce'); ?>
+                    <input type="hidden" name="tebuto_save_settings" value="1">
 
-        echo '<form method="post">';
-        // Add nonce field here for form validation
-        wp_nonce_field('tebuto_online_terminbuchung_save_settings', 'tebuto_online_terminbuchung_nonce');
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">
+                                <label for="background_color"><?php esc_html_e('Hintergrundfarbe', 'tebuto-online-terminbuchung'); ?></label>
+                            </th>
+                            <td>
+                                <input type="text" name="background_color" id="background_color" value="<?php echo esc_attr($background_color); ?>" class="tebuto-color-picker">
+                                <p class="description"><?php esc_html_e('Die Hintergrundfarbe des Buchungswidgets.', 'tebuto-online-terminbuchung'); ?></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                <label for="border"><?php esc_html_e('Rahmen anzeigen', 'tebuto-online-terminbuchung'); ?></label>
+                            </th>
+                            <td>
+                                <label class="tebuto-toggle">
+                                    <input type="checkbox" name="border" id="border" value="true" <?php checked($border, 'true'); ?>>
+                                    <span class="tebuto-toggle-slider"></span>
+                                </label>
+                                <p class="description"><?php esc_html_e('Zeigt einen Rahmen um das Widget an.', 'tebuto-online-terminbuchung'); ?></p>
+                            </td>
+                        </tr>
+                    </table>
 
-        echo '<h2 style="margin-top: 35px">' . esc_html__('Shortcode-Widget-Einstellungen', 'tebuto-online-terminbuchung') . '</h2>';
-        echo '<table class="form-table">';
+                    <p class="submit">
+                        <button type="submit" class="button button-primary"><?php esc_html_e('Einstellungen speichern', 'tebuto-online-terminbuchung'); ?></button>
+                    </p>
+                </form>
+            </div>
+        <?php endif; ?>
+    </div>
 
-        // Background Color Input
-        echo '<tr>';
-        echo '<th><label for="background_color">' . esc_html__('Hintergrundfarbe', 'tebuto-online-terminbuchung') . '</label></th>';
-        echo '<td><input type="text" name="background_color" id="background_color" value="' . esc_attr($background_color) . '" class="tebuto-color-picker"></td>';
-        echo '</tr>';
-
-        // Border Checkbox
-        echo '<tr>';
-        echo '<th><label for="border">' . esc_html__('Rahmen anzeigen', 'tebuto-online-terminbuchung') . '</label></th>';
-        echo '<td><input type="checkbox" name="border" id="border" value="true" ' . checked($border, 'true', false) . '></td>';
-        echo '</tr>';
-
-        echo '</table>';
-
-        echo '<input type="hidden" name="tebuto_online_terminbuchung_save_settings" value="1">';
-        echo '<button class="button button-primary" style="margin-top: 20px" type="submit">' . esc_html__('Speichern', 'tebuto-online-terminbuchung') . '</button>';
-        echo '</form>';
+    <script>
+    function tebuto_copyShortcode() {
+        const shortcode = document.getElementById('tebuto-shortcode').innerText;
+        navigator.clipboard.writeText(shortcode).then(function() {
+            const btn = document.querySelector('.tebuto-copy-btn');
+            const originalText = btn.innerText;
+            btn.innerText = '<?php echo esc_js(__('Kopiert!', 'tebuto-online-terminbuchung')); ?>';
+            setTimeout(function() {
+                btn.innerText = originalText;
+            }, 2000);
+        });
     }
-
-    echo '</div>';
+    </script>
+    <?php
 }

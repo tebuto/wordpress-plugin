@@ -1,16 +1,1349 @@
-#toplevel_page_tebuto-main > a > div.wp-menu-image.dashicons-before > img {
-  width: 18px !important;
-  height: 18px !important;
-  max-width: 100%;
-  max-height: 100%;
-  display: inline-block;
-  vertical-align: middle;
+/**
+ * Tebuto Admin Styles
+ *
+ * @package Tebuto
+ */
+
+/* ==========================================================================
+   CSS Custom Properties
+   ========================================================================== */
+
+:root {
+    --tebuto-primary: #009087;
+    --tebuto-primary-dark: #007a73;
+    --tebuto-primary-light: #00b4a9;
+    --tebuto-primary-subtle: rgba(0, 144, 135, 0.08);
+    --tebuto-success: #22c55e;
+    --tebuto-success-light: #dcfce7;
+    --tebuto-warning: #f59e0b;
+    --tebuto-warning-light: #fef3c7;
+    --tebuto-danger: #ef4444;
+    --tebuto-danger-light: #fee2e2;
+    --tebuto-info: #3b82f6;
+    --tebuto-info-light: #dbeafe;
+    --tebuto-text: #1e293b;
+    --tebuto-text-secondary: #64748b;
+    --tebuto-text-muted: #94a3b8;
+    --tebuto-border: #e2e8f0;
+    --tebuto-border-light: #f1f5f9;
+    --tebuto-bg: #f8fafc;
+    --tebuto-bg-dark: #f1f5f9;
+    --tebuto-white: #ffffff;
+    --tebuto-radius: 12px;
+    --tebuto-radius-sm: 8px;
+    --tebuto-radius-xs: 6px;
+    --tebuto-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    --tebuto-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+    --tebuto-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+    --tebuto-transition: 0.2s ease;
 }
 
-#toplevel_page_tebuto-main
-  > a
-  > div.wp-menu-image.dashicons-before:hover
-  > img {
-  filter: brightness(0) saturate(100%) invert(50%) sepia(50%) saturate(500%)
-    hue-rotate(180deg) brightness(90%);
+/* ==========================================================================
+   Menu Icon styling is in admin-menu-icon.css (loaded globally)
+   ========================================================================== */
+
+/* ==========================================================================
+   Admin Wrap
+   ========================================================================== */
+
+.tebuto-admin-wrap {
+    max-width: 1400px;
+    margin: 24px 24px 40px 2px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+.tebuto-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--tebuto-border);
+}
+
+.tebuto-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--tebuto-text);
+    letter-spacing: -0.02em;
+}
+
+/* ==========================================================================
+   Statistics Cards
+   ========================================================================== */
+
+.tebuto-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.tebuto-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px;
+    background: var(--tebuto-white);
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius);
+    box-shadow: var(--tebuto-shadow);
+    transition: transform var(--tebuto-transition), box-shadow var(--tebuto-transition);
+}
+
+.tebuto-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--tebuto-shadow-md);
+}
+
+.tebuto-stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--tebuto-radius);
+    flex-shrink: 0;
+}
+
+.tebuto-stat-icon .dashicons {
+    width: 28px;
+    height: 28px;
+    font-size: 28px;
+    color: var(--tebuto-white);
+}
+
+.tebuto-stat-icon-primary {
+    background: linear-gradient(135deg, var(--tebuto-primary) 0%, var(--tebuto-primary-dark) 100%);
+}
+
+.tebuto-stat-icon-success {
+    background: linear-gradient(135deg, var(--tebuto-success) 0%, #16a34a 100%);
+}
+
+.tebuto-stat-icon-warning {
+    background: linear-gradient(135deg, var(--tebuto-warning) 0%, #d97706 100%);
+}
+
+.tebuto-stat-icon-info {
+    background: linear-gradient(135deg, var(--tebuto-info) 0%, #2563eb 100%);
+}
+
+.tebuto-stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tebuto-stat-number {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--tebuto-text);
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.tebuto-stat-label {
+    font-size: 14px;
+    color: var(--tebuto-text-secondary);
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   Dashboard Grid
+   ========================================================================== */
+
+.tebuto-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+@media (max-width: 1200px) {
+    .tebuto-dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================================================
+   Cards
+   ========================================================================== */
+
+.tebuto-card {
+    background: var(--tebuto-white);
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius);
+    box-shadow: var(--tebuto-shadow);
+    overflow: hidden;
+}
+
+.tebuto-card > h2 {
+    margin: 0;
+    padding: 24px 28px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--tebuto-text);
+}
+
+.tebuto-card > p {
+    margin: 8px 0 0;
+    padding: 0 28px;
+    color: var(--tebuto-text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.tebuto-card > .button {
+    margin: 20px 28px 28px;
+}
+
+.tebuto-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--tebuto-border-light);
+    background: var(--tebuto-bg);
+}
+
+.tebuto-card-header h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--tebuto-text);
+}
+
+.tebuto-card-body {
+    padding: 24px;
+}
+
+/* Warning Card */
+.tebuto-card-warning {
+    border-color: var(--tebuto-warning);
+    background: var(--tebuto-warning-light);
+    padding: 32px;
+}
+
+.tebuto-card-warning h2 {
+    margin: 0 0 12px 0;
+    padding: 0;
+    color: #92400e;
+    font-size: 20px;
+}
+
+.tebuto-card-warning p {
+    margin: 0 0 20px 0;
+    padding: 0;
+    color: #78350f;
+    font-size: 15px;
+}
+
+.tebuto-card-warning .button {
+    margin: 0;
+}
+
+/* Connect Card */
+.tebuto-card-connect {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 32px;
+    border: 2px dashed var(--tebuto-border);
+    background: var(--tebuto-bg);
+}
+
+.tebuto-card-connect .tebuto-card-icon {
+    flex-shrink: 0;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--tebuto-primary);
+    border-radius: var(--tebuto-radius);
+    box-shadow: var(--tebuto-shadow);
+}
+
+.tebuto-card-connect .tebuto-card-icon .dashicons {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    color: var(--tebuto-white);
+}
+
+.tebuto-card-connect .tebuto-card-content h2 {
+    margin: 0 0 12px 0;
+    padding: 0;
+    font-size: 22px;
+    color: var(--tebuto-text);
+}
+
+.tebuto-card-connect .tebuto-card-content p {
+    margin: 0 0 20px 0;
+    padding: 0;
+    color: var(--tebuto-text-secondary);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* Success Card */
+.tebuto-card-success {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 28px;
+    border-left: 4px solid var(--tebuto-success);
+    background: var(--tebuto-success-light);
+    margin-bottom: 24px;
+}
+
+.tebuto-card-success .tebuto-card-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--tebuto-success);
+    border-radius: 50%;
+}
+
+.tebuto-card-success .tebuto-card-icon .dashicons {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    color: var(--tebuto-white);
+}
+
+.tebuto-card-success .tebuto-card-content h2 {
+    margin: 0 0 8px 0;
+    padding: 0;
+    font-size: 18px;
+    color: #166534;
+}
+
+.tebuto-card-success .tebuto-card-content p {
+    margin: 0;
+    padding: 0;
+    color: #166534;
+    font-size: 14px;
+}
+
+/* Help Card */
+.tebuto-card-help {
+    margin-top: 24px;
+    padding: 28px;
+}
+
+.tebuto-card-help h2 {
+    margin: 0 0 12px 0 !important;
+    padding: 0 !important;
+}
+
+.tebuto-card-help p {
+    padding: 0 !important;
+    margin: 0 0 20px 0 !important;
+}
+
+.tebuto-card-help .button {
+    margin: 0 !important;
+}
+
+/* ==========================================================================
+   Steps List
+   ========================================================================== */
+
+.tebuto-steps {
+    margin: 0;
+    padding: 28px;
+    list-style: none;
+    counter-reset: step;
+}
+
+.tebuto-steps li {
+    position: relative;
+    padding: 24px 24px 24px 56px;
+    margin-bottom: 20px;
+    background: var(--tebuto-bg);
+    border-radius: var(--tebuto-radius-sm);
+    border: 1px solid var(--tebuto-border-light);
+    counter-increment: step;
+}
+
+.tebuto-steps li:last-child {
+    margin-bottom: 0;
+}
+
+.tebuto-steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 16px;
+    top: 24px;
+    width: 28px;
+    height: 28px;
+    background: var(--tebuto-primary);
+    color: var(--tebuto-white);
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tebuto-steps li strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--tebuto-text);
+}
+
+.tebuto-steps li p {
+    margin: 0 0 16px 0;
+    padding: 0;
+    color: var(--tebuto-text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.tebuto-steps li .button {
+    margin: 0;
+}
+
+/* ==========================================================================
+   Quick Actions
+   ========================================================================== */
+
+.tebuto-quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+}
+
+.tebuto-quick-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 16px;
+    background: var(--tebuto-bg);
+    border: 1px solid var(--tebuto-border-light);
+    border-radius: var(--tebuto-radius-sm);
+    text-decoration: none;
+    color: var(--tebuto-text);
+    transition: all var(--tebuto-transition);
+}
+
+.tebuto-quick-action:hover {
+    background: var(--tebuto-primary);
+    border-color: var(--tebuto-primary);
+    color: var(--tebuto-white);
+    transform: translateY(-2px);
+    box-shadow: var(--tebuto-shadow-md);
+}
+
+.tebuto-quick-action .dashicons {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+}
+
+.tebuto-quick-action span:last-child {
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* ==========================================================================
+   Event & Booking Lists
+   ========================================================================== */
+
+.tebuto-event-list,
+.tebuto-booking-list,
+.tebuto-category-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tebuto-event-item,
+.tebuto-booking-item,
+.tebuto-category-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    margin: 0 -24px;
+    border-bottom: 1px solid var(--tebuto-border-light);
+    transition: background var(--tebuto-transition);
+}
+
+.tebuto-event-item:first-child,
+.tebuto-booking-item:first-child,
+.tebuto-category-item:first-child {
+    margin-top: -24px;
+    padding-top: 24px;
+}
+
+.tebuto-event-item:last-child,
+.tebuto-booking-item:last-child,
+.tebuto-category-item:last-child {
+    border-bottom: none;
+    margin-bottom: -24px;
+    padding-bottom: 24px;
+}
+
+.tebuto-event-item:hover,
+.tebuto-booking-item:hover,
+.tebuto-category-item:hover {
+    background: var(--tebuto-bg);
+}
+
+.tebuto-event-color,
+.tebuto-category-color {
+    width: 5px;
+    height: 48px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.tebuto-event-info,
+.tebuto-booking-info,
+.tebuto-category-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.tebuto-event-title,
+.tebuto-booking-client,
+.tebuto-category-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tebuto-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tebuto-event-time,
+.tebuto-booking-category,
+.tebuto-booking-time,
+.tebuto-category-meta {
+    font-size: 13px;
+    color: var(--tebuto-text-secondary);
+}
+
+.tebuto-booking-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Badges
+   ========================================================================== */
+
+.tebuto-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.tebuto-badge-default {
+    background: var(--tebuto-bg-dark);
+    color: var(--tebuto-text-secondary);
+}
+
+.tebuto-badge-success {
+    background: var(--tebuto-success-light);
+    color: #166534;
+}
+
+.tebuto-badge-warning {
+    background: var(--tebuto-warning-light);
+    color: #92400e;
+}
+
+.tebuto-badge-danger {
+    background: var(--tebuto-danger-light);
+    color: #991b1b;
+}
+
+.tebuto-badge-info {
+    background: var(--tebuto-info-light);
+    color: #1d4ed8;
+}
+
+/* ==========================================================================
+   Tables
+   ========================================================================== */
+
+.tebuto-table-responsive {
+    overflow-x: auto;
+    margin: 0 -24px;
+    padding: 0 24px;
+}
+
+.tebuto-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.tebuto-table th,
+.tebuto-table td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--tebuto-border-light);
+}
+
+.tebuto-table th {
+    background: var(--tebuto-bg);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--tebuto-text-secondary);
+    white-space: nowrap;
+}
+
+.tebuto-table tbody tr {
+    transition: background var(--tebuto-transition);
+}
+
+.tebuto-table tbody tr:hover {
+    background: var(--tebuto-bg);
+}
+
+.tebuto-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.tebuto-category-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tebuto-category-color-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+}
+
+.tebuto-action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   Forms
+   ========================================================================== */
+
+.tebuto-categories-grid {
+    display: grid;
+    grid-template-columns: minmax(320px, 420px) 1fr;
+    gap: 24px;
+}
+
+@media (max-width: 1024px) {
+    .tebuto-categories-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.tebuto-category-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.tebuto-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.tebuto-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tebuto-form-group-small {
+    max-width: 120px;
+}
+
+.tebuto-form-group label {
+    font-weight: 600;
+    color: var(--tebuto-text);
+    font-size: 13px;
+}
+
+.tebuto-form-group input[type="text"],
+.tebuto-form-group input[type="number"],
+.tebuto-form-group input[type="email"],
+.tebuto-form-group textarea,
+.tebuto-form-group select {
+    padding: 12px 16px;
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius-xs);
+    font-size: 14px;
+    transition: border-color var(--tebuto-transition), box-shadow var(--tebuto-transition);
+    background: var(--tebuto-white);
+}
+
+.tebuto-form-group input:focus,
+.tebuto-form-group textarea:focus,
+.tebuto-form-group select:focus {
+    border-color: var(--tebuto-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--tebuto-primary-subtle);
+}
+
+.tebuto-form-group input[type="color"] {
+    width: 100%;
+    height: 48px;
+    padding: 6px;
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius-xs);
+    cursor: pointer;
+}
+
+.tebuto-form-checkbox label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: 400;
+}
+
+.tebuto-form-checkbox input[type="checkbox"] {
+    margin-top: 3px;
+    width: 18px;
+    height: 18px;
+}
+
+.tebuto-form-group .description {
+    font-size: 12px;
+    color: var(--tebuto-text-muted);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.tebuto-form-actions {
+    display: flex;
+    gap: 12px;
+    padding-top: 12px;
+}
+
+/* ==========================================================================
+   Calendar
+   ========================================================================== */
+
+.tebuto-calendar-container {
+    position: relative;
+}
+
+.tebuto-calendar-filters {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    margin-bottom: 20px;
+    padding: 20px 24px;
+    background: var(--tebuto-white);
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius);
+    box-shadow: var(--tebuto-shadow);
+}
+
+.tebuto-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tebuto-filter-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--tebuto-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tebuto-filter-group select {
+    padding: 10px 14px;
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius-xs);
+    font-size: 14px;
+    min-width: 200px;
+    background: var(--tebuto-white);
+}
+
+.tebuto-filter-actions {
+    margin-left: auto;
+}
+
+.tebuto-calendar-legend {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 20px;
+    padding: 16px 20px;
+    background: var(--tebuto-bg);
+    border-radius: var(--tebuto-radius);
+}
+
+.tebuto-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--tebuto-text);
+}
+
+.tebuto-legend-color {
+    width: 18px;
+    height: 18px;
+    border-radius: var(--tebuto-radius-xs);
+}
+
+.tebuto-legend-available {
+    background: var(--tebuto-primary);
+}
+
+.tebuto-legend-pending {
+    background: var(--tebuto-warning);
+}
+
+.tebuto-legend-confirmed {
+    background: var(--tebuto-success);
+}
+
+.tebuto-legend-skipped {
+    background: #6b7280;
+}
+
+#tebuto-calendar {
+    background: var(--tebuto-white);
+    padding: 24px;
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius);
+    box-shadow: var(--tebuto-shadow);
+}
+
+.tebuto-calendar-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 32px;
+    background: var(--tebuto-white);
+    border-radius: var(--tebuto-radius);
+    box-shadow: var(--tebuto-shadow-lg);
+    z-index: 100;
+}
+
+.tebuto-calendar-event {
+    cursor: pointer;
+    transition: opacity var(--tebuto-transition);
+}
+
+.tebuto-calendar-event:hover {
+    opacity: 0.85;
+}
+
+/* FullCalendar overrides */
+.fc .fc-toolbar-title {
+    font-size: 1.3em !important;
+    font-weight: 600 !important;
+}
+
+.fc .fc-button-primary {
+    background-color: var(--tebuto-primary) !important;
+    border-color: var(--tebuto-primary) !important;
+    border-radius: var(--tebuto-radius-xs) !important;
+    padding: 8px 16px !important;
+}
+
+.fc .fc-button-primary:hover {
+    background-color: var(--tebuto-primary-dark) !important;
+    border-color: var(--tebuto-primary-dark) !important;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+    background-color: var(--tebuto-primary-dark) !important;
+    border-color: var(--tebuto-primary-dark) !important;
+}
+
+/* ==========================================================================
+   Bookings Page
+   ========================================================================== */
+
+.tebuto-filters-card {
+    margin-bottom: 24px;
+}
+
+.tebuto-bookings-filters {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.tebuto-client-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tebuto-client-email {
+    font-size: 12px;
+    color: var(--tebuto-text-muted);
+}
+
+.tebuto-category-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tebuto-datetime-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tebuto-date {
+    font-weight: 600;
+    color: var(--tebuto-text);
+}
+
+.tebuto-time {
+    font-size: 13px;
+    color: var(--tebuto-text-secondary);
+}
+
+.tebuto-location {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--tebuto-text-secondary);
+}
+
+.tebuto-location .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--tebuto-text-muted);
+}
+
+.tebuto-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 24px;
+    border-top: 1px solid var(--tebuto-border-light);
+}
+
+.tebuto-pagination-info {
+    color: var(--tebuto-text-secondary);
+    font-size: 14px;
+}
+
+.tebuto-pagination-total {
+    color: var(--tebuto-text-muted);
+}
+
+/* ==========================================================================
+   Modals
+   ========================================================================== */
+
+.tebuto-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100000;
+    padding: 20px;
+}
+
+.tebuto-modal-content {
+    background: var(--tebuto-white);
+    border-radius: var(--tebuto-radius);
+    width: 100%;
+    max-width: 520px;
+    max-height: calc(100vh - 40px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--tebuto-shadow-lg);
+}
+
+.tebuto-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--tebuto-border);
+}
+
+.tebuto-modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--tebuto-text);
+}
+
+.tebuto-modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px;
+    color: var(--tebuto-text-muted);
+    transition: color var(--tebuto-transition);
+    border-radius: var(--tebuto-radius-xs);
+}
+
+.tebuto-modal-close:hover {
+    color: var(--tebuto-text);
+    background: var(--tebuto-bg);
+}
+
+.tebuto-modal-body {
+    padding: 24px;
+    overflow-y: auto;
+}
+
+.tebuto-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 24px;
+    border-top: 1px solid var(--tebuto-border);
+    background: var(--tebuto-bg);
+}
+
+.tebuto-modal-details p {
+    margin: 0 0 16px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.tebuto-modal-details p:last-child {
+    margin-bottom: 0;
+}
+
+.tebuto-booking-details h4 {
+    margin: 0 0 16px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--tebuto-primary);
+    border-bottom: 1px solid var(--tebuto-border);
+    padding-bottom: 12px;
+}
+
+.tebuto-detail-section {
+    margin-bottom: 24px;
+}
+
+.tebuto-detail-section:last-child {
+    margin-bottom: 0;
+}
+
+.tebuto-detail-section p {
+    margin: 0 0 10px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   Empty States & Errors
+   ========================================================================== */
+
+.tebuto-empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--tebuto-text-muted);
+}
+
+.tebuto-empty-state .dashicons {
+    font-size: 56px;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+
+.tebuto-error,
+.tebuto-error-message {
+    color: #991b1b;
+    padding: 16px 20px;
+    background: var(--tebuto-danger-light);
+    border-radius: var(--tebuto-radius-sm);
+    font-size: 14px;
+    border-left: 4px solid var(--tebuto-danger);
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.tebuto-btn-danger {
+    background: var(--tebuto-danger) !important;
+    border-color: var(--tebuto-danger) !important;
+    color: var(--tebuto-white) !important;
+}
+
+.tebuto-btn-danger:hover {
+    background: #dc2626 !important;
+    border-color: #dc2626 !important;
+}
+
+.button.button-primary {
+    background: var(--tebuto-primary);
+    border-color: var(--tebuto-primary);
+}
+
+.button.button-primary:hover,
+.button.button-primary:focus {
+    background: var(--tebuto-primary-dark);
+    border-color: var(--tebuto-primary-dark);
+}
+
+/* ==========================================================================
+   Settings Page (Connection)
+   ========================================================================== */
+
+.tebuto-settings-card {
+    max-width: 640px;
+}
+
+.tebuto-connection-status {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: var(--tebuto-bg);
+    border-radius: var(--tebuto-radius);
+    margin-bottom: 24px;
+}
+
+.tebuto-connection-status .dashicons {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+}
+
+.tebuto-connection-status.connected {
+    background: var(--tebuto-success-light);
+}
+
+.tebuto-connection-status.connected .dashicons {
+    color: var(--tebuto-success);
+}
+
+.tebuto-connection-status.disconnected {
+    background: var(--tebuto-danger-light);
+}
+
+.tebuto-connection-status.disconnected .dashicons {
+    color: var(--tebuto-danger);
+}
+
+.tebuto-disconnect-form {
+    display: inline;
+}
+
+/* Settings page actions */
+.tebuto-settings-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+}
+
+.tebuto-settings-actions .button-hero {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    font-size: 15px;
+}
+
+.tebuto-settings-actions .button-hero .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+/* ==========================================================================
+   Shortcode Page
+   ========================================================================== */
+
+.tebuto-shortcode-box {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: var(--tebuto-bg);
+    border-radius: var(--tebuto-radius);
+    margin-bottom: 24px;
+}
+
+.tebuto-shortcode-box input {
+    flex: 1;
+    padding: 14px 18px;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 14px;
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius-xs);
+    background: var(--tebuto-white);
+}
+
+.tebuto-shortcode-preview {
+    padding: 24px;
+    background: var(--tebuto-bg);
+    border-radius: var(--tebuto-radius);
+    min-height: 240px;
+}
+
+/* ==========================================================================
+   Loading States
+   ========================================================================== */
+
+.tebuto-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+}
+
+.tebuto-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--tebuto-border);
+    border-top-color: var(--tebuto-primary);
+    border-radius: 50%;
+    animation: tebuto-spin 0.8s linear infinite;
+}
+
+@keyframes tebuto-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 782px) {
+    .tebuto-admin-wrap {
+        margin: 16px 16px 32px 2px;
+    }
+
+    .tebuto-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .tebuto-header h1 {
+        font-size: 24px;
+    }
+
+    .tebuto-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tebuto-stat-card {
+        padding: 20px;
+    }
+
+    .tebuto-form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .tebuto-calendar-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tebuto-filter-group select {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .tebuto-filter-actions {
+        margin-left: 0;
+    }
+
+    .tebuto-calendar-legend {
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .tebuto-bookings-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tebuto-action-buttons {
+        flex-direction: column;
+    }
+
+    .tebuto-modal-content {
+        width: 100%;
+        max-height: calc(100vh - 40px);
+    }
+
+    .tebuto-card-connect {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .tebuto-card-success {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .tebuto-steps li {
+        padding-left: 20px;
+        padding-top: 56px;
+    }
+
+    .tebuto-steps li::before {
+        top: 20px;
+        left: 20px;
+    }
 }

@@ -1,43 +1,86 @@
 <?php
+/**
+ * Tebuto admin menu registration.
+ *
+ * @package Tebuto
+ */
 
-if (! defined('ABSPATH')) {
-    exit; // Exit if accessed directly.
-}
+defined('ABSPATH') || exit;
 
-function tebuto_online_terminbuchung_add_admin_menu()
-{
-    // Hauptmenü für Tebuto
+/**
+ * Register admin menu pages.
+ *
+ * @return void
+ */
+function tebuto_add_admin_menu(): void {
+    // Main menu page - Dashboard
     add_menu_page(
-        esc_html__('Tebuto - Online-Terminbuchung', 'tebuto-online-terminbuchung'),
-        esc_html__('Tebuto', 'tebuto-online-terminbuchung'),
+        __('Tebuto - Online-Terminbuchung', 'tebuto-online-terminbuchung'),
+        __('Tebuto', 'tebuto-online-terminbuchung'),
         'manage_options',
         'tebuto-main',
-        'tebuto_online_terminbuchung_admin_page',
-        esc_url(TEBUTO_PLUGIN_URL . 'assets/tebuto-icon.png'),
-        100
+        'tebuto_dashboard_page',
+        TEBUTO_PLUGIN_URL . 'assets/tebuto-icon.png',
+        30
     );
 
-    // Untermenü: Einstellungen
+    // Submenu: Dashboard (duplicate to show correct name)
     add_submenu_page(
         'tebuto-main',
-        esc_html__('Einstellungen', 'tebuto-online-terminbuchung'),
-        esc_html__('Einstellungen', 'tebuto-online-terminbuchung'),
+        __('Dashboard', 'tebuto-online-terminbuchung'),
+        __('Dashboard', 'tebuto-online-terminbuchung'),
         'manage_options',
-        'tebuto-integration',
-        'tebuto_online_terminbuchung_admin_page'
+        'tebuto-main',
+        'tebuto_dashboard_page'
     );
 
-    // Untermenü: Shortcode
+    // Submenu: Calendar
     add_submenu_page(
         'tebuto-main',
-        esc_html__('Shortcode', 'tebuto-online-terminbuchung'),
-        esc_html__('Shortcode', 'tebuto-online-terminbuchung'),
+        __('Kalender', 'tebuto-online-terminbuchung'),
+        __('Kalender', 'tebuto-online-terminbuchung'),
+        'manage_options',
+        'tebuto-calendar',
+        'tebuto_calendar_page'
+    );
+
+    // Submenu: Bookings
+    add_submenu_page(
+        'tebuto-main',
+        __('Buchungen', 'tebuto-online-terminbuchung'),
+        __('Buchungen', 'tebuto-online-terminbuchung'),
+        'manage_options',
+        'tebuto-bookings',
+        'tebuto_bookings_page'
+    );
+
+    // Submenu: Categories
+    add_submenu_page(
+        'tebuto-main',
+        __('Kategorien', 'tebuto-online-terminbuchung'),
+        __('Kategorien', 'tebuto-online-terminbuchung'),
+        'manage_options',
+        'tebuto-categories',
+        'tebuto_categories_page'
+    );
+
+    // Submenu: Shortcode
+    add_submenu_page(
+        'tebuto-main',
+        __('Shortcode', 'tebuto-online-terminbuchung'),
+        __('Shortcode', 'tebuto-online-terminbuchung'),
         'manage_options',
         'tebuto-shortcode',
-        'tebuto_online_terminbuchung_shortcode_page'
+        'tebuto_shortcode_page'
     );
 
-    // Entfernt das Duplikat der Hauptseite im Submenü
-    remove_submenu_page('tebuto-main', 'tebuto-main');
+    // Submenu: Settings (Connection)
+    add_submenu_page(
+        'tebuto-main',
+        __('Einstellungen', 'tebuto-online-terminbuchung'),
+        __('Einstellungen', 'tebuto-online-terminbuchung'),
+        'manage_options',
+        'tebuto-integration',
+        'tebuto_admin_page'
+    );
 }
-add_action('admin_menu', 'tebuto_online_terminbuchung_add_admin_menu');

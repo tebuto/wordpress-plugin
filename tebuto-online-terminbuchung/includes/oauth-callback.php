@@ -1,69 +1,94 @@
 <?php
+/**
+ * OAuth callback handler for Tebuto plugin.
+ *
+ * @package Tebuto
+ */
 
-if (! defined('ABSPATH')) {
-    exit; // Exit if accessed directly.
-}
+defined('ABSPATH') || exit;
 
-function tebuto_online_terminbuchung_handle_oauth_callback()
-{
-    if (!isset($_GET['page']) || sanitize_text_field(wp_unslash($_GET['page'])) !== 'tebuto-integration') {
+/**
+ * Handle OAuth callback from Tebuto auth server.
+ *
+ * @return void
+ */
+function tebuto_handle_oauth_callback(): void {
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+    if (! isset($_GET['page']) || sanitize_text_field(wp_unslash($_GET['page'])) !== 'tebuto-integration') {
         return;
     }
 
-    if (!isset($_GET['code']) || !isset($_GET['state'])) {
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+    if (! isset($_GET['code'], $_GET['state'])) {
         return;
     }
 
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
     $state = sanitize_text_field(wp_unslash($_GET['state']));
-    if (!wp_verify_nonce($state, 'tebuto_online_terminbuchung_auth')) {
-        wp_die(esc_html__('Ungültiger State-Wert. Authentifizierung fehlgeschlagen.', 'tebuto-online-terminbuchung'));
+    if (! wp_verify_nonce($state, 'tebuto_auth')) {
+        wp_die(
+            esc_html__('Ungültiger State-Wert. Authentifizierung fehlgeschlagen.', 'tebuto-online-terminbuchung'),
+            esc_html__('Authentifizierungsfehler', 'tebuto-online-terminbuchung'),
+            ['response' => 403]
+        );
     }
 
-    $code = sanitize_text_field(wp_unslash($_GET['code']));
-    $base_url = tebuto_online_terminbuchung_get_base_url();
-    $token_url = esc_url_raw($base_url . '/realms/tebuto-therapists/protocol/openid-connect/token');
-    $client_id = 'wordpress-plugin';
-    $redirect_uri = esc_url_raw(admin_url('admin.php?page=tebuto-integration'));
-
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+    $code           = sanitize_text_field(wp_unslash($_GET['code']));
+    $token_url      = TEBUTO_AUTH_URL . '/realms/tebuto-therapists/protocol/openid-connect/token';
+    $redirect_uri   = admin_url('admin.php?page=tebuto-integration');
     $current_user_id = get_current_user_id();
-    $code_verifier = sanitize_text_field(get_transient('tebuto_online_terminbuchung_pkce_' . $current_user_id));
+    $code_verifier   = get_transient('tebuto_pkce_' . $current_user_id);
 
-    if (!$code_verifier) {
-        wp_die(esc_html__('PKCE Code Verifier nicht gefunden. Authentifizierung fehlgeschlagen.', 'tebuto-online-terminbuchung'));
+    if (! $code_verifier) {
+        wp_die(
+            esc_html__('PKCE Code Verifier nicht gefunden. Authentifizierung fehlgeschlagen.', 'tebuto-online-terminbuchung'),
+            esc_html__('Authentifizierungsfehler', 'tebuto-online-terminbuchung'),
+            ['response' => 400]
+        );
     }
+
+    delete_transient('tebuto_pkce_' . $current_user_id);
 
     $response = wp_remote_post($token_url, [
         'body' => [
-            'grant_type' => 'authorization_code',
-            'code' => $code,
-            'redirect_uri' => $redirect_uri,
-            'client_id' => $client_id,
+            'grant_type'    => 'authorization_code',
+            'code'          => $code,
+            'redirect_uri'  => $redirect_uri,
+            'client_id'     => TEBUTO_CLIENT_ID,
             'code_verifier' => $code_verifier,
         ],
+        'timeout' => 30,
     ]);
 
     if (is_wp_error($response)) {
-        wp_die(esc_html__('Fehler bei der Token-Anfrage.', 'tebuto-online-terminbuchung'));
+        wp_die(
+            esc_html__('Fehler bei der Token-Anfrage.', 'tebuto-online-terminbuchung') . ' ' . esc_html($response->get_error_message()),
+            esc_html__('Authentifizierungsfehler', 'tebuto-online-terminbuchung'),
+            ['response' => 500]
+        );
     }
 
     $response_body = json_decode(wp_remote_retrieve_body($response), true);
 
-    if (!isset($response_body['access_token'], $response_body['refresh_token'])) {
-        wp_die(esc_html__('Fehler beim Abrufen der Tokens.', 'tebuto-online-terminbuchung'));
+    if (! isset($response_body['access_token'], $response_body['refresh_token'])) {
+        wp_die(
+            esc_html__('Fehler beim Abrufen der Tokens.', 'tebuto-online-terminbuchung'),
+            esc_html__('Authentifizierungsfehler', 'tebuto-online-terminbuchung'),
+            ['response' => 500]
+        );
     }
 
-    // Sanitize tokens before saving
-    $access_token = sanitize_text_field($response_body['access_token']);
+    $access_token  = sanitize_text_field($response_body['access_token']);
     $refresh_token = sanitize_text_field($response_body['refresh_token']);
 
-    // Store sanitized tokens
-    update_user_meta($current_user_id, 'tebuto_online_terminbuchung_access_token', $access_token);
-    update_user_meta($current_user_id, 'tebuto_online_terminbuchung_refresh_token', $refresh_token);
+    tebuto_update_user_meta($current_user_id, 'access_token', $access_token);
+    tebuto_update_user_meta($current_user_id, 'refresh_token', $refresh_token);
 
-    // Retrieve and store the therapist UUID securely
-    tebuto_online_terminbuchung_store_therapist_uuid($current_user_id, $access_token);
+    tebuto_store_therapist_uuid($current_user_id, $access_token);
 
-    wp_safe_redirect(admin_url('admin.php?page=tebuto-integration'));
+    // Redirect to dashboard after successful connection
+    wp_safe_redirect(admin_url('admin.php?page=tebuto-main&connected=1'));
     exit;
 }
-add_action('admin_init', 'tebuto_online_terminbuchung_handle_oauth_callback');
+add_action('admin_init', 'tebuto_handle_oauth_callback');

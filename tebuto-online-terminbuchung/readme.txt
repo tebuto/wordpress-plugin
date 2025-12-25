@@ -1,24 +1,38 @@
 === Tebuto - Online-Terminbuchung ===
-Contributors: tebuto  
-Tags: integration, Tebuto, Terminbuchung, online booking  
-Requires at least: 5.0  
-Tested up to: 6.7  
-Requires PHP: 7.4  
-Stable tag: 1.0  
-License: GPLv2 or later  
-License URI: https://www.gnu.org/licenses/gpl-2.0.html  
+Contributors: tebuto
+Tags: online booking, appointment scheduling, calendar, Terminbuchung, Termine
+Requires at least: 5.0
+Tested up to: 6.9
+Requires PHP: 7.4
+Stable tag: 1.0.0
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Ein Plugin zur Integration von Tebuto. Biete deine öffentlichen Termine direkt auf deiner Website an.
+Integriere die Online-Terminbuchung von Tebuto in deine WordPress-Website. Biete öffentliche Termine direkt auf deiner Seite an.
 
 == Beschreibung ==
-Mit dem Plugin **Tebuto - Online-Terminbuchung** kannst du die öffentlichen Termine deines Tebuto-Kontos einfach auf deiner Website anzeigen. 
 
-**Funktionen:**
-- Einfache Integration deines Tebuto-Kontos
-- Anzeige öffentlicher Termine mit Shortcode oder Gutenberg-Block
-- Anpassbare Widget-Einstellungen direkt im Dashboard
+Mit dem Plugin **Tebuto - Online-Terminbuchung** kannst du die öffentlichen Termine deines Tebuto-Kontos einfach auf deiner Website anzeigen und buchbar machen.
 
-**Hinweis:** Für die Nutzung des Plugins ist ein kostenloser oder kostenpflichtiger Tebuto-Account erforderlich. Anmeldung unter: [Tebuto Website](https://tebuto.de).
+= Funktionen =
+
+* **Einfache Integration** - Verbinde dein Tebuto-Konto mit einem Klick
+* **Shortcode** - Füge die Terminbuchung per Shortcode ein: `[tebuto_online_terminbuchung_widget]`
+* **Gutenberg-Block** - Nutze den Tebuto-Block im WordPress-Editor
+* **Anpassbare Darstellung** - Passe Hintergrundfarbe und Rahmen an
+* **Responsive Design** - Optimiert für alle Bildschirmgrößen
+
+= Wie es funktioniert =
+
+1. Installiere und aktiviere das Plugin
+2. Gehe zu **Tebuto → Einstellungen** im Admin-Menü
+3. Klicke auf "Mit Tebuto verbinden" und melde dich an
+4. Füge den Shortcode oder Block auf deiner gewünschten Seite ein
+5. Deine öffentlichen Termine werden automatisch angezeigt
+
+= Hinweis =
+
+Für die Nutzung des Plugins ist ein Tebuto-Account erforderlich. Die Anmeldung ist unter [tebuto.de](https://tebuto.de) möglich.
 
 == Externe Services ==
 
@@ -26,28 +40,78 @@ Dieses Plugin verbindet sich mit den APIs von Tebuto (*.tebuto.de), um die Onlin
 
 Bei der Nutzung des Plugins werden folgende Daten an Tebuto übermittelt:
 
-Benutzerinformationen: Daten wie Name und E-Mail-Adresse, die für die Terminbuchung erforderlich sind.​
+* **Authentifizierungsdaten** - Für die sichere Verbindung mit deinem Tebuto-Konto
+* **Benutzerinformationen** - Daten wie Name und E-Mail-Adresse für Terminbuchungen
+* **Terminangaben** - Details zum gebuchten Termin (Datum, Uhrzeit, Art)
+* **Kommunikationsdaten** - Informationen für Benachrichtigungen und Erinnerungen
 
-Terminangaben: Details zum gebuchten Termin, einschließlich Datum, Uhrzeit und Art des Termins.​
+Diese Datenübermittlung ist notwendig, um die Funktionen des Plugins bereitzustellen.
 
-Kommunikationsdaten: Informationen, die für Benachrichtigungen und Erinnerungen notwendig sind.​
+Tebuto erfüllt alle Anforderungen der DSGVO. Daten werden ausschließlich innerhalb der EU gespeichert und verarbeitet.
 
-Diese Datenübermittlung ist notwendig, um die Funktionen des Plugins bereitzustellen und einen reibungslosen Ablauf der Terminbuchungen zu gewährleisten.​
-
-Tebuto legt großen Wert auf Datenschutz und erfüllt alle Anforderungen der DSGVO. Ihre Daten werden ausschließlich innerhalb der EU gespeichert und verarbeitet. Weitere Informationen finden Sie in den [Datenschutzrichtlinien](https://tebuto.de/datenschutzerklaerung) und [AGB](https://tebuto.de/agb) von Tebuto.
+* [Datenschutzerklärung](https://tebuto.de/datenschutzerklaerung)
+* [Allgemeine Geschäftsbedingungen](https://tebuto.de/agb)
 
 == Installation ==
-1. Lade das Plugin herunter und installiere es über den Plugin-Manager.
-2. Gehe zu den Plugin-Einstellungen und verbinde dein Tebuto-Konto.
-3. Konfiguriere die gewünschten Einstellungen und Funktionen.
 
-== Häufige Fragen ==
+= Automatische Installation =
+
+1. Gehe zu **Plugins → Plugin hinzufügen**
+2. Suche nach "Tebuto"
+3. Klicke auf "Jetzt installieren" und dann "Aktivieren"
+
+= Manuelle Installation =
+
+1. Lade das Plugin herunter und entpacke es
+2. Lade den Ordner `tebuto-online-terminbuchung` in `/wp-content/plugins/` hoch
+3. Aktiviere das Plugin über **Plugins → Installierte Plugins**
+
+= Nach der Installation =
+
+1. Gehe zu **Tebuto → Einstellungen**
+2. Verbinde dein Tebuto-Konto
+3. Erstelle in Tebuto deine Terminkategorien und Termine
+4. Füge den Shortcode oder Block auf deiner Seite ein
+
+== Häufig gestellte Fragen ==
+
 = Ist ein Tebuto-Account notwendig? =
-Ja, um dieses Plugin nutzen zu können, benötigst du einen Tebuto-Account. 
+
+Ja, um dieses Plugin nutzen zu können, benötigst du einen Tebuto-Account. Die Registrierung ist unter [tebuto.de](https://tebuto.de) möglich.
 
 = Ist das Plugin kostenlos? =
-Ja, das Plugin selbst ist kostenlos. Für einige Funktionen in Tebuto könnten Gebühren anfallen.
+
+Ja, das Plugin selbst ist kostenlos. Je nach Tebuto-Tarif können für erweiterte Funktionen Gebühren anfallen.
+
+= Kann ich mehrere Buchungswidgets auf einer Seite verwenden? =
+
+Aktuell unterstützt das Plugin ein Widget pro Seite. Mehrere Widgets werden in zukünftigen Versionen möglich sein.
+
+= Funktioniert das Plugin mit Page Buildern? =
+
+Ja, der Shortcode funktioniert mit allen gängigen Page Buildern wie Elementor, Divi, WPBakery und anderen.
+
+= Wie kann ich das Design anpassen? =
+
+Unter **Tebuto → Shortcode** kannst du die Hintergrundfarbe ändern und einen Rahmen aktivieren. Weitere Anpassungen sind über CSS möglich.
+
+== Screenshots ==
+
+1. Einstellungsseite - Verbindung mit Tebuto herstellen
+2. Shortcode-Einstellungen - Widget konfigurieren
+3. Frontend - Buchungswidget auf der Website
 
 == Changelog ==
-= 1.0 =
-- Erste Veröffentlichung mit grundlegender Tebuto-Integration.
+
+= 1.0.0 =
+* Erste stabile Version
+* OAuth-Integration mit Tebuto
+* Shortcode-Unterstützung
+* Gutenberg-Block
+* Anpassbare Widget-Einstellungen
+* Professionelles Admin-Interface
+
+== Upgrade Notice ==
+
+= 1.0.0 =
+Erste stabile Version des Tebuto Plugins.
