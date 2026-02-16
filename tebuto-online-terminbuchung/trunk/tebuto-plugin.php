@@ -3,7 +3,7 @@
  * Plugin Name: Tebuto - Online-Terminbuchung
  * Plugin URI: https://tebuto.de/dokumentation/wordpress-plugin
  * Description: Integriert die Online-Terminbuchung von Tebuto in deine WordPress-Website. Verwalte Termine, Kategorien und Buchungen direkt aus WordPress.
- * Version: 2.1.0
+ * Version: 2.0.0
  * Requires at least: 5.0
  * Requires PHP: 7.4
  * Author: Tebuto GmbH
@@ -21,7 +21,7 @@ defined('ABSPATH') || exit;
 /**
  * Plugin version.
  */
-define('TEBUTO_VERSION', '2.1.0');
+define('TEBUTO_VERSION', '2.0.0');
 
 /**
  * Plugin directory path.
@@ -39,38 +39,24 @@ define('TEBUTO_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('TEBUTO_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
 /**
- * Tebuto URLs — override these in wp-config.php for local development:
- *
- *   define('TEBUTO_API_URL',    'https://therapists.api.tebuto.local');
- *   define('TEBUTO_AUTH_URL',   'https://auth.tebuto.local');
- *   define('TEBUTO_WIDGET_URL', 'https://tebuto.local/widget/booking.js');
+ * Tebuto Therapists API URL (for authenticated therapist endpoints).
  */
-if (!defined('TEBUTO_API_URL')) {
-    define('TEBUTO_API_URL', 'https://therapists.api.tebuto.de');
-}
+define('TEBUTO_API_URL', 'https://therapists.api.tebuto.de');
 
-if (!defined('TEBUTO_AUTH_URL')) {
-    define('TEBUTO_AUTH_URL', 'https://auth.tebuto.de');
-}
+/**
+ * Tebuto Auth URL.
+ */
+define('TEBUTO_AUTH_URL', 'https://auth.tebuto.de');
 
-if (!defined('TEBUTO_WIDGET_URL')) {
-    define('TEBUTO_WIDGET_URL', 'https://tebuto.de/widget/booking.js');
-}
+/**
+ * Tebuto Widget URL.
+ */
+define('TEBUTO_WIDGET_URL', 'https://tebuto.de/widget/booking.js');
 
 /**
  * Tebuto OAuth Client ID.
  */
-if (!defined('TEBUTO_CLIENT_ID')) {
-    define('TEBUTO_CLIENT_ID', 'wordpress-plugin');
-}
-
-/**
- * SSL verification for server-to-server requests.
- * Set to false in wp-config.php for local development with self-signed certificates.
- */
-if (!defined('TEBUTO_SSL_VERIFY')) {
-    define('TEBUTO_SSL_VERIFY', true);
-}
+define('TEBUTO_CLIENT_ID', 'wordpress-plugin');
 
 /**
  * Tebuto user meta prefix.

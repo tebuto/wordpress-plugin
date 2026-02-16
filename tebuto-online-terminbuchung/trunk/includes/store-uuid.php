@@ -21,8 +21,7 @@ function tebuto_store_therapist_uuid(int $user_id, string $access_token): bool {
         'headers' => [
             'Authorization' => 'Bearer ' . $access_token,
         ],
-        'timeout'   => 30,
-        'sslverify' => TEBUTO_SSL_VERIFY,
+        'timeout' => 30,
     ]);
 
     if (is_wp_error($response)) {

@@ -36,13 +36,6 @@ class Tebuto_API {
     private ?int $therapist_id = null;
 
     /**
-     * User ID (from who-am-i, needed for managed users endpoint).
-     *
-     * @var int|null
-     */
-    private ?int $tebuto_user_id = null;
-
-    /**
      * User ID.
      *
      * @var int
@@ -82,8 +75,6 @@ class Tebuto_API {
         $this->access_token = tebuto_get_user_meta($this->user_id, 'access_token');
         $therapist_id = tebuto_get_user_meta($this->user_id, 'therapist_id');
         $this->therapist_id = $therapist_id ? (int) $therapist_id : null;
-        $tebuto_user_id = tebuto_get_user_meta($this->user_id, 'tebuto_user_id');
-        $this->tebuto_user_id = $tebuto_user_id ? (int) $tebuto_user_id : null;
         
         // Auto-fetch therapist ID if missing but we have a valid token
         if (empty($this->therapist_id) && !empty($this->access_token)) {
@@ -107,8 +98,7 @@ class Tebuto_API {
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->access_token,
             ],
-            'timeout'   => 30,
-            'sslverify' => TEBUTO_SSL_VERIFY,
+            'timeout' => 30,
         ]);
 
         if (is_wp_error($response)) {
@@ -141,12 +131,6 @@ class Tebuto_API {
         if (!isset($response_body['therapists'][0]['therapist']['id'])) {
             $this->last_error = __('Therapeuten-Daten nicht in API-Antwort gefunden.', 'tebuto-online-terminbuchung');
             return false;
-        }
-
-        // Store Tebuto user ID (needed for managed users endpoint)
-        if (isset($response_body['id'])) {
-            $this->tebuto_user_id = absint($response_body['id']);
-            tebuto_update_user_meta($this->user_id, 'tebuto_user_id', $this->tebuto_user_id);
         }
 
         $therapist = $response_body['therapists'][0]['therapist'];
@@ -251,8 +235,7 @@ class Tebuto_API {
                 'Authorization' => 'Bearer ' . $this->access_token,
                 'Content-Type'  => 'application/json',
             ],
-            'timeout'   => 30,
-            'sslverify' => TEBUTO_SSL_VERIFY,
+            'timeout' => 30,
         ];
 
         if (!empty($data) && in_array($method, ['POST', 'PUT', 'PATCH'], true)) {
@@ -318,8 +301,7 @@ class Tebuto_API {
                 'refresh_token' => $refresh_token,
                 'client_id'     => TEBUTO_CLIENT_ID,
             ],
-            'timeout'   => 30,
-            'sslverify' => TEBUTO_SSL_VERIFY,
+            'timeout' => 30,
         ]);
 
         if (is_wp_error($response)) {
@@ -364,8 +346,7 @@ class Tebuto_API {
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->access_token,
             ],
-            'timeout'   => 30,
-            'sslverify' => TEBUTO_SSL_VERIFY,
+            'timeout' => 30,
         ]);
 
         if (is_wp_error($response)) {
@@ -388,7 +369,6 @@ class Tebuto_API {
     public function get_event_categories() {
         return $this->request('GET', 'therapists/' . $this->therapist_id . '/event-categories');
     }
-
 
     /**
      * Create an event category.
@@ -594,100 +574,6 @@ class Tebuto_API {
      */
     public function get_therapist() {
         return $this->request('GET', 'therapists/' . $this->therapist_id);
-    }
-
-    /**
-     * Get therapist name from stored meta.
-     *
-     * @return string|null
-     */
-    public function get_therapist_name(): ?string {
-        return tebuto_get_user_meta($this->user_id, 'therapist_name') ?: null;
-    }
-
-    // =========================================================================
-    // MANAGED USERS
-    // =========================================================================
-
-    /**
-     * Get managed users (subusers).
-     *
-     * Requires the Tebuto user ID (from who-am-i), not the therapist ID.
-     *
-     * @return array|WP_Error
-     */
-    public function get_managed_users() {
-        if (empty($this->tebuto_user_id)) {
-            // Try to fetch it from who-am-i
-            $who_am_i = $this->who_am_i();
-            if (is_wp_error($who_am_i)) {
-                return $who_am_i;
-            }
-            if (isset($who_am_i['id'])) {
-                $this->tebuto_user_id = absint($who_am_i['id']);
-                tebuto_update_user_meta($this->user_id, 'tebuto_user_id', $this->tebuto_user_id);
-            }
-        }
-
-        if (empty($this->tebuto_user_id)) {
-            return new WP_Error('no_user_id', __('Tebuto User-ID nicht gefunden.', 'tebuto-online-terminbuchung'));
-        }
-
-        return $this->request('GET', 'users/' . $this->tebuto_user_id . '/managed-users');
-    }
-
-    /**
-     * Get all configured therapists (main therapist + managed users' therapists).
-     *
-     * Returns an array of [ 'id' => int, 'name' => string ] entries suitable
-     * for passing as data-configured-therapists to the booking widget.
-     *
-     * @return array List of therapist entries with 'id' and 'name'.
-     */
-    public function get_configured_therapists(): array {
-        $therapists = [];
-
-        // Add main therapist
-        $main_name = $this->get_therapist_name();
-        if ($this->therapist_id && $main_name) {
-            $therapists[] = [
-                'id'   => $this->therapist_id,
-                'name' => $main_name,
-            ];
-        } elseif ($this->therapist_id) {
-            // Fallback: fetch therapist info from API
-            $info = $this->get_therapist();
-            if (!is_wp_error($info) && isset($info['name'])) {
-                $therapists[] = [
-                    'id'   => $this->therapist_id,
-                    'name' => $info['name'],
-                ];
-                tebuto_update_user_meta($this->user_id, 'therapist_name', sanitize_text_field($info['name']));
-            }
-        }
-
-        // Add managed users' therapists
-        $managed = $this->get_managed_users();
-        if (!is_wp_error($managed) && isset($managed['users']) && is_array($managed['users'])) {
-            $seen_ids = array_column($therapists, 'id');
-            foreach ($managed['users'] as $user) {
-                if (!isset($user['therapists']) || !is_array($user['therapists'])) {
-                    continue;
-                }
-                foreach ($user['therapists'] as $t) {
-                    $tid = $t['id'] ?? 0;
-                    if ($tid && !in_array($tid, $seen_ids, true)) {
-                        $therapists[] = [
-                            'id'   => $tid,
-                            'name' => $t['name'] ?? '',
-                        ];
-                        $seen_ids[] = $tid;
-                    }
-                }
-            }
-        }
-
-        return $therapists;
     }
 }
 

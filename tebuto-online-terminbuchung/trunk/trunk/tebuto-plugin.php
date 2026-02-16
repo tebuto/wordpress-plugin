@@ -39,30 +39,24 @@ define('TEBUTO_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('TEBUTO_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
 /**
- * Tebuto URLs — override these in wp-config.php for local development:
- *
- *   define('TEBUTO_API_URL',    'https://therapists.api.tebuto.local');
- *   define('TEBUTO_AUTH_URL',   'https://auth.tebuto.local');
- *   define('TEBUTO_WIDGET_URL', 'https://tebuto.local/widget/booking.js');
+ * Tebuto Therapists API URL (for authenticated therapist endpoints).
  */
-if (!defined('TEBUTO_API_URL')) {
-    define('TEBUTO_API_URL', 'https://therapists.api.tebuto.de');
-}
+define('TEBUTO_API_URL', 'https://therapists.api.tebuto.de');
 
-if (!defined('TEBUTO_AUTH_URL')) {
-    define('TEBUTO_AUTH_URL', 'https://auth.tebuto.de');
-}
+/**
+ * Tebuto Auth URL.
+ */
+define('TEBUTO_AUTH_URL', 'https://auth.tebuto.de');
 
-if (!defined('TEBUTO_WIDGET_URL')) {
-    define('TEBUTO_WIDGET_URL', 'https://tebuto.de/widget/booking.js');
-}
+/**
+ * Tebuto Widget URL.
+ */
+define('TEBUTO_WIDGET_URL', 'https://tebuto.de/widget/booking.js');
 
 /**
  * Tebuto OAuth Client ID.
  */
-if (!defined('TEBUTO_CLIENT_ID')) {
-    define('TEBUTO_CLIENT_ID', 'wordpress-plugin');
-}
+define('TEBUTO_CLIENT_ID', 'wordpress-plugin');
 
 /**
  * Tebuto user meta prefix.

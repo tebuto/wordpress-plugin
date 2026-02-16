@@ -100,36 +100,3 @@ function tebuto_is_connected(): bool {
 function tebuto_get_therapist_uuid(): string {
     return tebuto_get_user_meta(get_current_user_id(), 'therapist_uuid');
 }
-
-/**
- * Find the WordPress user ID that has a Tebuto connection configured.
- *
- * On the frontend, `get_current_user_id()` returns 0 for unauthenticated
- * visitors. The widget settings (UUID, colors, categories, etc.) are stored
- * as user meta on the admin who configured the plugin. This helper resolves
- * that admin user ID so the shortcode can render for all visitors.
- *
- * @return int Connected user ID, or 0 if no user is connected.
- */
-function tebuto_get_connected_user_id(): int {
-    $current_user_id = get_current_user_id();
-
-    // If the current user has a therapist UUID, use them directly.
-    if ( $current_user_id > 0 ) {
-        $uuid = tebuto_get_user_meta( $current_user_id, 'therapist_uuid' );
-        if ( ! empty( $uuid ) ) {
-            return $current_user_id;
-        }
-    }
-
-    // Find any WordPress user who has connected to Tebuto.
-    $users = get_users( [
-        'meta_key'   => TEBUTO_META_PREFIX . 'therapist_uuid',
-        'meta_compare' => '!=',
-        'meta_value' => '',
-        'number'     => 1,
-        'fields'     => 'ID',
-    ] );
-
-    return ! empty( $users ) ? (int) $users[0] : 0;
-}

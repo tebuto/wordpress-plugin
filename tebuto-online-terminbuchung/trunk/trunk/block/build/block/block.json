@@ -30,7 +30,7 @@
     },
     "border": {
       "type": "boolean",
-      "default": false
+      "default": true
     },
     "inheritFont": {
       "type": "boolean",
@@ -40,15 +40,7 @@
       "type": "boolean",
       "default": false
     },
-    "showProviderFilter": {
-      "type": "boolean",
-      "default": false
-    },
     "categories": {
-      "type": "string",
-      "default": ""
-    },
-    "configuredCategoriesJson": {
       "type": "string",
       "default": ""
     },

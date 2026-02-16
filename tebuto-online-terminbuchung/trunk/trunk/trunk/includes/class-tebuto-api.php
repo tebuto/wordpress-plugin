@@ -370,7 +370,6 @@ class Tebuto_API {
         return $this->request('GET', 'therapists/' . $this->therapist_id . '/event-categories');
     }
 
-
     /**
      * Create an event category.
      *

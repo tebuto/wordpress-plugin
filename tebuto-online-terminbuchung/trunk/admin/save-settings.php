@@ -31,8 +31,6 @@ function tebuto_save_settings(): void {
         tebuto_delete_user_meta($current_user_id, 'refresh_token');
         tebuto_delete_user_meta($current_user_id, 'access_token');
         tebuto_delete_user_meta($current_user_id, 'therapist_uuid');
-        tebuto_delete_user_meta($current_user_id, 'therapist_id');
-        tebuto_delete_user_meta($current_user_id, 'therapist_name');
         tebuto_delete_user_meta($current_user_id, 'background_color');
         tebuto_delete_user_meta($current_user_id, 'border');
         tebuto_delete_user_meta($current_user_id, 'primary_color');
@@ -42,7 +40,6 @@ function tebuto_save_settings(): void {
         tebuto_delete_user_meta($current_user_id, 'inherit_font');
         tebuto_delete_user_meta($current_user_id, 'categories');
         tebuto_delete_user_meta($current_user_id, 'show_quick_filters');
-        tebuto_delete_user_meta($current_user_id, 'show_provider_filter');
         tebuto_delete_user_meta($current_user_id, 'custom_css');
 
         wp_safe_redirect(admin_url('admin.php?page=tebuto-integration&disconnected=1'));
@@ -78,8 +75,7 @@ function tebuto_save_settings(): void {
         // Boolean settings
         $border             = isset($_POST['border']) && $_POST['border'] === 'true' ? 'true' : 'false';
         $inherit_font       = isset($_POST['inherit_font']) && $_POST['inherit_font'] === 'true' ? 'true' : 'false';
-        $show_quick_filters  = isset($_POST['show_quick_filters']) && $_POST['show_quick_filters'] === 'true' ? 'true' : 'false';
-        $show_provider_filter = isset($_POST['show_provider_filter']) && $_POST['show_provider_filter'] === 'true' ? 'true' : 'false';
+        $show_quick_filters = isset($_POST['show_quick_filters']) && $_POST['show_quick_filters'] === 'true' ? 'true' : 'false';
 
         // Categories (comma-separated list of IDs from multiselect)
         $categories = '';
@@ -111,7 +107,6 @@ function tebuto_save_settings(): void {
         tebuto_update_user_meta($current_user_id, 'inherit_font', $inherit_font);
         tebuto_update_user_meta($current_user_id, 'categories', $categories);
         tebuto_update_user_meta($current_user_id, 'show_quick_filters', $show_quick_filters);
-        tebuto_update_user_meta($current_user_id, 'show_provider_filter', $show_provider_filter);
         tebuto_update_user_meta($current_user_id, 'custom_css', $custom_css);
 
         wp_safe_redirect(admin_url('admin.php?page=tebuto-shortcode&saved=1'));
