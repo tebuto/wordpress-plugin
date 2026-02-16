@@ -4,7 +4,7 @@ Tags: online booking, appointment scheduling, calendar, Terminbuchung, Termine
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.0.0
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,7 +85,7 @@ Ja, das Plugin selbst ist kostenlos. Je nach Tebuto-Tarif können für erweitert
 
 = Kann ich mehrere Buchungswidgets auf einer Seite verwenden? =
 
-Aktuell unterstützt das Plugin ein Widget pro Seite. Mehrere Widgets werden in zukünftigen Versionen möglich sein.
+Ja! Ab Version 2.1.0 können mehrere Widgets mit unterschiedlichen Einstellungen auf derselben Seite verwendet werden. Nutze dazu den Shortcode mit individuellen Attributen, z.B. `[tebuto_online_terminbuchung_widget primary_color="#3b82f6" categories="1,2,3"]`.
 
 = Funktioniert das Plugin mit Page Buildern? =
 
@@ -102,6 +102,21 @@ Unter **Tebuto → Shortcode** kannst du die Hintergrundfarbe ändern und einen 
 3. Frontend - Buchungswidget auf der Website
 
 == Changelog ==
+
+= 2.1.0 =
+* **NEU: Mehrere Widgets pro Seite** - Verschiedene Buchungswidgets mit individuellen Einstellungen auf derselben Seite verwenden
+* **NEU: Shortcode-Attribute** - Einstellungen direkt im Shortcode überschreiben, z.B. `[tebuto_online_terminbuchung_widget primary_color="#3b82f6" categories="1,2,3"]`
+* **NEU: Anbieterfilter** - Neuer Filter zur Auswahl des Anbieters im Widget für Multi-User-Konten
+* **NEU: Live-Shortcode-Generator** - Der angezeigte Shortcode aktualisiert sich automatisch bei Änderungen an den Einstellungen
+* **NEU: Konfigurierbare URLs** - API-, Auth- und Widget-URLs können per wp-config.php überschrieben werden (für lokale Entwicklung)
+* **Fix: Widget für nicht angemeldete Besucher** - Das Buchungswidget wird nun korrekt für alle Seitenbesucher angezeigt, nicht nur für eingeloggte WordPress-Nutzer
+* **Fix: Verbindungstrennung** - Beim Trennen der Tebuto-Verbindung werden nun alle gespeicherten Daten vollständig entfernt
+* **Fix: Doppelte Kategorien im Widget** - Bei Multi-User-Konten werden gleichnamige Kategorien verschiedener Anbieter im Widget nur einmal angezeigt
+* **Verbesserung: Kategorien-Deduplizierung** - Duplikate bei gleichnamigen Kategorien von Unternutzern werden automatisch entfernt
+* **Verbesserung: Kategorienfilter** - Nur öffentlich buchbare Kategorien werden angezeigt, Tebuto-Meet-Kategorien werden ausgeblendet
+* **Verbesserung: Eingabevalidierung** - Verbesserte Sanitisierung aller Shortcode-Attribute (Farben, Kategorien, CSS)
+* **Verbesserung: Gutenberg-Block** - Anbieterfilter und konfigurierte Kategorien nun auch im Block-Editor verfügbar
+* **Änderung: Rahmen-Standard** - Der Rahmen ist standardmäßig deaktiviert
 
 = 2.0.0 =
 * **NEU: Dashboard** - Übersicht über anstehende Termine direkt im WordPress-Admin
@@ -126,6 +141,9 @@ Unter **Tebuto → Shortcode** kannst du die Hintergrundfarbe ändern und einen 
 * Professionelles Admin-Interface
 
 == Upgrade Notice ==
+
+= 2.1.0 =
+Mehrere Widgets pro Seite, Anbieterfilter für Multi-User-Konten und Live-Shortcode-Generator!
 
 = 2.0.0 =
 Großes Update mit Dashboard, Terminverwaltung, erweiterten Widget-Einstellungen und Live-Vorschau!

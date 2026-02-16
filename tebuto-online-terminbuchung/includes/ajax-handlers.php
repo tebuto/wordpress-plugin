@@ -43,13 +43,19 @@ function tebuto_ajax_get_categories(): void {
         wp_send_json_error($api->get_last_error(), 500);
     }
 
-    // Transform to simple id/name array
+    // Transform to simple id/name array, deduplicated by name
     $result = [];
+    $seen_names = [];
     if (is_array($categories)) {
         foreach ($categories as $category) {
+            $name = $category['name'] ?? __('Unbenannt', 'tebuto-online-terminbuchung');
+            if (in_array($name, $seen_names, true)) {
+                continue;
+            }
+            $seen_names[] = $name;
             $result[] = [
                 'id'    => $category['id'] ?? 0,
-                'name'  => $category['name'] ?? __('Unbenannt', 'tebuto-online-terminbuchung'),
+                'name'  => $name,
                 'color' => $category['color'] ?? '#009087',
             ];
         }

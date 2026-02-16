@@ -43,7 +43,7 @@ function tebuto_enqueue_block_editor_assets(): void {
         'textPrimary'      => tebuto_get_user_meta($current_user_id, 'text_primary', '#374151'),
         'textSecondary'    => tebuto_get_user_meta($current_user_id, 'text_secondary', '#6b7280'),
         'borderColor'      => tebuto_get_user_meta($current_user_id, 'border_color', '#E9E9E9'),
-        'border'           => tebuto_get_user_meta($current_user_id, 'border', 'true') === 'true',
+        'border'           => tebuto_get_user_meta($current_user_id, 'border', 'false') === 'true',
         'inheritFont'      => tebuto_get_user_meta($current_user_id, 'inherit_font', 'false') === 'true',
         'showQuickFilters' => tebuto_get_user_meta($current_user_id, 'show_quick_filters', 'false') === 'true',
         'categories'       => tebuto_get_user_meta($current_user_id, 'categories', ''),

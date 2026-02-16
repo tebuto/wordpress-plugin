@@ -20,11 +20,12 @@ function tebuto_shortcode_page(): void {
     $text_primary       = tebuto_get_user_meta($current_user_id, 'text_primary', '#374151');
     $text_secondary     = tebuto_get_user_meta($current_user_id, 'text_secondary', '#6b7280');
     $border_color       = tebuto_get_user_meta($current_user_id, 'border_color', '#E9E9E9');
-    $border             = tebuto_get_user_meta($current_user_id, 'border', 'true');
+    $border             = tebuto_get_user_meta($current_user_id, 'border', 'false');
     $inherit_font       = tebuto_get_user_meta($current_user_id, 'inherit_font', 'false');
     $categories         = tebuto_get_user_meta($current_user_id, 'categories', '');
-    $show_quick_filters = tebuto_get_user_meta($current_user_id, 'show_quick_filters', 'false');
-    $custom_css         = tebuto_get_user_meta($current_user_id, 'custom_css', '');
+    $show_quick_filters  = tebuto_get_user_meta($current_user_id, 'show_quick_filters', 'false');
+    $show_provider_filter = tebuto_get_user_meta($current_user_id, 'show_provider_filter', 'false');
+    $custom_css          = tebuto_get_user_meta($current_user_id, 'custom_css', '');
 
     // Convert categories string to array
     $selected_categories = [];
@@ -124,10 +125,10 @@ function tebuto_shortcode_page(): void {
                         <h2><?php esc_html_e('Shortcode einbinden', 'tebuto-online-terminbuchung'); ?></h2>
                     </div>
                     <div class="tebuto-card-body">
-                        <p class="tebuto-intro-text"><?php esc_html_e('Füge diesen Shortcode in eine Seite oder einen Beitrag ein, um das Tebuto Buchungswidget anzuzeigen:', 'tebuto-online-terminbuchung'); ?></p>
+                        <p class="tebuto-intro-text"><?php esc_html_e('Kopiere diesen Shortcode und füge ihn in eine Seite oder einen Beitrag ein. Die Konfiguration wird direkt im Shortcode gespeichert — so kannst du mehrere Widgets mit unterschiedlichen Einstellungen verwenden.', 'tebuto-online-terminbuchung'); ?></p>
                         
                         <div class="tebuto-shortcode-box">
-                            <code id="tebuto-shortcode">[tebuto_online_terminbuchung_widget]</code>
+                            <code id="tebuto-shortcode" class="tebuto-shortcode-code">[tebuto_online_terminbuchung_widget]</code>
                             <button type="button" class="button button-primary tebuto-copy-btn" onclick="tebuto_copyShortcode()">
                                 <span class="dashicons dashicons-clipboard"></span>
                                 <?php esc_html_e('Kopieren', 'tebuto-online-terminbuchung'); ?>
@@ -136,7 +137,7 @@ function tebuto_shortcode_page(): void {
 
                         <div class="tebuto-info-box">
                             <span class="dashicons dashicons-info"></span>
-                            <p><?php esc_html_e('Alternativ kannst du den Tebuto-Block im Gutenberg-Editor verwenden. Suche einfach nach "Tebuto" in der Block-Bibliothek.', 'tebuto-online-terminbuchung'); ?></p>
+                            <p><?php esc_html_e('Der Shortcode enthält alle unten konfigurierten Einstellungen. Du kannst verschiedene Shortcodes mit unterschiedlichen Einstellungen auf verschiedenen Seiten verwenden.', 'tebuto-online-terminbuchung'); ?></p>
                         </div>
                     </div>
                 </div>
@@ -256,9 +257,20 @@ function tebuto_shortcode_page(): void {
                                         <label class="tebuto-switch">
                                             <input type="checkbox" name="show_quick_filters" id="show_quick_filters" value="true" <?php checked($show_quick_filters, 'true'); ?>>
                                             <span class="tebuto-switch-slider"></span>
-                                </label>
+                                        </label>
                                     </div>
                                     <?php endif; ?>
+
+                                    <div class="tebuto-switch-option">
+                                        <div class="tebuto-switch-option-text">
+                                            <span class="tebuto-switch-option-label"><?php esc_html_e('Anbieterfilter anzeigen', 'tebuto-online-terminbuchung'); ?></span>
+                                            <span class="tebuto-switch-option-desc"><?php esc_html_e('Zeigt einen Filter zur Auswahl des Anbieters im Widget', 'tebuto-online-terminbuchung'); ?></span>
+                                        </div>
+                                        <label class="tebuto-switch">
+                                            <input type="checkbox" name="show_provider_filter" id="show_provider_filter" value="true" <?php checked($show_provider_filter, 'true'); ?>>
+                                            <span class="tebuto-switch-slider"></span>
+                                        </label>
+                                    </div>
                                 </div>
 
                                 <!-- Categories Section -->
@@ -293,7 +305,7 @@ function tebuto_shortcode_page(): void {
                             <div class="tebuto-form-actions">
                                     <button type="submit" class="button button-primary button-hero">
                                         <span class="dashicons dashicons-saved"></span>
-                                    <?php esc_html_e('Einstellungen speichern', 'tebuto-online-terminbuchung'); ?>
+                                    <?php esc_html_e('Als Standard speichern', 'tebuto-online-terminbuchung'); ?>
                                 </button>
                             </div>
                         </form>
@@ -319,6 +331,93 @@ function tebuto_shortcode_page(): void {
     jQuery(document).ready(function($) {
         const selectedCategories = <?php echo wp_json_encode($selected_categories); ?>;
         const ajaxNonce = '<?php echo esc_js(wp_create_nonce('tebuto_admin')); ?>';
+
+        // Default values (used to determine which params to include in shortcode)
+        const DEFAULTS = {
+            primary_color: '#00B4A9',
+            background_color: '#ffffff',
+            text_primary: '#374151',
+            text_secondary: '#6b7280',
+            border_color: '#E9E9E9',
+            border: 'false',
+            inherit_font: 'false',
+            show_quick_filters: 'false',
+            show_provider_filter: 'false',
+            categories: '',
+            custom_css: ''
+        };
+
+        // Build shortcode string from current form values
+        function buildShortcode() {
+            const params = [];
+
+            const primaryColor = $('#primary_color').val();
+            if (primaryColor && primaryColor.toLowerCase() !== DEFAULTS.primary_color.toLowerCase()) {
+                params.push('primary_color="' + primaryColor + '"');
+            }
+
+            const bgColor = $('#background_color').val();
+            if (bgColor && bgColor.toLowerCase() !== DEFAULTS.background_color.toLowerCase()) {
+                params.push('background_color="' + bgColor + '"');
+            }
+
+            const textPri = $('#text_primary').val();
+            if (textPri && textPri.toLowerCase() !== DEFAULTS.text_primary.toLowerCase()) {
+                params.push('text_primary="' + textPri + '"');
+            }
+
+            const textSec = $('#text_secondary').val();
+            if (textSec && textSec.toLowerCase() !== DEFAULTS.text_secondary.toLowerCase()) {
+                params.push('text_secondary="' + textSec + '"');
+            }
+
+            const borderCol = $('#border_color').val();
+            if (borderCol && borderCol.toLowerCase() !== DEFAULTS.border_color.toLowerCase()) {
+                params.push('border_color="' + borderCol + '"');
+            }
+
+            const borderVal = $('#border').is(':checked') ? 'true' : 'false';
+            if (borderVal !== DEFAULTS.border) {
+                params.push('border="' + borderVal + '"');
+            }
+
+            const inheritFont = $('#inherit_font').is(':checked') ? 'true' : 'false';
+            if (inheritFont !== DEFAULTS.inherit_font) {
+                params.push('inherit_font="' + inheritFont + '"');
+            }
+
+            const quickFilters = $('#show_quick_filters').is(':checked') ? 'true' : 'false';
+            if (quickFilters !== DEFAULTS.show_quick_filters) {
+                params.push('show_quick_filters="' + quickFilters + '"');
+            }
+
+            const providerFilter = $('#show_provider_filter').is(':checked') ? 'true' : 'false';
+            if (providerFilter !== DEFAULTS.show_provider_filter) {
+                params.push('show_provider_filter="' + providerFilter + '"');
+            }
+
+            const cats = getSelectedCategories();
+            if (cats) {
+                params.push('categories="' + cats + '"');
+            }
+
+            const customCss = $('#custom_css').val().trim();
+            if (customCss) {
+                params.push('custom_css="' + customCss.replace(/"/g, '&quot;') + '"');
+            }
+
+            if (params.length === 0) {
+                return '[tebuto_online_terminbuchung_widget]';
+            }
+
+            return '[tebuto_online_terminbuchung_widget ' + params.join(' ') + ']';
+        }
+
+        // Update the displayed shortcode
+        function updateShortcodeDisplay() {
+            const shortcode = buildShortcode();
+            $('#tebuto-shortcode').text(shortcode);
+        }
 
         // Copy shortcode function
         function tebuto_copyShortcode() {
@@ -346,6 +445,7 @@ function tebuto_shortcode_page(): void {
             picker.on('input change', function() {
                 hex.val($(this).val().toUpperCase());
                 tebuto_updatePreview();
+                updateShortcodeDisplay();
             });
             
             hex.on('input', function() {
@@ -355,13 +455,15 @@ function tebuto_shortcode_page(): void {
                     picker.val(val);
                     hex.val(val.toUpperCase());
                     tebuto_updatePreview();
+                    updateShortcodeDisplay();
                 }
             });
         });
 
-        // Toggle switches update preview
+        // Toggle switches update preview and shortcode
         $('input[type="checkbox"]').on('change', function() {
             tebuto_updatePreview();
+            updateShortcodeDisplay();
         });
 
         // Theme presets
@@ -388,6 +490,7 @@ function tebuto_shortcode_page(): void {
             $btn.addClass('active');
             
             tebuto_updatePreview();
+            updateShortcodeDisplay();
         });
 
         // Debounce helper
@@ -403,6 +506,9 @@ function tebuto_shortcode_page(): void {
             };
         }
 
+        // Categories loaded from AJAX (used by loadWidget for configured-categories)
+        var loadedCategories = null;
+
         // Load categories for multiselect
         function loadCategories() {
             $.ajax({
@@ -414,6 +520,7 @@ function tebuto_shortcode_page(): void {
                 },
                 success: function(response) {
                     if (response.success) {
+                        loadedCategories = response.data;
                         renderCategoriesMultiselect(response.data);
                     } else {
                         $('#tebuto-categories-container').html(
@@ -454,10 +561,14 @@ function tebuto_shortcode_page(): void {
             html += '</div>';
             container.html(html);
 
-            // Update preview when category selection changes
+            // Update preview and shortcode when category selection changes
             container.find('input[type="checkbox"]').on('change', function() {
                 tebuto_updatePreview();
+                updateShortcodeDisplay();
             });
+
+            // Initial shortcode build after categories are loaded
+            updateShortcodeDisplay();
         }
 
         // Escape HTML helper
@@ -488,6 +599,7 @@ function tebuto_shortcode_page(): void {
                 border: $('#border').is(':checked'),
                 inheritFont: $('#inherit_font').is(':checked'),
                 showQuickFilters: $('#show_quick_filters').is(':checked'),
+                showProviderFilter: $('#show_provider_filter').is(':checked'),
                 categories: getSelectedCategories()
             };
         }
@@ -521,9 +633,25 @@ function tebuto_shortcode_page(): void {
             widgetScript.dataset.border = config.border ? 'true' : 'false';
             widgetScript.dataset.inheritFont = config.inheritFont ? 'true' : 'false';
             widgetScript.dataset.showQuickFilters = config.showQuickFilters ? 'true' : 'false';
+            if (config.showProviderFilter) {
+                widgetScript.dataset.includeSubusers = 'true';
+                widgetScript.dataset.showQuickFilters = 'true';
+                // Do NOT pass data-configured-categories when the provider
+                // filter is active. The external widget breaks its therapist
+                // dropdown when configured-categories is present alongside
+                // include-subusers. Let the widget derive categories itself.
+            }
             
-            if (config.categories) {
-                widgetScript.dataset.categories = config.categories;
+            // Pass category IDs to constrain the event API query.
+            // When the provider filter is active, skip category IDs because
+            // the main therapist's IDs differ from subuser IDs for
+            // identically named categories — restricting would hide subuser
+            // events. The widget uses configured-categories for the UI.
+            if (!config.showProviderFilter) {
+                var categoriesToPass = config.categories;
+                if (categoriesToPass) {
+                    widgetScript.dataset.categories = categoriesToPass;
+                }
             }
             
             widgetScript.async = true;
@@ -542,14 +670,15 @@ function tebuto_shortcode_page(): void {
         }
         window.tebuto_refreshPreview = tebuto_refreshPreview;
 
-        // Custom CSS preview update
+        // Custom CSS preview and shortcode update
         $('#custom_css').on('input', debounce(function() {
-            // For custom CSS, we'd need to inject it - for now just mark preview as potentially stale
+            updateShortcodeDisplay();
         }, 500));
 
         // Initial load
         loadCategories();
         loadWidget();
+        updateShortcodeDisplay();
     });
     </script>
     <style>
@@ -600,6 +729,18 @@ function tebuto_shortcode_page(): void {
 
     #tebuto-widget-preview-container #tebuto-booking-widget {
         max-width: 100%;
+    }
+
+    /* Shortcode display */
+    .tebuto-shortcode-code {
+        display: block;
+        word-break: break-all;
+        white-space: pre-wrap;
+        max-height: 120px;
+        overflow-y: auto;
+        font-size: 12px;
+        line-height: 1.5;
+        flex: 1;
     }
 
     /* Form Sections */

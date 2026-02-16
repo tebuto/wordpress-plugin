@@ -72,7 +72,9 @@ export default function Edit({ attributes, setAttributes }) {
 		border,
 		inheritFont,
 		showQuickFilters,
+		showProviderFilter,
 		categories,
+		configuredCategoriesJson,
 		customCss,
 	} = attributes;
 
@@ -142,6 +144,17 @@ export default function Edit({ attributes, setAttributes }) {
 		setIsMultiUser(window.tebutoData?.isMultiUser || false);
 	}, []);
 
+	// Store deduplicated categories as configured-categories for the widget
+	// UI dropdown. This prevents duplicate category names when multiple
+	// providers share identically named categories.
+	useEffect(() => {
+		if (availableCategories.length > 0) {
+			setAttributes({
+				configuredCategoriesJson: JSON.stringify(availableCategories),
+			});
+		}
+	}, [availableCategories]);
+
 	// Toggle category selection
 	const toggleCategory = (categoryId) => {
 		const newSelected = selectedCategories.includes(categoryId)
@@ -189,8 +202,22 @@ export default function Edit({ attributes, setAttributes }) {
 		script.dataset.border = border ? "true" : "false";
 		script.dataset.inheritFont = inheritFont ? "true" : "false";
 		script.dataset.showQuickFilters = showQuickFilters ? "true" : "false";
+		if (showProviderFilter) {
+			script.dataset.includeSubusers = "true";
+			script.dataset.showQuickFilters = "true";
+		}
 
-		if (categories) {
+		// Pass deduplicated categories for the widget UI dropdown to prevent
+		// duplicate category names across providers.
+		if (configuredCategoriesJson) {
+			script.dataset.configuredCategories = configuredCategoriesJson;
+		}
+
+		// Pass category IDs to constrain the event API query.
+		// When the provider filter is active, skip category IDs because
+		// the main therapist's IDs differ from subuser IDs for identically
+		// named categories — restricting would hide subuser events.
+		if (!showProviderFilter && categories) {
 			script.dataset.categories = categories;
 		}
 
@@ -215,6 +242,7 @@ export default function Edit({ attributes, setAttributes }) {
 		border,
 		inheritFont,
 		showQuickFilters,
+		showProviderFilter,
 		categories,
 		therapistUUID,
 	]);
@@ -399,6 +427,16 @@ export default function Edit({ attributes, setAttributes }) {
 							onChange={(value) => setAttributes({ showQuickFilters: value })}
 						/>
 					)}
+
+					<ToggleControl
+						label={__("Anbieterfilter anzeigen", "tebuto-online-terminbuchung")}
+						help={__(
+							"Zeigt einen Filter zur Auswahl des Anbieters im Widget",
+							"tebuto-online-terminbuchung"
+						)}
+						checked={showProviderFilter}
+						onChange={(value) => setAttributes({ showProviderFilter: value })}
+					/>
 				</PanelBody>
 
 				{/* Categories */}

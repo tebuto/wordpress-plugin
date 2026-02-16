@@ -58,7 +58,8 @@ function tebuto_handle_oauth_callback(): void {
             'client_id'     => TEBUTO_CLIENT_ID,
             'code_verifier' => $code_verifier,
         ],
-        'timeout' => 30,
+        'timeout'   => 30,
+        'sslverify' => TEBUTO_SSL_VERIFY,
     ]);
 
     if (is_wp_error($response)) {

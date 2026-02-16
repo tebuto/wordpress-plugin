@@ -13,6 +13,11 @@ services:
       WORDPRESS_DB_USER: root
       WORDPRESS_DB_PASSWORD: example
       WORDPRESS_DB_NAME: wordpress
+    extra_hosts:
+      - "tebuto.local:host-gateway"
+      - "auth.tebuto.local:host-gateway"
+      - "api.tebuto.local:host-gateway"
+      - "therapists.api.tebuto.local:host-gateway"
 
   db:
     image: mariadb:10.5
