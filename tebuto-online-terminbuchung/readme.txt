@@ -4,7 +4,7 @@ Tags: online booking, appointment scheduling, calendar, Terminbuchung, Termine
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.1.0
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -103,6 +103,9 @@ Unter **Tebuto → Shortcode** kannst du die Hintergrundfarbe ändern und einen 
 
 == Changelog ==
 
+= 2.2.0 =
+* TODO: Add changelog entries
+
 = 2.1.0 =
 * **NEU: Mehrere Widgets pro Seite** - Verschiedene Buchungswidgets mit individuellen Einstellungen auf derselben Seite verwenden
 * **NEU: Shortcode-Attribute** - Einstellungen direkt im Shortcode überschreiben, z.B. `[tebuto_online_terminbuchung_widget primary_color="#3b82f6" categories="1,2,3"]`
@@ -141,6 +144,9 @@ Unter **Tebuto → Shortcode** kannst du die Hintergrundfarbe ändern und einen 
 * Professionelles Admin-Interface
 
 == Upgrade Notice ==
+
+= 2.2.0 =
+TODO: Add upgrade notice
 
 = 2.1.0 =
 Mehrere Widgets pro Seite, Anbieterfilter für Multi-User-Konten und Live-Shortcode-Generator!

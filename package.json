@@ -7,6 +7,8 @@
   "license": "MIT",
   "scripts": {
     "build": "./scripts/build.sh",
+    "version:bump": "./scripts/bump-version.sh",
+    "version:check": "./scripts/bump-version.sh --check",
     "build:block": "npm --prefix tebuto-online-terminbuchung/block run build",
     "lint": "npm --prefix tebuto-online-terminbuchung/block run lint:js",
     "start": "npm --prefix tebuto-online-terminbuchung/block run start",
@@ -26,7 +28,6 @@
   "bugs": {
     "url": "https://github.com/tebuto/wordpress-plugin/issues"
   },
-
   "keywords": [
     "appointment",
     "booking",

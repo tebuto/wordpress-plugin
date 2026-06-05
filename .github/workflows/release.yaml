@@ -39,25 +39,12 @@ jobs:
 
       - name: Verify version consistency
         run: |
-          PLUGIN_VERSION=$(grep -oP "define\('TEBUTO_VERSION', '\K[^']+" tebuto-online-terminbuchung/tebuto-plugin.php)
-          HEADER_VERSION=$(grep -oP "^\s*\* Version: \K.+" tebuto-online-terminbuchung/tebuto-plugin.php | tr -d ' ')
-          STABLE_TAG=$(grep -oP "^Stable tag: \K.+" tebuto-online-terminbuchung/readme.txt | tr -d ' ')
-
-          if [ "$PLUGIN_VERSION" != "$HEADER_VERSION" ] || [ "$PLUGIN_VERSION" != "$STABLE_TAG" ]; then
-            echo "Version mismatch: TEBUTO_VERSION=$PLUGIN_VERSION, Header=$HEADER_VERSION, Stable tag=$STABLE_TAG"
-            exit 1
-          fi
-
           if [ "${{ github.event_name }}" = "release" ]; then
-            RELEASE_TAG="${{ github.event.release.tag_name }}"
-            RELEASE_TAG="${RELEASE_TAG#v}"
-            if [ "$PLUGIN_VERSION" != "$RELEASE_TAG" ]; then
-              echo "Release tag $RELEASE_TAG does not match plugin version $PLUGIN_VERSION"
-              exit 1
-            fi
+            ./scripts/bump-version.sh --check --release-tag "${{ github.event.release.tag_name }}"
+          else
+            ./scripts/bump-version.sh --check
           fi
-
-          echo "VERSION=$PLUGIN_VERSION" >> "$GITHUB_ENV"
+          echo "VERSION=$(./scripts/bump-version.sh --print-version)" >> "$GITHUB_ENV"
 
       - name: WordPress Plugin Deploy
         id: deploy

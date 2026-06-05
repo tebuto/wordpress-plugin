@@ -157,11 +157,22 @@ Add these repository secrets under **Settings → Secrets and variables → Acti
 
 ### Pre-release (PR to `main`)
 
-1. Bump the version in:
-   - `tebuto-online-terminbuchung/tebuto-plugin.php` (`Version:` header and `TEBUTO_VERSION` constant)
-   - `tebuto-online-terminbuchung/readme.txt` (`Stable tag:` and changelog)
-   - Root `package.json`
-2. Build and verify locally: `npm run build`
+1. Bump the version everywhere in one step:
+
+   ```bash
+   npm run version:bump 2.2.0
+   # or: npm run version:bump minor
+   ```
+
+   This updates `tebuto-plugin.php`, `readme.txt` (`Stable tag` + changelog/upgrade notice stubs), and `package.json`. Edit the changelog stubs in `readme.txt` before merging.
+
+2. Verify sync and build locally:
+
+   ```bash
+   npm run version:check
+   npm run build
+   ```
+
 3. Merge to `main`
 
 ### Release
