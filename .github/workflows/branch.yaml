@@ -1,0 +1,37 @@
+name: Branch
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    name: Build & Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: tebuto-online-terminbuchung/block/package-lock.json
+
+      - name: Install dependencies
+        working-directory: tebuto-online-terminbuchung/block
+        run: npm ci
+
+      - name: Lint JavaScript
+        working-directory: tebuto-online-terminbuchung/block
+        run: npm run lint:js
+
+      - name: Build Gutenberg block
+        working-directory: tebuto-online-terminbuchung/block
+        run: npm run build
+
+      - name: Verify plugin ZIP build
+        run: ./scripts/build.sh

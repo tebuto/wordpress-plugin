@@ -1,9 +1,10 @@
-version: '3.8'
+# Local WordPress development environment.
+# See README.md and CONTRIBUTING.md for setup instructions.
 
 services:
   wordpress:
     image: wordpress:latest
-    platform: linux/arm64 # Definiert die Plattform
+    platform: linux/arm64
     ports:
       - "8000:80"
     volumes:
@@ -21,7 +22,7 @@ services:
 
   db:
     image: mariadb:10.5
-    platform: linux/arm64 # Definiert die Plattform
+    platform: linux/arm64
     environment:
       MYSQL_ROOT_PASSWORD: example
       MYSQL_DATABASE: wordpress

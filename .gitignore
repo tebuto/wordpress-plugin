@@ -1,4 +1,18 @@
-wordpress
-node_modules
+# Local WordPress installation (docker compose)
+wordpress/
 
+# Dependencies
+node_modules/
+
+# Build artifacts
+.build/
+*.zip
+
+# OS files
 .DS_Store
+
+# SVN metadata
+.svn/
+
+# Local tooling
+.playwright-mcp/

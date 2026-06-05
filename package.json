@@ -1,12 +1,46 @@
 {
-  "name": "wordpress-plugin",
-  "version": "2.1.0",
-  "description": "",
-  "main": "index.js",
+  "name": "tebuto-wordpress-plugin",
+  "version": "2.2.0",
+  "description": "WordPress plugin for integrating Tebuto appointment booking",
+  "homepage": "https://tebuto.de/dokumentation/wordpress-plugin",
+  "author": "Artus Engineering GmbH",
+  "license": "MIT",
   "scripts": {
-    "zip": "cd tebuto-online-terminbuchung/trunk && zip -r ../../tebuto.zip . -x \"block/node_modules/*\" -x \"block/src/*\" && cd -"
+    "build": "./scripts/build.sh",
+    "build:block": "npm --prefix tebuto-online-terminbuchung/block run build",
+    "lint": "npm --prefix tebuto-online-terminbuchung/block run lint:js",
+    "start": "npm --prefix tebuto-online-terminbuchung/block run start",
+    "postinstall": "npm --prefix tebuto-online-terminbuchung/block ci",
+    "dev:setup": "./scripts/dev-setup.sh",
+    "dev:up": "docker compose up -d",
+    "dev:down": "docker compose down",
+    "dev:logs": "docker compose logs -f wordpress",
+    "dev:build": "./scripts/dev-sync.sh",
+    "dev:sync": "./scripts/dev-sync.sh --skip-build",
+    "dev": "concurrently -k -n block,sync \"npm run start\" \"chokidar 'tebuto-online-terminbuchung/**/*' -i '**/node_modules/**' -i '**/.svn/**' -i '**/assets-wporg/**' --debounce 500 -c 'npm run dev:sync'\""
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tebuto/wordpress-plugin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tebuto/wordpress-plugin/issues"
+  },
+
+  "keywords": [
+    "appointment",
+    "booking",
+    "calendar",
+    "wordpress",
+    "tebuto",
+    "gutenberg",
+    "terminbuchung"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "chokidar-cli": "^3.0.0",
+    "concurrently": "^9.1.2"
+  }
 }

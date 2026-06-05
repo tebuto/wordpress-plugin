@@ -1,0 +1,12 @@
+<?php
+/**
+ * Local Tebuto development overrides.
+ *
+ * Copy this file to wordpress/wp-config.local.php and adjust as needed.
+ * It is loaded automatically after running npm run dev:setup.
+ */
+
+define( 'TEBUTO_API_URL', 'https://therapists.api.tebuto.local' );
+define( 'TEBUTO_AUTH_URL', 'https://auth.tebuto.local' );
+define( 'TEBUTO_WIDGET_URL', 'https://tebuto.local/widget/booking.js' );
+define( 'TEBUTO_SSL_VERIFY', false );
