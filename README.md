@@ -8,10 +8,10 @@
 
 ## SVN
 
-1. Source code is located in the `trunk` directory
+1. Source code is located in the `tebuto-online-terminbuchung` directory
 2. The `tags` directory contains the release versions
 3. To release a new version, create a new tag with the version number via SVN e.g. 
     ```sh
-    svn copy trunk tags/1.0.0         
+    svn copy tebuto-online-terminbuchung tags/1.0.0         
     svn --username=tebuto commit -m "Initial plugin upload – Version 1.0.0"
     ```
