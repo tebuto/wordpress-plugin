@@ -1,0 +1,82 @@
+name: Release to WordPress.org
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Skip SVN commit (test build only)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    name: Deploy to WordPress.org
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event.release.prerelease != true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.release.tag_name || github.ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: tebuto-online-terminbuchung/block/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build plugin
+        run: ./scripts/build.sh --keep-build-dir
+
+      - name: Verify version consistency
+        run: |
+          PLUGIN_VERSION=$(grep -oP "define\('TEBUTO_VERSION', '\K[^']+" tebuto-online-terminbuchung/tebuto-plugin.php)
+          HEADER_VERSION=$(grep -oP "^\s*\* Version: \K.+" tebuto-online-terminbuchung/tebuto-plugin.php | tr -d ' ')
+          STABLE_TAG=$(grep -oP "^Stable tag: \K.+" tebuto-online-terminbuchung/readme.txt | tr -d ' ')
+
+          if [ "$PLUGIN_VERSION" != "$HEADER_VERSION" ] || [ "$PLUGIN_VERSION" != "$STABLE_TAG" ]; then
+            echo "Version mismatch: TEBUTO_VERSION=$PLUGIN_VERSION, Header=$HEADER_VERSION, Stable tag=$STABLE_TAG"
+            exit 1
+          fi
+
+          if [ "${{ github.event_name }}" = "release" ]; then
+            RELEASE_TAG="${{ github.event.release.tag_name }}"
+            RELEASE_TAG="${RELEASE_TAG#v}"
+            if [ "$PLUGIN_VERSION" != "$RELEASE_TAG" ]; then
+              echo "Release tag $RELEASE_TAG does not match plugin version $PLUGIN_VERSION"
+              exit 1
+            fi
+          fi
+
+          echo "VERSION=$PLUGIN_VERSION" >> "$GITHUB_ENV"
+
+      - name: WordPress Plugin Deploy
+        id: deploy
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        with:
+          generate-zip: true
+          dry-run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: tebuto-online-terminbuchung
+          BUILD_DIR: .build/tebuto-online-terminbuchung
+          ASSETS_DIR: tebuto-online-terminbuchung/assets-wporg
+          VERSION: ${{ env.VERSION }}
+
+      - name: Upload release asset
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: ${{ steps.deploy.outputs.zip-path }}

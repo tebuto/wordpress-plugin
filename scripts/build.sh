@@ -6,6 +6,19 @@ PLUGIN_SLUG="tebuto-online-terminbuchung"
 SOURCE_DIR="$ROOT_DIR/$PLUGIN_SLUG"
 BUILD_DIR="$ROOT_DIR/.build"
 ZIP_FILE="$ROOT_DIR/${PLUGIN_SLUG}.zip"
+KEEP_BUILD_DIR=false
+
+for arg in "$@"; do
+	case $arg in
+		--keep-build-dir)
+			KEEP_BUILD_DIR=true
+			;;
+	esac
+done
+
+if [ "${KEEP_BUILD_DIR:-}" = "1" ]; then
+	KEEP_BUILD_DIR=true
+fi
 
 cd "$ROOT_DIR"
 
@@ -38,7 +51,9 @@ cp -R "$SOURCE_DIR/block/build" "$BUILD_DIR/$PLUGIN_SLUG/block/"
 echo "Creating the zip archive..."
 (cd "$BUILD_DIR" && zip -r "$ZIP_FILE" .)
 
-echo "Cleaning up build directory..."
-rm -rf "$BUILD_DIR"
+if [ "$KEEP_BUILD_DIR" = false ]; then
+	echo "Cleaning up build directory..."
+	rm -rf "$BUILD_DIR"
+fi
 
 echo "Build completed: $ZIP_FILE"

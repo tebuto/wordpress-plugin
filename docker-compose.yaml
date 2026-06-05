@@ -21,7 +21,7 @@ services:
       - "therapists.api.tebuto.local:host-gateway"
 
   db:
-    image: mariadb:10.5
+    image: mariadb:latest
     platform: linux/arm64
     environment:
       MYSQL_ROOT_PASSWORD: example

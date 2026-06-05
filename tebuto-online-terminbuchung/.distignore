@@ -1,0 +1,7 @@
+block/src
+block/package.json
+block/package-lock.json
+block/node_modules
+assets-wporg
+.svn
+.DS_Store

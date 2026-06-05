@@ -117,6 +117,7 @@ npm run lint
 ```
 tebuto-online-terminbuchung/   # Plugin source (development trunk)
 ├── admin/                     # WordPress admin pages and settings
+├── assets-wporg/              # WordPress.org banners, icons, screenshots (deployed to SVN assets/)
 ├── block/                     # Gutenberg block (React + @wordpress/scripts)
 │   ├── src/                   # Block source
 │   └── build/                 # Compiled block assets
@@ -125,7 +126,6 @@ tebuto-online-terminbuchung/   # Plugin source (development trunk)
 └── readme.txt                 # WordPress.org plugin readme
 scripts/                       # Build and development scripts (build, dev-sync, dev-setup)
 wordpress/                     # Local WordPress instance (Docker volume, gitignored)
-tags/                          # Historical release snapshots (mirrors SVN tags)
 ```
 
 ## Coding Standards
@@ -144,25 +144,53 @@ tags/                          # Historical release snapshots (mirrors SVN tags)
 
 ## Releasing to WordPress.org
 
-Releases are published manually via the WordPress.org SVN repository — there is no automated release pipeline.
+Releases are automated via GitHub Actions when a GitHub Release is published. The workflow builds production-only artifacts (no `block/src/`, `package-lock.json`, or `node_modules`) and deploys them to the WordPress.org SVN repository.
 
-### SVN Layout
+### Prerequisites
 
-- **Trunk**: `tebuto-online-terminbuchung/` (plugin source)
-- **Tags**: `tags/{version}/` (immutable release snapshots)
+Add these repository secrets under **Settings → Secrets and variables → Actions**:
 
-### Release Steps
+| Secret | Description |
+| --- | --- |
+| `SVN_USERNAME` | WordPress.org username |
+| `SVN_PASSWORD` | WordPress.org password ([application password](https://make.wordpress.org/core/2020/11/05/wordpress-org-accounts-now-require-2fa/) recommended) |
 
-1. Update the version in `tebuto-plugin.php`, `readme.txt` (Stable tag + changelog), and root `package.json`
-2. Build and verify: `npm run build`
-3. Copy the plugin to SVN trunk and create a new tag:
+### Pre-release (PR to `main`)
 
-   ```sh
-   svn copy tebuto-online-terminbuchung tags/X.Y.Z
-   svn --username=tebuto commit -m "Release version X.Y.Z"
-   ```
+1. Bump the version in:
+   - `tebuto-online-terminbuchung/tebuto-plugin.php` (`Version:` header and `TEBUTO_VERSION` constant)
+   - `tebuto-online-terminbuchung/readme.txt` (`Stable tag:` and changelog)
+   - Root `package.json`
+2. Build and verify locally: `npm run build`
+3. Merge to `main`
 
-4. Update the `tags/` directory in this repository to mirror the SVN tag (optional, for history)
+### Release
+
+1. Go to **GitHub → Releases → Draft a new release**
+2. Choose tag `X.Y.Z` (must match the version in the plugin files; no `v` prefix)
+3. Publish the release — the [Release to WordPress.org](.github/workflows/release.yaml) workflow will:
+   - Build the plugin via `scripts/build.sh`
+   - Deploy to SVN `trunk/` and create `tags/X.Y.Z/`
+   - Update SVN `assets/` from `assets-wporg/`
+   - Attach `tebuto-online-terminbuchung.zip` to the GitHub Release
+
+Pre-releases are skipped automatically.
+
+### Testing the release workflow
+
+Before the first automated release, run a dry-run from the Actions tab:
+
+1. Go to **Actions → Release to WordPress.org → Run workflow**
+2. Leave **dry_run** enabled (default) and run on `main`
+3. Confirm the build and version check steps pass (no SVN commit is made)
+
+To test a live deploy without creating a GitHub Release, run the workflow manually with **dry_run** disabled. This requires the SVN secrets to be configured.
+
+### What gets deployed
+
+The build script (`scripts/build.sh`) packages only production files. Development artifacts are excluded — see `tebuto-online-terminbuchung/.distignore` for the full list.
+
+Existing WordPress.org SVN tags are never modified; only new version tags are created.
 
 > **Note:** The WordPress.org distribution is licensed under [GPLv2 or later](https://www.gnu.org/licenses/gpl-2.0.html), as required by the WordPress Plugin Directory. The source code in this GitHub repository is licensed under the [MIT License](LICENSE).
 
