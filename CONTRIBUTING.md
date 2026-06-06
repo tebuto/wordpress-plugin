@@ -207,7 +207,7 @@ The build script (`scripts/build.sh`) packages only production files. Developmen
 
 Existing WordPress.org SVN tags are never modified; only new version tags are created.
 
-> **Note:** The WordPress.org distribution is licensed under [GPLv2 or later](https://www.gnu.org/licenses/gpl-2.0.html), as required by the WordPress Plugin Directory. The source code in this GitHub repository is licensed under the [MIT License](LICENSE).
+> **Note:** This repository is licensed under [GPLv2 or later](LICENSE), as required by the WordPress Plugin Directory.
 
 ## Related Projects
 

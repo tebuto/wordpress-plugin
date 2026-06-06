@@ -4,7 +4,7 @@
   "description": "WordPress plugin for integrating Tebuto appointment booking",
   "homepage": "https://tebuto.de/dokumentation/wordpress-plugin",
   "author": "Artus Engineering GmbH",
-  "license": "MIT",
+  "license": "GPL-2.0-or-later",
   "scripts": {
     "build": "./scripts/build.sh",
     "version:bump": "./scripts/bump-version.sh",

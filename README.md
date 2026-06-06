@@ -6,7 +6,7 @@
 
 <div align="center">
   <a href="https://wordpress.org/plugins/tebuto-online-terminbuchung/"><img alt="WordPress Plugin" src="https://img.shields.io/wordpress/plugin/v/tebuto-online-terminbuchung?label=wordpress.org"></a>
-  <a href="https://github.com/tebuto/wordpress-plugin/blob/main/LICENSE"><img alt="MIT License" src="https://img.shields.io/github/license/tebuto/wordpress-plugin"></a>
+  <a href="https://github.com/tebuto/wordpress-plugin/blob/main/LICENSE"><img alt="GPLv2 License" src="https://img.shields.io/github/license/tebuto/wordpress-plugin"></a>
   <a href="https://github.com/tebuto/wordpress-plugin/actions/workflows/branch.yaml"><img alt="CI Status" src="https://img.shields.io/github/actions/workflow/status/tebuto/wordpress-plugin/.github%2Fworkflows%2Fbranch.yaml?label=CI&logo=GitHub"></a>
 </div>
 
@@ -217,6 +217,4 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for de
 
 ## License
 
-This repository is licensed under the [MIT License](LICENSE).
-
-The version distributed via the [WordPress Plugin Directory](https://wordpress.org/plugins/tebuto-online-terminbuchung/) is released under [GPLv2 or later](https://www.gnu.org/licenses/gpl-2.0.html), as required by WordPress.org.
+This repository is licensed under [GPLv2 or later](LICENSE).
