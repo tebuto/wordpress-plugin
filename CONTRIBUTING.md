@@ -68,13 +68,17 @@ The `docker-compose.yaml` maps the required hostnames to your machine via `host-
 
 ### Keycloak Client (Local Auth)
 
-When running against a local Tebuto stack, configure a Keycloak client in the `tebuto-therapists` realm:
+When developing against a self-hosted Tebuto instance (for example the `*.tebuto.local` URLs in `wp-config.local.php`), create an OAuth client in the Keycloak realm `tebuto-therapists`:
 
-1. Create a client named `wordpress-plugin`
-2. Set **Valid redirect URIs** to `*`
-3. Add the `offline_access` scope
-4. Enable PKCE: **Advanced Settings → Proof Key for Code Exchange Code Challenge Method → S256**
-5. Set the login theme to `tebuto`
+1. Client id: `wordpress-plugin` (must match `TEBUTO_CLIENT_ID` in `tebuto-plugin.php`)
+2. Client type: **public**; enable standard authorization code flow
+3. **Valid redirect URIs** — at least `http://localhost:8000/*` (Docker WordPress default port); add other origins if WordPress runs on a different host or port
+4. **Web origins** — matching WordPress admin origin (e.g. `http://localhost:8000`)
+5. Client scopes — plugin requests `openid offline_access`; add optional scope `offline_access`
+6. Advanced: PKCE code challenge method **S256**
+7. Login theme: **tebuto** (when that theme is installed on your Keycloak instance)
+
+Connect via **Tebuto → Verbindung** in wp-admin (full-page OAuth redirect). The block editor iframe cannot complete login because Keycloak blocks embedded auth with `frame-ancestors`.
 
 ## Development Workflow
 

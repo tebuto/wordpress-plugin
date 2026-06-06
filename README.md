@@ -179,9 +179,9 @@ npm run dev:sync
 
 The plugin is installed at `wordpress/wp-content/plugins/tebuto-online-terminbuchung/`. The `wordpress/` directory is gitignored and persists between container restarts.
 
-### Local Tebuto Stack
+### Local Tebuto API
 
-When developing against a local Tebuto environment, edit `wordpress/wp-config.local.php`:
+When developing against a self-hosted Tebuto instance, edit `wordpress/wp-config.local.php`:
 
 ```php
 define('TEBUTO_API_URL', 'https://therapists.api.tebuto.local');
@@ -192,7 +192,7 @@ define('TEBUTO_SSL_VERIFY', false);
 
 Docker maps the required hostnames to your machine via `host-gateway` (see `docker-compose.yaml`).
 
-For Keycloak setup when running a local Tebuto stack, see [CONTRIBUTING.md](CONTRIBUTING.md).
+For Keycloak OAuth client setup when using a self-hosted Tebuto instance, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full development guide.
 

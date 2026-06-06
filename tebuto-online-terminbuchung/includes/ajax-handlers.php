@@ -16,6 +16,7 @@ function tebuto_register_ajax_handlers(): void {
     add_action('wp_ajax_tebuto_get_events', 'tebuto_ajax_get_events');
     add_action('wp_ajax_tebuto_booking_action', 'tebuto_ajax_booking_action');
     add_action('wp_ajax_tebuto_get_categories', 'tebuto_ajax_get_categories');
+    add_action('wp_ajax_tebuto_get_configured_therapists', 'tebuto_ajax_get_configured_therapists');
 }
 add_action('init', 'tebuto_register_ajax_handlers');
 
@@ -37,31 +38,50 @@ function tebuto_ajax_get_categories(): void {
         wp_send_json_error(__('Nicht mit Tebuto verbunden.', 'tebuto-online-terminbuchung'), 401);
     }
 
-    $categories = $api->get_event_categories();
+    $categories = $api->get_aggregated_event_categories();
 
     if (is_wp_error($categories)) {
         wp_send_json_error($api->get_last_error(), 500);
     }
 
-    // Transform to simple id/name array, deduplicated by name
     $result = [];
-    $seen_names = [];
     if (is_array($categories)) {
         foreach ($categories as $category) {
-            $name = $category['name'] ?? __('Unbenannt', 'tebuto-online-terminbuchung');
-            if (in_array($name, $seen_names, true)) {
-                continue;
-            }
-            $seen_names[] = $name;
             $result[] = [
-                'id'    => $category['id'] ?? 0,
-                'name'  => $name,
-                'color' => $category['color'] ?? '#009087',
+                'id'                   => $category['id'] ?? 0,
+                'name'                 => $category['displayName'] ?? ($category['name'] ?? __('Unbenannt', 'tebuto-online-terminbuchung')),
+                'color'                => $category['color'] ?? '#009087',
+                'therapistId'          => $category['therapistId'] ?? 0,
+                'therapistName'        => $category['therapistName'] ?? '',
+                'isFromSubaccount'     => ! empty($category['isFromSubaccount']),
+                'publicBookingEnabled' => ! empty($category['publicBookingEnabled']),
+                'widgetSelectable'     => ! empty($category['widgetSelectable']),
             ];
         }
     }
 
     wp_send_json_success($result);
+}
+
+/**
+ * AJAX handler: Get configured therapists for multi-user widget previews.
+ *
+ * @return void
+ */
+function tebuto_ajax_get_configured_therapists(): void {
+    check_ajax_referer('tebuto_admin', 'nonce');
+
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(__('Keine Berechtigung.', 'tebuto-online-terminbuchung'), 403);
+    }
+
+    $api = new Tebuto_API();
+
+    if (!$api->is_connected()) {
+        wp_send_json_error(__('Nicht mit Tebuto verbunden.', 'tebuto-online-terminbuchung'), 401);
+    }
+
+    wp_send_json_success($api->get_configured_therapists());
 }
 
 /**

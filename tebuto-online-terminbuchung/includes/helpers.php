@@ -133,3 +133,46 @@ function tebuto_get_connected_user_id(): int {
 
     return ! empty( $users ) ? (int) $users[0] : 0;
 }
+
+/**
+ * Resolve widget account capabilities (matches Tebuto webapp WidgetThemeConfigurator).
+ *
+ * @param int|null $user_id WordPress user ID. Defaults to current user.
+ * @return array{has_managed_users: bool, is_managing_user: bool}
+ */
+function tebuto_get_widget_account_capabilities( ?int $user_id = null ): array {
+    $defaults = [
+        'has_managed_users' => false,
+        'is_managing_user'  => false,
+    ];
+
+    $user_id = $user_id ?? get_current_user_id();
+    if ( $user_id <= 0 ) {
+        return $defaults;
+    }
+
+    $api = new Tebuto_API( $user_id );
+    if ( ! $api->is_connected() ) {
+        return $defaults;
+    }
+
+    $who_am_i = $api->who_am_i();
+    if ( is_wp_error( $who_am_i ) ) {
+        return $defaults;
+    }
+
+    $is_managing_user  = ! empty( $who_am_i['isMultiUserManager'] );
+    $has_managed_users = false;
+
+    if ( $is_managing_user ) {
+        $managed = $api->get_managed_users();
+        if ( ! is_wp_error( $managed ) && ! empty( $managed['users'] ) && is_array( $managed['users'] ) ) {
+            $has_managed_users = count( $managed['users'] ) > 0;
+        }
+    }
+
+    return [
+        'has_managed_users' => $has_managed_users,
+        'is_managing_user'  => $is_managing_user,
+    ];
+}

@@ -386,7 +386,209 @@ class Tebuto_API {
      * @return array|WP_Error
      */
     public function get_event_categories() {
-        return $this->request('GET', 'therapists/' . $this->therapist_id . '/event-categories');
+        return $this->get_event_categories_for_therapist($this->therapist_id);
+    }
+
+    /**
+     * Get event categories for a specific therapist (manager may query subaccounts).
+     *
+     * @param int|null $therapist_id Therapist ID. Defaults to the connected therapist.
+     * @return array|WP_Error
+     */
+    public function get_event_categories_for_therapist(?int $therapist_id = null) {
+        $resolved_therapist_id = $therapist_id ?? $this->therapist_id;
+        if (empty($resolved_therapist_id)) {
+            return new WP_Error('no_therapist_id', __('Therapeuten-ID nicht gefunden.', 'tebuto-online-terminbuchung'));
+        }
+
+        return $this->request('GET', 'therapists/' . $resolved_therapist_id . '/event-categories');
+    }
+
+    /**
+     * Normalize a category row for plugin lists (dashboard, widget configurator).
+     *
+     * @param array  $category           Raw API category.
+     * @param int    $therapist_id       Owning therapist ID.
+     * @param string $therapist_name     Owning therapist name.
+     * @param bool   $is_from_subaccount Whether the row belongs to a managed account.
+     * @return array
+     */
+    private function map_aggregated_category_row(
+        array $category,
+        int $therapist_id,
+        string $therapist_name,
+        bool $is_from_subaccount
+    ): array {
+        $name = $category['name'] ?? __('Unbenannt', 'tebuto-online-terminbuchung');
+        $display_name = $is_from_subaccount && $therapist_name !== ''
+            ? sprintf('%s (%s)', $name, $therapist_name)
+            : $name;
+        $public_booking_enabled = ! empty($category['publicBookingEnabled']);
+
+        return array_merge($category, [
+            'id'                  => $category['id'] ?? 0,
+            'name'                => $name,
+            'displayName'         => $display_name,
+            'color'               => $category['color'] ?? '#009087',
+            'therapistId'         => $therapist_id,
+            'therapistName'       => $therapist_name,
+            'isFromSubaccount'    => $is_from_subaccount,
+            'isInheritedCategory' => ! empty($category['isInheritedCategory']),
+            'publicBookingEnabled'=> $public_booking_enabled,
+            'widgetSelectable'    => $public_booking_enabled,
+        ]);
+    }
+
+    /**
+     * Sort aggregated categories for plugin UIs: public first, then by display name.
+     *
+     * @param array $categories Aggregated category rows.
+     * @return array
+     */
+    private function sort_aggregated_event_categories(array $categories): array {
+        usort(
+            $categories,
+            static function (array $a, array $b): int {
+                $public_compare = (empty($a['widgetSelectable']) ? 1 : 0) <=> (empty($b['widgetSelectable']) ? 1 : 0);
+                if ($public_compare !== 0) {
+                    return $public_compare;
+                }
+
+                return strcasecmp(
+                    (string) ($a['displayName'] ?? $a['name'] ?? ''),
+                    (string) ($b['displayName'] ?? $b['name'] ?? '')
+                );
+            }
+        );
+
+        return $categories;
+    }
+
+    /**
+     * Aggregate all event categories for the manager account and subaccounts.
+     *
+     * Includes every category for display in the plugin. Non-public rows stay visible
+     * but are marked with widgetSelectable=false. Subaccount inherited mirrors are omitted.
+     *
+     * @return array|WP_Error
+     */
+    public function get_aggregated_event_categories() {
+        if (empty($this->therapist_id)) {
+            return new WP_Error('no_therapist_id', __('Therapeuten-ID nicht gefunden.', 'tebuto-online-terminbuchung'));
+        }
+
+        $main_name = $this->get_therapist_name() ?? '';
+        $main_categories = $this->get_event_categories_for_therapist($this->therapist_id);
+        if (is_wp_error($main_categories)) {
+            return $main_categories;
+        }
+
+        $result = [];
+        if (is_array($main_categories)) {
+            foreach ($main_categories as $category) {
+                $result[] = $this->map_aggregated_category_row(
+                    $category,
+                    $this->therapist_id,
+                    $main_name,
+                    false
+                );
+            }
+        }
+
+        $capabilities = tebuto_get_widget_account_capabilities($this->user_id);
+        if (empty($capabilities['has_managed_users'])) {
+            return $this->sort_aggregated_event_categories($result);
+        }
+
+        $configured_therapists = $this->get_configured_therapists();
+        foreach ($configured_therapists as $therapist) {
+            $therapist_id = $therapist['id'] ?? 0;
+            if (!$therapist_id || $therapist_id === $this->therapist_id) {
+                continue;
+            }
+
+            $sub_categories = $this->get_event_categories_for_therapist($therapist_id);
+            if (is_wp_error($sub_categories) || !is_array($sub_categories)) {
+                continue;
+            }
+
+            $therapist_name = $therapist['name'] ?? '';
+            foreach ($sub_categories as $category) {
+                if (!empty($category['isInheritedCategory'])) {
+                    continue;
+                }
+
+                $result[] = $this->map_aggregated_category_row(
+                    $category,
+                    $therapist_id,
+                    $therapist_name,
+                    true
+                );
+            }
+        }
+
+        return $this->sort_aggregated_event_categories($result);
+    }
+
+    /**
+     * Resolve configured therapists for a widget category selection.
+     *
+     * @param int[] $category_ids Selected widget category IDs.
+     * @return array List of therapist entries with id and name.
+     */
+    public function get_configured_therapists_for_category_ids(array $category_ids): array {
+        if (empty($category_ids)) {
+            return [];
+        }
+
+        $aggregated = $this->get_aggregated_event_categories();
+        if (is_wp_error($aggregated) || !is_array($aggregated)) {
+            return [];
+        }
+
+        $selected_ids = array_flip(array_map('absint', $category_ids));
+        $therapists = [];
+        $seen_ids = [];
+
+        foreach ($aggregated as $category) {
+            $category_id = absint($category['id'] ?? 0);
+            if ($category_id === 0 || !isset($selected_ids[$category_id])) {
+                continue;
+            }
+
+            $therapist_id = absint($category['therapistId'] ?? 0);
+            if ($therapist_id === 0 || isset($seen_ids[$therapist_id])) {
+                continue;
+            }
+
+            $seen_ids[$therapist_id] = true;
+            $therapists[] = [
+                'id'   => $therapist_id,
+                'name' => (string) ($category['therapistName'] ?? ''),
+            ];
+        }
+
+        return $therapists;
+    }
+
+    /**
+     * Aggregate widget-selectable categories for the manager account and subaccounts.
+     *
+     * Public categories from the main therapist plus non-inherited public categories
+     * owned by subaccounts. Subaccount rows use "Name (Therapist)" labels.
+     *
+     * @return array|WP_Error
+     */
+    public function get_widget_selectable_categories() {
+        $aggregated = $this->get_aggregated_event_categories();
+        if (is_wp_error($aggregated)) {
+            return $aggregated;
+        }
+
+        return array_values(array_filter(
+            $aggregated,
+            static fn(array $category): bool => ! empty($category['widgetSelectable'])
+        ));
     }
 
 
@@ -594,6 +796,15 @@ class Tebuto_API {
      */
     public function get_therapist() {
         return $this->request('GET', 'therapists/' . $this->therapist_id);
+    }
+
+    /**
+     * Get global therapist branding (widget theme colors).
+     *
+     * @return array|WP_Error
+     */
+    public function get_branding() {
+        return $this->request('GET', 'therapists/' . $this->therapist_id . '/branding');
     }
 
     /**

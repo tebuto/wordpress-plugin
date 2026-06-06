@@ -30,7 +30,7 @@ function tebuto_dashboard_page(): void {
         'start' => $month_start,
         'page_size' => 100,
     ]);
-    $categories = $api->get_event_categories();
+    $categories = $api->get_aggregated_event_categories();
 
     // Calculate statistics
     $stats = tebuto_calculate_dashboard_stats($bookings_result, $upcoming_events);
@@ -139,19 +139,28 @@ function tebuto_dashboard_page(): void {
                         <p class="tebuto-empty-state"><?php esc_html_e('Noch keine Kategorien erstellt.', 'tebuto-online-terminbuchung'); ?></p>
                     <?php else : ?>
                         <ul class="tebuto-category-list">
-                            <?php foreach (array_slice($categories, 0, 5) as $category) : ?>
-                                <li class="tebuto-category-item">
+                            <?php foreach ($categories as $category) :
+                                $is_widget_selectable = ! empty($category['widgetSelectable']);
+                                ?>
+                                <li
+                                    class="tebuto-category-item<?php echo $is_widget_selectable ? '' : ' tebuto-category-item--unavailable'; ?>"
+                                    <?php if (!$is_widget_selectable) : ?>
+                                        title="<?php esc_attr_e('Nur öffentliche Kategorien können im WordPress-Widget verwendet werden.', 'tebuto-online-terminbuchung'); ?>"
+                                    <?php endif; ?>
+                                >
                                     <div class="tebuto-category-color" style="background-color: <?php echo esc_attr($category['color']); ?>"></div>
                                     <div class="tebuto-category-info">
-                                        <span class="tebuto-category-name"><?php echo esc_html($category['name']); ?></span>
+                                        <span class="tebuto-category-name"><?php echo esc_html($category['displayName'] ?? $category['name']); ?></span>
                                         <span class="tebuto-category-meta">
                                             <?php echo esc_html($category['duration']); ?> <?php esc_html_e('Min.', 'tebuto-online-terminbuchung'); ?>
                                             · <?php echo esc_html(number_format((float) $category['price'], 2, ',', '.')); ?> €
                                         </span>
                                     </div>
                                     <div class="tebuto-category-badges">
-                                        <?php if ($category['publicBookingEnabled']) : ?>
+                                        <?php if ($is_widget_selectable) : ?>
                                             <span class="tebuto-badge tebuto-badge-success"><?php esc_html_e('Öffentlich', 'tebuto-online-terminbuchung'); ?></span>
+                                        <?php else : ?>
+                                            <span class="tebuto-badge tebuto-badge-warning"><?php esc_html_e('Nicht öffentlich', 'tebuto-online-terminbuchung'); ?></span>
                                         <?php endif; ?>
                                         <?php if ($category['privateBookingEnabled']) : ?>
                                             <span class="tebuto-badge tebuto-badge-info"><?php esc_html_e('Privat', 'tebuto-online-terminbuchung'); ?></span>

@@ -30,7 +30,7 @@
 		},
 		"border": {
 			"type": "boolean",
-			"default": false
+			"default": true
 		},
 		"inheritFont": {
 			"type": "boolean",
@@ -44,11 +44,23 @@
 			"type": "boolean",
 			"default": false
 		},
+		"showLocationQuickFilter": {
+			"type": "boolean",
+			"default": false
+		},
+		"showCategorySelectionFirst": {
+			"type": "boolean",
+			"default": true
+		},
 		"categories": {
 			"type": "string",
 			"default": ""
 		},
 		"configuredCategoriesJson": {
+			"type": "string",
+			"default": ""
+		},
+		"configuredTherapistsJson": {
 			"type": "string",
 			"default": ""
 		},

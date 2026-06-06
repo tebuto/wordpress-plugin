@@ -20,12 +20,13 @@ function tebuto_shortcode_page(): void {
     $text_primary       = tebuto_get_user_meta($current_user_id, 'text_primary', '#374151');
     $text_secondary     = tebuto_get_user_meta($current_user_id, 'text_secondary', '#6b7280');
     $border_color       = tebuto_get_user_meta($current_user_id, 'border_color', '#E9E9E9');
-    $border             = tebuto_get_user_meta($current_user_id, 'border', 'false');
-    $inherit_font       = tebuto_get_user_meta($current_user_id, 'inherit_font', 'false');
-    $categories         = tebuto_get_user_meta($current_user_id, 'categories', '');
-    $show_quick_filters  = tebuto_get_user_meta($current_user_id, 'show_quick_filters', 'false');
-    $show_provider_filter = tebuto_get_user_meta($current_user_id, 'show_provider_filter', 'false');
-    $custom_css          = tebuto_get_user_meta($current_user_id, 'custom_css', '');
+    $border                   = tebuto_get_user_meta($current_user_id, 'border', 'true');
+    $inherit_font             = tebuto_get_user_meta($current_user_id, 'inherit_font', 'false');
+    $categories               = tebuto_get_user_meta($current_user_id, 'categories', '');
+    $show_provider_filter     = tebuto_get_user_meta($current_user_id, 'show_provider_filter', 'false');
+    $show_location_quick_filter = tebuto_get_user_meta($current_user_id, 'show_location_quick_filter', 'false');
+    $show_category_selection_first = tebuto_get_user_meta($current_user_id, 'show_category_selection_first', 'true');
+    $custom_css               = tebuto_get_user_meta($current_user_id, 'custom_css', '');
 
     // Convert categories string to array
     $selected_categories = [];
@@ -33,14 +34,14 @@ function tebuto_shortcode_page(): void {
         $selected_categories = array_map('intval', explode(',', $categories));
     }
 
-    // Check if user has subusers (multi-user account)
-    $is_multi_user = false;
     $api = new Tebuto_API();
-    if ($api->is_connected()) {
-        $who_am_i = $api->who_am_i();
-        if (! is_wp_error($who_am_i) && isset($who_am_i['therapists'][0]['therapist']['subusers'])) {
-            $is_multi_user = count($who_am_i['therapists'][0]['therapist']['subusers']) > 0;
-        }
+    $widget_capabilities = tebuto_get_widget_account_capabilities($current_user_id);
+    $has_managed_users   = $widget_capabilities['has_managed_users'];
+    $is_managing_user    = $widget_capabilities['is_managing_user'];
+
+    $configured_therapists = [];
+    if ($api->is_connected() && $show_provider_filter === 'true') {
+        $configured_therapists = $api->get_configured_therapists();
     }
 
     // Theme presets
@@ -152,6 +153,19 @@ function tebuto_shortcode_page(): void {
                             <?php wp_nonce_field('tebuto_save_settings', 'tebuto_nonce'); ?>
                             <input type="hidden" name="tebuto_save_settings" value="1">
 
+                                <div class="tebuto-form-section" id="show_category_selection_first_section" style="display: none;">
+                                    <div class="tebuto-switch-option" id="show_category_selection_first_option">
+                                        <div class="tebuto-switch-option-text">
+                                            <span class="tebuto-switch-option-label"><?php esc_html_e('Kategorieauswahl als ersten Schritt', 'tebuto-online-terminbuchung'); ?></span>
+                                            <span class="tebuto-switch-option-desc"><?php esc_html_e('Zeigt bei mehreren ausgewählten Kategorien zuerst eine Kategorieauswahl, bevor der Kalender erscheint.', 'tebuto-online-terminbuchung'); ?></span>
+                                        </div>
+                                        <label class="tebuto-switch">
+                                            <input type="checkbox" name="show_category_selection_first" id="show_category_selection_first" value="true" <?php checked($show_category_selection_first, 'true'); ?>>
+                                            <span class="tebuto-switch-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+
                                 <!-- Theme Presets -->
                                 <div class="tebuto-form-section">
                                     <h3 class="tebuto-form-section-title"><?php esc_html_e('Farbvorlagen', 'tebuto-online-terminbuchung'); ?></h3>
@@ -248,29 +262,31 @@ function tebuto_shortcode_page(): void {
                                         </label>
                                     </div>
 
-                                    <?php if ($is_multi_user) : ?>
+                                    <?php if ($has_managed_users) : ?>
                                     <div class="tebuto-switch-option">
                                         <div class="tebuto-switch-option-text">
-                                            <span class="tebuto-switch-option-label"><?php esc_html_e('Schnellfilter anzeigen', 'tebuto-online-terminbuchung'); ?></span>
-                                            <span class="tebuto-switch-option-desc"><?php esc_html_e('Zeigt Schnellfilter für Termine (heute, morgen, etc.)', 'tebuto-online-terminbuchung'); ?></span>
+                                            <span class="tebuto-switch-option-label"><?php esc_html_e('Termine von verwalteten Konten anzeigen', 'tebuto-online-terminbuchung'); ?></span>
+                                            <span class="tebuto-switch-option-desc" id="show_provider_filter_desc"><?php esc_html_e('Zeigt auch Termine von verwalteten Konten an – z. B. bei gemeinsam genutzten Kategorien, die Sie erstellt haben. Klient:innen können im Widget per Anbieterfilter den gewünschten Termin wählen.', 'tebuto-online-terminbuchung'); ?></span>
                                         </div>
-                                        <label class="tebuto-switch">
-                                            <input type="checkbox" name="show_quick_filters" id="show_quick_filters" value="true" <?php checked($show_quick_filters, 'true'); ?>>
+                                        <label class="tebuto-switch" id="show_provider_filter_switch">
+                                            <input type="checkbox" name="show_provider_filter" id="show_provider_filter" value="true" <?php checked($show_provider_filter, 'true'); ?>>
                                             <span class="tebuto-switch-slider"></span>
                                         </label>
                                     </div>
                                     <?php endif; ?>
 
+                                    <?php if ($is_managing_user) : ?>
                                     <div class="tebuto-switch-option">
                                         <div class="tebuto-switch-option-text">
-                                            <span class="tebuto-switch-option-label"><?php esc_html_e('Anbieterfilter anzeigen', 'tebuto-online-terminbuchung'); ?></span>
-                                            <span class="tebuto-switch-option-desc"><?php esc_html_e('Zeigt einen Filter zur Auswahl des Anbieters im Widget', 'tebuto-online-terminbuchung'); ?></span>
+                                            <span class="tebuto-switch-option-label"><?php esc_html_e('Ortsfilter anzeigen', 'tebuto-online-terminbuchung'); ?></span>
+                                            <span class="tebuto-switch-option-desc"><?php esc_html_e('Zeigt einen Schnellfilter nach Standort im Widget', 'tebuto-online-terminbuchung'); ?></span>
                                         </div>
                                         <label class="tebuto-switch">
-                                            <input type="checkbox" name="show_provider_filter" id="show_provider_filter" value="true" <?php checked($show_provider_filter, 'true'); ?>>
+                                            <input type="checkbox" name="show_location_quick_filter" id="show_location_quick_filter" value="true" <?php checked($show_location_quick_filter, 'true'); ?>>
                                             <span class="tebuto-switch-slider"></span>
                                         </label>
                                     </div>
+                                    <?php endif; ?>
                                 </div>
 
                                 <!-- Categories Section -->
@@ -285,7 +301,7 @@ function tebuto_shortcode_page(): void {
                                                 <?php esc_html_e('Kategorien werden geladen...', 'tebuto-online-terminbuchung'); ?>
                                             </div>
                                         </div>
-                                        <p class="description"><?php esc_html_e('Wähle die Kategorien aus, die im Widget angezeigt werden sollen. Keine Auswahl = alle Kategorien.', 'tebuto-online-terminbuchung'); ?></p>
+                                        <p class="description"><?php esc_html_e('Alle Kategorien werden angezeigt. Nur öffentliche Kategorien können im Widget verwendet werden.', 'tebuto-online-terminbuchung'); ?></p>
                                         <!-- Hidden input to store selected category IDs -->
                                         <input type="hidden" name="categories_json" id="categories_json" value="<?php echo esc_attr(wp_json_encode($selected_categories)); ?>">
                                     </div>
@@ -331,6 +347,7 @@ function tebuto_shortcode_page(): void {
     jQuery(document).ready(function($) {
         const selectedCategories = <?php echo wp_json_encode($selected_categories); ?>;
         const ajaxNonce = '<?php echo esc_js(wp_create_nonce('tebuto_admin')); ?>';
+        let configuredTherapists = <?php echo wp_json_encode($configured_therapists); ?>;
 
         // Default values (used to determine which params to include in shortcode)
         const DEFAULTS = {
@@ -339,10 +356,11 @@ function tebuto_shortcode_page(): void {
             text_primary: '#374151',
             text_secondary: '#6b7280',
             border_color: '#E9E9E9',
-            border: 'false',
+            border: 'true',
             inherit_font: 'false',
-            show_quick_filters: 'false',
             show_provider_filter: 'false',
+            show_location_quick_filter: 'false',
+            show_category_selection_first: 'true',
             categories: '',
             custom_css: ''
         };
@@ -386,14 +404,19 @@ function tebuto_shortcode_page(): void {
                 params.push('inherit_font="' + inheritFont + '"');
             }
 
-            const quickFilters = $('#show_quick_filters').is(':checked') ? 'true' : 'false';
-            if (quickFilters !== DEFAULTS.show_quick_filters) {
-                params.push('show_quick_filters="' + quickFilters + '"');
-            }
-
             const providerFilter = $('#show_provider_filter').is(':checked') ? 'true' : 'false';
             if (providerFilter !== DEFAULTS.show_provider_filter) {
                 params.push('show_provider_filter="' + providerFilter + '"');
+            }
+
+            const locationFilter = $('#show_location_quick_filter').is(':checked') ? 'true' : 'false';
+            if (locationFilter !== DEFAULTS.show_location_quick_filter) {
+                params.push('show_location_quick_filter="' + locationFilter + '"');
+            }
+
+            const categorySelectionFirst = $('#show_category_selection_first').is(':checked') ? 'true' : 'false';
+            if (categorySelectionFirst !== DEFAULTS.show_category_selection_first) {
+                params.push('show_category_selection_first="' + categorySelectionFirst + '"');
             }
 
             const cats = getSelectedCategories();
@@ -462,8 +485,17 @@ function tebuto_shortcode_page(): void {
 
         // Toggle switches update preview and shortcode
         $('input[type="checkbox"]').on('change', function() {
-            tebuto_updatePreview();
-            updateShortcodeDisplay();
+            const refreshPreview = function() {
+                tebuto_updatePreview();
+                updateShortcodeDisplay();
+            };
+
+            if ($(this).attr('id') === 'show_provider_filter') {
+                loadConfiguredTherapists().always(refreshPreview);
+                return;
+            }
+
+            refreshPreview();
         });
 
         // Theme presets
@@ -541,19 +573,33 @@ function tebuto_shortcode_page(): void {
             const container = $('#tebuto-categories-container');
             
             if (!categories || categories.length === 0) {
-                container.html('<p class="tebuto-empty"><?php echo esc_js(__('Keine Kategorien vorhanden.', 'tebuto-online-terminbuchung')); ?></p>');
+                container.html('<p class="tebuto-empty"><?php echo esc_js(__('Keine öffentlichen Kategorien vorhanden.', 'tebuto-online-terminbuchung')); ?></p>');
                 return;
             }
+
+            const selectableCategoryIds = categories
+                .filter(function(cat) { return cat.widgetSelectable; })
+                .map(function(cat) { return cat.id; });
+            const effectiveSelected = selectedCategories.length > 0
+                ? selectedCategories
+                : selectableCategoryIds;
 
             let html = '<div class="tebuto-category-checkboxes">';
             
             categories.forEach(function(cat) {
-                const checked = selectedCategories.includes(cat.id) ? 'checked' : '';
+                const isSelectable = Boolean(cat.widgetSelectable);
+                const checked = isSelectable && effectiveSelected.includes(cat.id) ? 'checked' : '';
+                const disabled = isSelectable ? '' : 'disabled';
+                const unavailableClass = isSelectable ? '' : ' tebuto-category-checkbox--unavailable';
+                const unavailableHint = isSelectable
+                    ? ''
+                    : ' title="<?php echo esc_js(__('Nur öffentliche Kategorien können im WordPress-Widget verwendet werden.', 'tebuto-online-terminbuchung')); ?>"';
                 html += `
-                    <label class="tebuto-category-checkbox">
-                        <input type="checkbox" name="categories[]" value="${cat.id}" ${checked}>
+                    <label class="tebuto-category-checkbox${unavailableClass}"${unavailableHint}>
+                        <input type="checkbox" name="categories[]" value="${cat.id}" ${checked} ${disabled}>
                         <span class="tebuto-category-color-dot" style="background: ${cat.color}"></span>
                         <span class="tebuto-category-name">${escapeHtml(cat.name)}</span>
+                        ${isSelectable ? '' : '<span class="tebuto-category-unavailable-hint"><?php echo esc_js(__('Nicht öffentlich', 'tebuto-online-terminbuchung')); ?></span>'}
                     </label>
                 `;
             });
@@ -561,14 +607,29 @@ function tebuto_shortcode_page(): void {
             html += '</div>';
             container.html(html);
 
+            syncCategorySelectionFirstVisibility();
+
             // Update preview and shortcode when category selection changes
             container.find('input[type="checkbox"]').on('change', function() {
+                syncCategorySelectionFirstVisibility();
+                syncManagedAccountEventsSwitch();
+                if (isManagedAccountEventsEnabled()) {
+                    loadConfiguredTherapists().always(function() {
+                        tebuto_updatePreview();
+                        updateShortcodeDisplay();
+                    });
+                    return;
+                }
                 tebuto_updatePreview();
                 updateShortcodeDisplay();
             });
 
-            // Initial shortcode build after categories are loaded
-            updateShortcodeDisplay();
+            syncManagedAccountEventsSwitch();
+            if (isManagedAccountEventsEnabled()) {
+                loadConfiguredTherapists().always(updateShortcodeDisplay);
+            } else {
+                updateShortcodeDisplay();
+            }
         }
 
         // Escape HTML helper
@@ -587,6 +648,77 @@ function tebuto_shortcode_page(): void {
             return selected.join(',');
         }
 
+        function getEffectiveSelectedCategoryCount() {
+            const selectedIds = getSelectedCategories()
+                .split(',')
+                .filter(Boolean);
+
+            if (selectedIds.length > 0) {
+                return selectedIds.length;
+            }
+
+            if (!loadedCategories || loadedCategories.length === 0) {
+                return 0;
+            }
+
+            return loadedCategories.filter(function(category) {
+                return category.widgetSelectable;
+            }).length;
+        }
+
+        function syncCategorySelectionFirstVisibility() {
+            const showOption = getEffectiveSelectedCategoryCount() > 1;
+            $('#show_category_selection_first_section').toggle(showOption);
+        }
+
+        const managedAccountEventsDefaultHelp = <?php echo wp_json_encode(
+            __('Zeigt auch Termine von verwalteten Konten an – z. B. bei gemeinsam genutzten Kategorien, die Sie erstellt haben. Klient:innen können im Widget per Anbieterfilter den gewünschten Termin wählen.', 'tebuto-online-terminbuchung')
+        ); ?>;
+        const managedAccountEventsAutoHelp = <?php echo wp_json_encode(
+            __('Automatisch aktiv, weil Kategorien von verwalteten Konten ausgewählt sind.', 'tebuto-online-terminbuchung')
+        ); ?>;
+
+        function hasSubaccountCategoriesSelected() {
+            if (!loadedCategories || loadedCategories.length === 0) {
+                return false;
+            }
+
+            const selectedIds = getSelectedCategories()
+                .split(',')
+                .filter(Boolean)
+                .map(function(id) { return parseInt(id, 10); });
+
+            return loadedCategories.some(function(category) {
+                return (
+                    selectedIds.includes(category.id) &&
+                    Boolean(category.isFromSubaccount) &&
+                    Boolean(category.widgetSelectable)
+                );
+            });
+        }
+
+        function syncManagedAccountEventsSwitch() {
+            const $switch = $('#show_provider_filter');
+            if ($switch.length === 0) {
+                return;
+            }
+
+            const autoEnabled = hasSubaccountCategoriesSelected();
+            if (autoEnabled) {
+                $switch.prop('checked', true).prop('disabled', true);
+                $('#show_provider_filter_switch').addClass('tebuto-switch-disabled');
+                $('#show_provider_filter_desc').text(managedAccountEventsAutoHelp);
+            } else {
+                $switch.prop('disabled', false);
+                $('#show_provider_filter_switch').removeClass('tebuto-switch-disabled');
+                $('#show_provider_filter_desc').text(managedAccountEventsDefaultHelp);
+            }
+        }
+
+        function isManagedAccountEventsEnabled() {
+            return $('#show_provider_filter').is(':checked') || hasSubaccountCategoriesSelected();
+        }
+
         // Get current form values
         function getWidgetConfig() {
             return {
@@ -598,10 +730,45 @@ function tebuto_shortcode_page(): void {
                 borderColor: $('#border_color').val(),
                 border: $('#border').is(':checked'),
                 inheritFont: $('#inherit_font').is(':checked'),
-                showQuickFilters: $('#show_quick_filters').is(':checked'),
-                showProviderFilter: $('#show_provider_filter').is(':checked'),
+                showProviderFilter: isManagedAccountEventsEnabled(),
+                showLocationQuickFilter: $('#show_location_quick_filter').is(':checked'),
+                showCategorySelectionFirst: $('#show_category_selection_first').is(':checked'),
                 categories: getSelectedCategories()
             };
+        }
+
+        function buildConfiguredTherapistsForSelection() {
+            if (!isManagedAccountEventsEnabled() || !loadedCategories || loadedCategories.length === 0) {
+                configuredTherapists = [];
+                return;
+            }
+
+            const selectedIds = getSelectedCategories()
+                .split(',')
+                .filter(Boolean)
+                .map(function(id) { return parseInt(id, 10); });
+
+            const seenTherapistIds = {};
+            configuredTherapists = [];
+
+            loadedCategories.forEach(function(category) {
+                if (!selectedIds.includes(category.id) || !category.widgetSelectable) {
+                    return;
+                }
+                if (!category.therapistId || seenTherapistIds[category.therapistId]) {
+                    return;
+                }
+                seenTherapistIds[category.therapistId] = true;
+                configuredTherapists.push({
+                    id: category.therapistId,
+                    name: category.therapistName || ''
+                });
+            });
+        }
+
+        function loadConfiguredTherapists() {
+            buildConfiguredTherapistsForSelection();
+            return $.Deferred().resolve().promise();
         }
 
         // Load widget script
@@ -632,29 +799,51 @@ function tebuto_shortcode_page(): void {
             widgetScript.dataset.borderColor = config.borderColor;
             widgetScript.dataset.border = config.border ? 'true' : 'false';
             widgetScript.dataset.inheritFont = config.inheritFont ? 'true' : 'false';
-            widgetScript.dataset.showQuickFilters = config.showQuickFilters ? 'true' : 'false';
-            if (config.showProviderFilter) {
+            const managedAccountEventsEnabled = isManagedAccountEventsEnabled();
+            if (managedAccountEventsEnabled) {
                 widgetScript.dataset.includeSubusers = 'true';
                 widgetScript.dataset.showQuickFilters = 'true';
             }
+            if (config.showLocationQuickFilter) {
+                widgetScript.dataset.showLocationQuickFilter = 'true';
+            }
 
-            // Pass deduplicated categories for the widget UI dropdown.
-            // This prevents the widget from showing duplicate category names
-            // when multiple providers share identically named categories.
-            if (loadedCategories && loadedCategories.length > 0) {
-                widgetScript.dataset.configuredCategories = JSON.stringify(loadedCategories);
+            if (!config.showCategorySelectionFirst) {
+                widgetScript.dataset.showCategorySelectionFirst = 'false';
+            }
+
+            if (managedAccountEventsEnabled && loadedCategories && loadedCategories.length > 0) {
+                const selectedIds = (config.categories || '')
+                    .split(',')
+                    .filter(Boolean)
+                    .map(function(id) { return parseInt(id, 10); });
+                const configuredCategories = loadedCategories
+                    .filter(function(category) {
+                        return category.widgetSelectable && selectedIds.includes(category.id);
+                    })
+                    .map(function(category) {
+                        return {
+                            id: category.id,
+                            name: category.name,
+                            color: category.color,
+                            isFromSubaccount: Boolean(category.isFromSubaccount),
+                            therapistId: category.therapistId || 0,
+                            therapistName: category.therapistName || ''
+                        };
+                    });
+
+                if (configuredCategories.length > 0) {
+                    widgetScript.dataset.configuredCategories = JSON.stringify(configuredCategories);
+                }
+            }
+
+            buildConfiguredTherapistsForSelection();
+            if (managedAccountEventsEnabled && configuredTherapists.length > 0) {
+                widgetScript.dataset.configuredTherapists = JSON.stringify(configuredTherapists);
             }
             
-            // Pass category IDs to constrain the event API query.
-            // When the provider filter is active, skip category IDs because
-            // the main therapist's IDs differ from subuser IDs for
-            // identically named categories — restricting would hide subuser
-            // events.
-            if (!config.showProviderFilter) {
-                var categoriesToPass = config.categories;
-                if (categoriesToPass) {
-                    widgetScript.dataset.categories = categoriesToPass;
-                }
+            if (config.categories) {
+                widgetScript.dataset.categories = config.categories;
             }
             
             widgetScript.async = true;
@@ -680,8 +869,10 @@ function tebuto_shortcode_page(): void {
 
         // Initial load
         loadCategories();
-        loadWidget();
-        updateShortcodeDisplay();
+        loadConfiguredTherapists().always(function() {
+            loadWidget();
+            updateShortcodeDisplay();
+        });
     });
     </script>
     <style>
@@ -881,6 +1072,24 @@ function tebuto_shortcode_page(): void {
 
     .tebuto-category-checkbox:hover {
         background: var(--tebuto-bg);
+    }
+
+    .tebuto-category-checkbox--unavailable {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
+    .tebuto-category-checkbox--unavailable:hover {
+        background: transparent;
+    }
+
+    .tebuto-category-unavailable-hint {
+        margin-left: auto;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--tebuto-text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
     }
 
     .tebuto-category-checkbox input[type="checkbox"] {

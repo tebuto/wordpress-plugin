@@ -7,10 +7,12 @@ export default function save( { attributes } ) {
 		borderColor,
 		border,
 		inheritFont,
-		showQuickFilters,
 		showProviderFilter,
+		showLocationQuickFilter,
+		showCategorySelectionFirst,
 		categories,
 		configuredCategoriesJson,
+		configuredTherapistsJson,
 		customCss,
 	} = attributes;
 
@@ -50,27 +52,100 @@ export default function save( { attributes } ) {
 		widgetAttributes[ 'data-inherit-font' ] = 'true';
 	}
 
-	if ( showQuickFilters ) {
-		widgetAttributes[ 'data-show-quick-filters' ] = 'true';
+	let hasSubaccountCategories = false;
+	if ( configuredCategoriesJson ) {
+		try {
+			const configuredCategories = JSON.parse( configuredCategoriesJson );
+			hasSubaccountCategories = Array.isArray( configuredCategories )
+				? configuredCategories.some(
+						( category ) => category.isFromSubaccount === true
+				  )
+				: false;
+		} catch {
+			hasSubaccountCategories = false;
+		}
 	}
 
-	if ( showProviderFilter ) {
+	if ( showProviderFilter || hasSubaccountCategories ) {
 		widgetAttributes[ 'data-include-subusers' ] = 'true';
 		widgetAttributes[ 'data-show-quick-filters' ] = 'true';
 	}
 
-	// Pass deduplicated categories for the widget UI dropdown to prevent
-	// duplicate category names across providers.
-	if ( configuredCategoriesJson ) {
+	if ( showLocationQuickFilter ) {
+		widgetAttributes[ 'data-show-location-quick-filter' ] = 'true';
+	}
+
+	if ( ( showProviderFilter || hasSubaccountCategories ) && configuredCategoriesJson ) {
 		widgetAttributes[ 'data-configured-categories' ] =
 			configuredCategoriesJson;
 	}
 
-	// Categories filter — skip when provider filter is active because the
-	// main therapist's category IDs differ from the subuser's IDs for
-	// identically named categories; restricting would hide subuser events.
-	if ( categories && ! showProviderFilter ) {
-		widgetAttributes[ 'data-categories' ] = categories;
+	const configuredTherapistsFromCategories = ( () => {
+		if ( ! configuredCategoriesJson ) {
+			return '';
+		}
+		try {
+			const configuredCategories = JSON.parse( configuredCategoriesJson );
+			if ( ! Array.isArray( configuredCategories ) ) {
+				return '';
+			}
+			const seenTherapistIds = new Set();
+			const therapists = [];
+			for ( const category of configuredCategories ) {
+				const therapistId = Number( category.therapistId );
+				if (
+					! Number.isFinite( therapistId ) ||
+					therapistId <= 0 ||
+					seenTherapistIds.has( therapistId )
+				) {
+					continue;
+				}
+				seenTherapistIds.add( therapistId );
+				therapists.push( {
+					id: therapistId,
+					name: String( category.therapistName ?? '' ),
+				} );
+			}
+			return therapists.length > 0 ? JSON.stringify( therapists ) : '';
+		} catch {
+			return '';
+		}
+	} )();
+
+	const configuredTherapistsForSave =
+		configuredTherapistsFromCategories || configuredTherapistsJson || '';
+
+	if (
+		( showProviderFilter || hasSubaccountCategories ) &&
+		configuredTherapistsForSave
+	) {
+		widgetAttributes[ 'data-configured-therapists' ] =
+			configuredTherapistsForSave;
+	}
+
+	let categoriesForEmbed = categories;
+	if ( ! categoriesForEmbed?.trim() && configuredCategoriesJson ) {
+		try {
+			const configuredCategories = JSON.parse( configuredCategoriesJson );
+			if ( Array.isArray( configuredCategories ) ) {
+				const categoryIds = configuredCategories
+					.map( ( category ) => Number( category.id ) )
+					.filter( ( categoryId ) => Number.isFinite( categoryId ) && categoryId > 0 );
+				if ( categoryIds.length > 0 ) {
+					categoriesForEmbed = categoryIds.join( ',' );
+				}
+			}
+		} catch {
+			categoriesForEmbed = categories;
+		}
+	}
+
+	if ( categoriesForEmbed?.trim() ) {
+		widgetAttributes[ 'data-categories' ] = categoriesForEmbed;
+	}
+
+	if ( showCategorySelectionFirst === false ) {
+		widgetAttributes[ 'data-show-category-selection-first' ] = 'false';
 	}
 
 	return (

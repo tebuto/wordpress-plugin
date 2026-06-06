@@ -1,6 +1,6 @@
 === Tebuto - Online-Terminbuchung ===
 Contributors: tebuto
-Tags: online booking, appointment scheduling, calendar, Terminbuchung, Termine
+Tags: Praxissoftware, Terminbuchung, Therapie, Buchungswidget, Kalender
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
@@ -8,42 +8,51 @@ Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Integriere die Online-Terminbuchung von Tebuto in deine WordPress-Website. Biete öffentliche Termine direkt auf deiner Seite an.
+Verbinde deine Tebuto-Praxissoftware mit WordPress: Buchungswidget einbetten, Termine verwalten und Buchungen direkt aus dem Admin-Bereich bearbeiten.
 
 == Beschreibung ==
 
-Mit dem Plugin **Tebuto - Online-Terminbuchung** kannst du die öffentlichen Termine deines Tebuto-Kontos einfach auf deiner Website anzeigen und buchbar machen.
+**Tebuto** ist eine Praxissoftware für Therapeut:innen, Berater:innen und Coaches auf Selbstzahlerbasis. Neben Online-Terminbuchung bietet Tebuto Klientenverwaltung, Zahlungen, Kalenderintegration, sichere Kommunikation und weitere Werkzeuge für den Praxisalltag.
+
+Mit diesem Plugin bindest du die **Online-Terminbuchung** deines Tebuto-Kontos in deine WordPress-Website ein. Besucher:innen können Termine direkt auf deiner Seite buchen, ohne zu einer externen Buchungsseite weitergeleitet zu werden. Zusätzlich kannst du anstehende Termine und Buchungen bequem im WordPress-Admin einsehen und bearbeiten.
 
 = Funktionen =
 
-* **Einfache Integration** - Verbinde dein Tebuto-Konto mit einem Klick
-* **Shortcode** - Füge die Terminbuchung per Shortcode ein: `[tebuto_online_terminbuchung_widget]`
-* **Gutenberg-Block** - Nutze den Tebuto-Block im WordPress-Editor
-* **Anpassbare Darstellung** - Passe Hintergrundfarbe und Rahmen an
-* **Responsive Design** - Optimiert für alle Bildschirmgrößen
+* **Buchungswidget** – Öffentliche Termine per Shortcode oder Gutenberg-Block auf deiner Website anzeigen
+* **WordPress-Dashboard** – Übersicht über anstehende Termine direkt im Admin-Bereich
+* **Buchungsverwaltung** – Buchungen einsehen, bestätigen und absagen
+* **Kategorienverwaltung** – Terminkategorien aus WordPress heraus verwalten
+* **Anpassbare Darstellung** – Farben, Theme-Presets, Kategorienfilter, Schnellfilter und eigenes CSS
+* **Multi-User-Praxen** – Anbieterfilter für Praxen mit mehreren Therapeut:innen
+* **Mehrere Widgets pro Seite** – Verschiedene Konfigurationen über Shortcode-Attribute
+* **Responsive Design** – Optimiert für alle Bildschirmgrößen
 
 = Wie es funktioniert =
 
 1. Installiere und aktiviere das Plugin
-2. Gehe zu **Tebuto → Einstellungen** im Admin-Menü
-3. Klicke auf "Mit Tebuto verbinden" und melde dich an
-4. Füge den Shortcode oder Block auf deiner gewünschten Seite ein
-5. Deine öffentlichen Termine werden automatisch angezeigt
+2. Registriere dich bei [tebuto.de](https://tebuto.de) oder melde dich mit deinem bestehenden Tebuto-Konto an
+3. Gehe zu **Tebuto → Verbindung** im WordPress-Admin und verbinde dein Konto
+4. Konfiguriere das Widget unter **Tebuto → Shortcode**
+5. Füge den Shortcode oder Gutenberg-Block auf deiner gewünschten Seite ein
 
-= Hinweis =
+= Hinweis zu Tebuto und Abonnement =
 
-Für die Nutzung des Plugins ist ein Tebuto-Account erforderlich. Die Anmeldung ist unter [tebuto.de](https://tebuto.de) möglich.
+Für die Nutzung des Plugins ist ein **aktives Tebuto-Konto** erforderlich. Das WordPress-Plugin selbst ist kostenlos.
+
+Tebuto kann **30 Tage lang kostenlos getestet** werden. Anschließend ist ein **monatliches Abonnement** erforderlich – es gibt keinen dauerhaften kostenlosen Tarif. Alle Funktionen von Tebuto, einschließlich der Online-Terminbuchung, stehen im Rahmen des Abonnements zur Verfügung.
+
+Aktuelle Preise und Leistungsumfang findest du auf [tebuto.de](https://tebuto.de).
 
 == Externe Services ==
 
-Dieses Plugin verbindet sich mit den APIs von Tebuto (*.tebuto.de), um die Online-Terminbuchungen zu ermöglichen.
+Dieses Plugin verbindet sich mit den APIs von Tebuto (*.tebuto.de), um die Online-Terminbuchung und die Verwaltungsfunktionen im WordPress-Admin bereitzustellen.
 
 Bei der Nutzung des Plugins werden folgende Daten an Tebuto übermittelt:
 
-* **Authentifizierungsdaten** - Für die sichere Verbindung mit deinem Tebuto-Konto
-* **Benutzerinformationen** - Daten wie Name und E-Mail-Adresse für Terminbuchungen
-* **Terminangaben** - Details zum gebuchten Termin (Datum, Uhrzeit, Art)
-* **Kommunikationsdaten** - Informationen für Benachrichtigungen und Erinnerungen
+* **Authentifizierungsdaten** – Für die sichere Verbindung mit deinem Tebuto-Konto
+* **Benutzerinformationen** – Daten wie Name und E-Mail-Adresse für Terminbuchungen
+* **Terminangaben** – Details zum gebuchten Termin (Datum, Uhrzeit, Art)
+* **Kommunikationsdaten** – Informationen für Benachrichtigungen und Erinnerungen
 
 Diese Datenübermittlung ist notwendig, um die Funktionen des Plugins bereitzustellen.
 
@@ -68,20 +77,27 @@ Tebuto erfüllt alle Anforderungen der DSGVO. Daten werden ausschließlich inner
 
 = Nach der Installation =
 
-1. Gehe zu **Tebuto → Einstellungen**
-2. Verbinde dein Tebuto-Konto
-3. Erstelle in Tebuto deine Terminkategorien und Termine
-4. Füge den Shortcode oder Block auf deiner Seite ein
+1. Erstelle ein Tebuto-Konto auf [tebuto.de](https://tebuto.de) oder melde dich an
+2. Gehe zu **Tebuto → Verbindung** und verbinde dein Tebuto-Konto
+3. Richte in Tebuto deine Terminkategorien und Verfügbarkeiten ein
+4. Konfiguriere das Widget unter **Tebuto → Shortcode**
+5. Füge den Shortcode oder Block auf deiner Seite ein
 
 == Häufig gestellte Fragen ==
 
 = Ist ein Tebuto-Account notwendig? =
 
-Ja, um dieses Plugin nutzen zu können, benötigst du einen Tebuto-Account. Die Registrierung ist unter [tebuto.de](https://tebuto.de) möglich.
+Ja. Das Plugin verbindet deine WordPress-Website mit deinem Tebuto-Konto. Die Registrierung ist unter [tebuto.de](https://tebuto.de) möglich.
 
 = Ist das Plugin kostenlos? =
 
-Ja, das Plugin selbst ist kostenlos. Je nach Tebuto-Tarif können für erweiterte Funktionen Gebühren anfallen.
+Ja, das WordPress-Plugin selbst ist kostenlos und unter der GPLv2-Lizenz veröffentlicht.
+
+Für Tebuto als Praxissoftware gilt: Du kannst Tebuto 30 Tage lang kostenlos testen. Danach ist ein monatliches Abonnement erforderlich. Es gibt keinen dauerhaften kostenlosen Tarif. Details zu Preisen und Leistungen findest du auf [tebuto.de](https://tebuto.de).
+
+= Was ist Tebuto genau? =
+
+Tebuto ist eine Praxissoftware für Therapeut:innen, Berater:innen und Coaches auf Selbstzahlerbasis. Das Plugin integriert vor allem die Online-Terminbuchung in deine Website. Die vollständige Praxisverwaltung – Kalender, Klienten, Zahlungen, Kommunikation und mehr – erfolgt in der Tebuto-Webanwendung unter [app.tebuto.de](https://app.tebuto.de).
 
 = Kann ich mehrere Buchungswidgets auf einer Seite verwenden? =
 
@@ -93,7 +109,7 @@ Ja, der Shortcode funktioniert mit allen gängigen Page Buildern wie Elementor, 
 
 = Wie kann ich das Design anpassen? =
 
-Unter **Tebuto → Shortcode** kannst du die Hintergrundfarbe ändern und einen Rahmen aktivieren. Weitere Anpassungen sind über CSS möglich.
+Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter, Schnellfilter und weiteres CSS anpassen. Einstellungen lassen sich auch direkt im Shortcode überschreiben.
 
 == Screenshots ==
 
@@ -104,7 +120,10 @@ Unter **Tebuto → Shortcode** kannst du die Hintergrundfarbe ändern und einen 
 == Changelog ==
 
 = 2.2.0 =
-* TODO: Add changelog entries
+* **NEU: Standort-Schnellfilter** – Optionaler Schnellfilter nach Standort/Ort im Buchungswidget
+* **NEU: Kategorieauswahl zuerst** – Option, Besucher:innen zuerst eine Terminart wählen zu lassen
+* **NEU: Shortcode-Attribute** – `show_location_quick_filter` und `show_category_selection_first` auch per Shortcode steuerbar
+* **Verbesserung: Gutenberg-Block** – Neue Widget-Optionen im Block-Editor verfügbar
 
 = 2.1.0 =
 * **NEU: Mehrere Widgets pro Seite** - Verschiedene Buchungswidgets mit individuellen Einstellungen auf derselben Seite verwenden
@@ -146,7 +165,7 @@ Unter **Tebuto → Shortcode** kannst du die Hintergrundfarbe ändern und einen 
 == Upgrade Notice ==
 
 = 2.2.0 =
-TODO: Add upgrade notice
+Neue Widget-Optionen: Standort-Schnellfilter und Kategorieauswahl vor der Terminauswahl.
 
 = 2.1.0 =
 Mehrere Widgets pro Seite, Anbieterfilter für Multi-User-Konten und Live-Shortcode-Generator!

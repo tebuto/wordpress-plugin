@@ -519,6 +519,24 @@
     background: var(--tebuto-bg);
 }
 
+.tebuto-category-item--unavailable {
+    opacity: 0.55;
+    cursor: default;
+}
+
+.tebuto-category-item--unavailable:hover {
+    background: transparent;
+}
+
+.tebuto-category-unavailable-hint {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--tebuto-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
 .tebuto-event-color {
     width: 5px;
     height: 48px;
@@ -1729,6 +1747,12 @@
 
 .tebuto-switch input:checked + .tebuto-switch-slider:before {
     transform: translateX(20px);
+}
+
+.tebuto-switch-disabled .tebuto-switch-slider,
+.tebuto-switch input:disabled + .tebuto-switch-slider {
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 /* Outage fee options */

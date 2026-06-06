@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -70,10 +70,12 @@ export default function Edit( { attributes, setAttributes } ) {
 		borderColor,
 		border,
 		inheritFont,
-		showQuickFilters,
 		showProviderFilter,
+		showLocationQuickFilter,
+		showCategorySelectionFirst,
 		categories,
 		configuredCategoriesJson,
+		configuredTherapistsJson,
 		customCss,
 	} = attributes;
 
@@ -84,7 +86,8 @@ export default function Edit( { attributes, setAttributes } ) {
 	const [ availableCategories, setAvailableCategories ] = useState( [] );
 	const [ loadingCategories, setLoadingCategories ] = useState( true );
 	const [ categoriesError, setCategoriesError ] = useState( null );
-	const [ isMultiUser, setIsMultiUser ] = useState( false );
+	const [ hasManagedUsers, setHasManagedUsers ] = useState( false );
+	const [ isManagingUser, setIsManagingUser ] = useState( false );
 
 	const blockProps = useBlockProps( {
 		className: 'tebuto-block-editor',
@@ -146,24 +149,132 @@ export default function Edit( { attributes, setAttributes } ) {
 		fetchCategories();
 	}, [ therapistUUID, ajaxUrl ] );
 
-	// Check if multi-user (for quick filters option)
 	useEffect( () => {
-		setIsMultiUser( window.tebutoData?.isMultiUser || false );
+		setHasManagedUsers( window.tebutoData?.hasManagedUsers || false );
+		setIsManagingUser( window.tebutoData?.isManagingUser || false );
 	}, [] );
 
-	// Store deduplicated categories as configured-categories for the widget
-	// UI dropdown. This prevents duplicate category names when multiple
-	// providers share identically named categories.
+	const isCategoryWidgetSelectable = ( category ) =>
+		Boolean( category.widgetSelectable ?? category.publicBookingEnabled );
+
+	const selectedAvailableCategories = useMemo(
+		() =>
+			availableCategories.filter(
+				( category ) =>
+					selectedCategories.includes( category.id ) &&
+					isCategoryWidgetSelectable( category )
+			),
+		[ availableCategories, selectedCategories ]
+	);
+	const hasSubaccountCategoriesSelected = selectedAvailableCategories.some(
+		( category ) => category.isFromSubaccount
+	);
+	const shouldUseConfiguredCategories =
+		showProviderFilter || hasSubaccountCategoriesSelected;
+
+	const configuredTherapistsForEmbed = useMemo( () => {
+		if (
+			! shouldUseConfiguredCategories ||
+			selectedAvailableCategories.length === 0
+		) {
+			return [];
+		}
+
+		const seenTherapistIds = new Set();
+		return selectedAvailableCategories.reduce( ( therapists, category ) => {
+			const therapistId = category.therapistId;
+			if (
+				! therapistId ||
+				seenTherapistIds.has( therapistId )
+			) {
+				return therapists;
+			}
+
+			seenTherapistIds.add( therapistId );
+			therapists.push( {
+				id: therapistId,
+				name: category.therapistName || '',
+			} );
+			return therapists;
+		}, [] );
+	}, [ shouldUseConfiguredCategories, selectedAvailableCategories ] );
+
 	useEffect( () => {
-		if ( availableCategories.length > 0 ) {
+		if ( ! shouldUseConfiguredCategories || selectedAvailableCategories.length === 0 ) {
+			if ( configuredCategoriesJson ) {
+				setAttributes( { configuredCategoriesJson: '' } );
+			}
+			return;
+		}
+
+		const nextCategoriesJson = JSON.stringify(
+			selectedAvailableCategories.map( ( category ) => ( {
+				id: category.id,
+				name: category.name,
+				color: category.color,
+				isFromSubaccount: Boolean( category.isFromSubaccount ),
+				therapistId: category.therapistId ?? 0,
+				therapistName: category.therapistName ?? '',
+			} ) )
+		);
+		if ( configuredCategoriesJson !== nextCategoriesJson ) {
 			setAttributes( {
-				configuredCategoriesJson: JSON.stringify( availableCategories ),
+				configuredCategoriesJson: nextCategoriesJson,
 			} );
 		}
-	}, [ availableCategories ] );
+	}, [
+		selectedAvailableCategories,
+		shouldUseConfiguredCategories,
+		configuredCategoriesJson,
+	] );
+
+	useEffect( () => {
+		if ( ! shouldUseConfiguredCategories ) {
+			if ( configuredTherapistsJson ) {
+				setAttributes( { configuredTherapistsJson: '' } );
+			}
+			return;
+		}
+
+		const nextTherapistsJson =
+			configuredTherapistsForEmbed.length > 0
+				? JSON.stringify( configuredTherapistsForEmbed )
+				: '';
+
+		if ( configuredTherapistsJson !== nextTherapistsJson ) {
+			setAttributes( {
+				configuredTherapistsJson: nextTherapistsJson,
+			} );
+		}
+	}, [
+		shouldUseConfiguredCategories,
+		configuredTherapistsForEmbed,
+		configuredTherapistsJson,
+	] );
+
+	useEffect( () => {
+		if (
+			availableCategories.length > 0 &&
+			( ! categories || categories.trim() === '' )
+		) {
+			setAttributes( {
+				categories: availableCategories
+					.filter( ( category ) => isCategoryWidgetSelectable( category ) )
+					.map( ( category ) => category.id )
+					.join( ',' ),
+			} );
+		}
+	}, [ availableCategories, categories ] );
 
 	// Toggle category selection
 	const toggleCategory = ( categoryId ) => {
+		const category = availableCategories.find(
+			( entry ) => entry.id === categoryId
+		);
+		if ( category && ! isCategoryWidgetSelectable( category ) ) {
+			return;
+		}
+
 		const newSelected = selectedCategories.includes( categoryId )
 			? selectedCategories.filter( ( id ) => id !== categoryId )
 			: [ ...selectedCategories, categoryId ];
@@ -210,24 +321,51 @@ export default function Edit( { attributes, setAttributes } ) {
 		script.dataset.borderColor = borderColor;
 		script.dataset.border = border ? 'true' : 'false';
 		script.dataset.inheritFont = inheritFont ? 'true' : 'false';
-		script.dataset.showQuickFilters = showQuickFilters ? 'true' : 'false';
-		if ( showProviderFilter ) {
+		const embedUsesManagedAccounts =
+			shouldUseConfiguredCategories ||
+			( Boolean( categories?.trim() ) && hasManagedUsers );
+
+		if ( embedUsesManagedAccounts ) {
 			script.dataset.includeSubusers = 'true';
 			script.dataset.showQuickFilters = 'true';
 		}
-
-		// Pass deduplicated categories for the widget UI dropdown to prevent
-		// duplicate category names across providers.
-		if ( configuredCategoriesJson ) {
-			script.dataset.configuredCategories = configuredCategoriesJson;
+		if ( showLocationQuickFilter ) {
+			script.dataset.showLocationQuickFilter = 'true';
 		}
 
-		// Pass category IDs to constrain the event API query.
-		// When the provider filter is active, skip category IDs because
-		// the main therapist's IDs differ from subuser IDs for identically
-		// named categories — restricting would hide subuser events.
-		if ( ! showProviderFilter && categories ) {
+		if (
+			shouldUseConfiguredCategories &&
+			selectedAvailableCategories.length > 0
+		) {
+			script.dataset.configuredCategories = JSON.stringify(
+				selectedAvailableCategories.map( ( category ) => ( {
+					id: category.id,
+					name: category.name,
+					color: category.color,
+					isFromSubaccount: Boolean( category.isFromSubaccount ),
+					therapistId: category.therapistId ?? 0,
+					therapistName: category.therapistName ?? '',
+				} ) )
+			);
+		}
+		if (
+			shouldUseConfiguredCategories &&
+			configuredTherapistsForEmbed.length > 0
+		) {
+			script.dataset.configuredTherapists = JSON.stringify(
+				configuredTherapistsForEmbed
+			);
+		}
+
+		// Always pass explicit category selections to the API. Subaccount-owned
+		// categories use local row IDs; omitting this reverts to all manager
+		// categories and surfaces inherited slots the user did not select.
+		if ( categories ) {
 			script.dataset.categories = categories;
+		}
+
+		if ( showCategorySelectionFirst === false ) {
+			script.dataset.showCategorySelectionFirst = 'false';
 		}
 
 		script.async = true;
@@ -250,16 +388,16 @@ export default function Edit( { attributes, setAttributes } ) {
 		borderColor,
 		border,
 		inheritFont,
-		showQuickFilters,
 		showProviderFilter,
+		showLocationQuickFilter,
+		showCategorySelectionFirst,
 		categories,
+		shouldUseConfiguredCategories,
+		selectedAvailableCategories,
+		configuredTherapistsForEmbed,
+		hasManagedUsers,
 		therapistUUID,
 	] );
-
-	// Initial load
-	useEffect( () => {
-		loadWidgetPreview();
-	}, [] );
 
 	if ( ! therapistUUID ) {
 		return (
@@ -299,6 +437,33 @@ export default function Edit( { attributes, setAttributes } ) {
 	return (
 		<>
 			<InspectorControls>
+				{ selectedAvailableCategories.length > 1 && (
+					<PanelBody
+						title={ __(
+							'Kategorieauswahl',
+							'tebuto-online-terminbuchung'
+						) }
+						initialOpen={ true }
+					>
+						<ToggleControl
+							label={ __(
+								'Kategorieauswahl als ersten Schritt',
+								'tebuto-online-terminbuchung'
+							) }
+							help={ __(
+								'Zeigt bei mehreren ausgewählten Kategorien zuerst eine Kategorieauswahl, bevor der Kalender erscheint.',
+								'tebuto-online-terminbuchung'
+							) }
+							checked={ showCategorySelectionFirst !== false }
+							onChange={ ( value ) =>
+								setAttributes( {
+									showCategorySelectionFirst: value,
+								} )
+							}
+						/>
+					</PanelBody>
+				) }
+
 				{ /* Theme Presets */ }
 				<PanelBody
 					title={ __(
@@ -486,37 +651,52 @@ export default function Edit( { attributes, setAttributes } ) {
 						}
 					/>
 
-					{ isMultiUser && (
+					{ hasManagedUsers && (
 						<ToggleControl
 							label={ __(
-								'Schnellfilter anzeigen',
+								'Termine von verwalteten Konten anzeigen',
 								'tebuto-online-terminbuchung'
 							) }
-							help={ __(
-								'Zeigt Schnellfilter für Termine',
-								'tebuto-online-terminbuchung'
-							) }
-							checked={ showQuickFilters }
+							help={
+								hasSubaccountCategoriesSelected
+									? __(
+											'Automatisch aktiv, weil Kategorien von verwalteten Konten ausgewählt sind.',
+											'tebuto-online-terminbuchung'
+									  )
+									: __(
+											'Zeigt auch Termine von verwalteten Konten an – z. B. bei gemeinsam genutzten Kategorien, die Sie erstellt haben. Klient:innen können im Widget per Anbieterfilter den gewünschten Termin wählen.',
+											'tebuto-online-terminbuchung'
+									  )
+							}
+							checked={
+								showProviderFilter ||
+								hasSubaccountCategoriesSelected
+							}
+							disabled={ hasSubaccountCategoriesSelected }
 							onChange={ ( value ) =>
-								setAttributes( { showQuickFilters: value } )
+								setAttributes( { showProviderFilter: value } )
 							}
 						/>
 					) }
 
-					<ToggleControl
-						label={ __(
-							'Anbieterfilter anzeigen',
-							'tebuto-online-terminbuchung'
-						) }
-						help={ __(
-							'Zeigt einen Filter zur Auswahl des Anbieters im Widget',
-							'tebuto-online-terminbuchung'
-						) }
-						checked={ showProviderFilter }
-						onChange={ ( value ) =>
-							setAttributes( { showProviderFilter: value } )
-						}
-					/>
+					{ isManagingUser && (
+						<ToggleControl
+							label={ __(
+								'Ortsfilter anzeigen',
+								'tebuto-online-terminbuchung'
+							) }
+							help={ __(
+								'Zeigt einen Schnellfilter nach Standort im Widget',
+								'tebuto-online-terminbuchung'
+							) }
+							checked={ showLocationQuickFilter }
+							onChange={ ( value ) =>
+								setAttributes( {
+									showLocationQuickFilter: value,
+								} )
+							}
+						/>
+					) }
 				</PanelBody>
 
 				{ /* Categories */ }
@@ -526,7 +706,7 @@ export default function Edit( { attributes, setAttributes } ) {
 				>
 					<p className="tebuto-panel-description">
 						{ __(
-							'Wähle die Kategorien aus, die im Widget angezeigt werden sollen. Keine Auswahl = alle Kategorien.',
+							'Alle Kategorien werden angezeigt. Nur öffentliche Kategorien können im Widget verwendet werden.',
 							'tebuto-online-terminbuchung'
 						) }
 					</p>
@@ -557,33 +737,54 @@ export default function Edit( { attributes, setAttributes } ) {
 									) }
 								</p>
 							) : (
-								availableCategories.map( ( cat ) => (
-									<div
-										key={ cat.id }
-										className="tebuto-category-item"
-									>
-										<CheckboxControl
-											label={
-												<span className="tebuto-category-label">
-													<span
-														className="tebuto-category-color"
-														style={ {
-															backgroundColor:
-																cat.color,
-														} }
-													/>
-													{ cat.name }
-												</span>
+								availableCategories.map( ( cat ) => {
+									const isSelectable =
+										isCategoryWidgetSelectable( cat );
+
+									return (
+										<div
+											key={ cat.id }
+											className={
+												isSelectable
+													? 'tebuto-category-item'
+													: 'tebuto-category-item tebuto-category-item--unavailable'
 											}
-											checked={ selectedCategories.includes(
-												cat.id
-											) }
-											onChange={ () =>
-												toggleCategory( cat.id )
-											}
-										/>
-									</div>
-								) )
+										>
+											<CheckboxControl
+												label={
+													<span className="tebuto-category-label">
+														<span
+															className="tebuto-category-color"
+															style={ {
+																backgroundColor:
+																	cat.color,
+															} }
+														/>
+														{ cat.name }
+														{ ! isSelectable && (
+															<span className="tebuto-category-unavailable-hint">
+																{ __(
+																	'Nicht öffentlich',
+																	'tebuto-online-terminbuchung'
+																) }
+															</span>
+														) }
+													</span>
+												}
+												checked={
+													isSelectable &&
+													selectedCategories.includes(
+														cat.id
+													)
+												}
+												disabled={ ! isSelectable }
+												onChange={ () =>
+													toggleCategory( cat.id )
+												}
+											/>
+										</div>
+									);
+								} )
 							) }
 						</div>
 					) }

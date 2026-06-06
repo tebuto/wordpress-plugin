@@ -23,7 +23,7 @@ $tebuto_widget_instance_count = 0;
  * Usage:
  *   [tebuto_online_terminbuchung_widget]
  *   [tebuto_online_terminbuchung_widget primary_color="#3b82f6" categories="1,2,3"]
- *   [tebuto_online_terminbuchung_widget border="false" inherit_font="true" custom_css="#tebuto-booking-widget-2 { ... }"]
+ *   [tebuto_online_terminbuchung_widget border="false" inherit_font="true" show_provider_filter="true" show_location_quick_filter="true" show_category_selection_first="false"]
  *
  * @param array<string, string>|string $atts Shortcode attributes.
  * @return string Widget HTML output.
@@ -53,12 +53,14 @@ function tebuto_widget_shortcode( $atts = [] ): string {
         'text_primary'       => tebuto_get_user_meta( $current_user_id, 'text_primary', '#374151' ),
         'text_secondary'     => tebuto_get_user_meta( $current_user_id, 'text_secondary', '#6b7280' ),
         'border_color'       => tebuto_get_user_meta( $current_user_id, 'border_color', '#E9E9E9' ),
-        'border'             => tebuto_get_user_meta( $current_user_id, 'border', 'false' ),
-        'inherit_font'       => tebuto_get_user_meta( $current_user_id, 'inherit_font', 'false' ),
-        'categories'         => tebuto_get_user_meta( $current_user_id, 'categories', '' ),
-        'show_quick_filters'  => tebuto_get_user_meta( $current_user_id, 'show_quick_filters', 'false' ),
-        'show_provider_filter' => tebuto_get_user_meta( $current_user_id, 'show_provider_filter', 'false' ),
-        'custom_css'          => tebuto_get_user_meta( $current_user_id, 'custom_css', '' ),
+        'border'                  => tebuto_get_user_meta( $current_user_id, 'border', 'true' ),
+        'inherit_font'            => tebuto_get_user_meta( $current_user_id, 'inherit_font', 'false' ),
+        'categories'              => tebuto_get_user_meta( $current_user_id, 'categories', '' ),
+        'show_quick_filters'      => tebuto_get_user_meta( $current_user_id, 'show_quick_filters', 'false' ),
+        'show_provider_filter'    => tebuto_get_user_meta( $current_user_id, 'show_provider_filter', 'false' ),
+        'show_location_quick_filter' => tebuto_get_user_meta( $current_user_id, 'show_location_quick_filter', 'false' ),
+        'show_category_selection_first' => tebuto_get_user_meta( $current_user_id, 'show_category_selection_first', 'true' ),
+        'custom_css'              => tebuto_get_user_meta( $current_user_id, 'custom_css', '' ),
     ];
 
     $parsed = shortcode_atts( $defaults, $atts, 'tebuto_online_terminbuchung_widget' );
@@ -71,9 +73,11 @@ function tebuto_widget_shortcode( $atts = [] ): string {
     $border_color       = sanitize_hex_color( $parsed['border_color'] ) ?: '#E9E9E9';
     $border             = $parsed['border'] === 'true' ? 'true' : 'false';
     $inherit_font       = $parsed['inherit_font'] === 'true' ? 'true' : 'false';
-    $show_quick_filters  = $parsed['show_quick_filters'] === 'true' ? 'true' : 'false';
-    $show_provider_filter = $parsed['show_provider_filter'] === 'true' ? 'true' : 'false';
-    $categories          = preg_replace( '/[^0-9,]/', '', $parsed['categories'] );
+    $show_quick_filters       = $parsed['show_quick_filters'] === 'true' ? 'true' : 'false';
+    $show_provider_filter     = $parsed['show_provider_filter'] === 'true' ? 'true' : 'false';
+    $show_location_quick_filter = $parsed['show_location_quick_filter'] === 'true' ? 'true' : 'false';
+    $show_category_selection_first = $parsed['show_category_selection_first'] === 'false' ? 'false' : 'true';
+    $categories               = preg_replace( '/[^0-9,]/', '', $parsed['categories'] );
     $custom_css         = wp_strip_all_tags( $parsed['custom_css'] );
 
     // Generate unique instance ID
@@ -114,80 +118,125 @@ function tebuto_widget_shortcode( $atts = [] ): string {
         $widget_attrs['data-inherit-font'] = 'true';
     }
 
-    if ( $show_quick_filters === 'true' ) {
-        $widget_attrs['data-show-quick-filters'] = 'true';
-    }
-
     if ( $show_provider_filter === 'true' ) {
         $widget_attrs['data-include-subusers']    = 'true';
         $widget_attrs['data-show-quick-filters'] = 'true';
+    } elseif ( $show_quick_filters === 'true' ) {
+        $widget_attrs['data-show-quick-filters'] = 'true';
+    }
+
+    if ( $show_location_quick_filter === 'true' ) {
+        $widget_attrs['data-show-location-quick-filter'] = 'true';
+    }
+
+    if ( $show_category_selection_first === 'false' ) {
+        $widget_attrs['data-show-category-selection-first'] = 'false';
+    }
+
+    if ( $show_provider_filter === 'true' ) {
 
         $api = new Tebuto_API( $current_user_id );
         if ( $api->is_connected() ) {
-            // Fetch categories and deduplicate by name for the widget UI dropdown.
-            // When the user configured specific category IDs, only include
-            // categories whose names match — this handles the case where
-            // different providers have different IDs for the same category name.
-            $all_categories = $api->get_event_categories();
+            $all_categories = $api->get_widget_selectable_categories();
             if ( ! is_wp_error( $all_categories ) && is_array( $all_categories ) ) {
-                // If the user configured specific categories, resolve their
-                // names first so we can filter across all providers by name.
                 $configured_cat_ids = [];
                 if ( ! empty( $categories ) ) {
                     $configured_cat_ids = array_map( 'intval', explode( ',', $categories ) );
                 }
 
-                $allowed_names = [];
-                if ( ! empty( $configured_cat_ids ) ) {
-                    foreach ( $all_categories as $cat ) {
-                        $cat_id = $cat['id'] ?? 0;
-                        if ( in_array( $cat_id, $configured_cat_ids, true ) ) {
-                            $allowed_names[] = $cat['name'] ?? '';
-                        }
-                    }
-                    $allowed_names = array_unique( $allowed_names );
-                }
-
-                $seen_names         = [];
-                $deduped_categories = [];
+                $configured_categories = [];
                 foreach ( $all_categories as $cat ) {
-                    $name = $cat['name'] ?? '';
-
-                    // Skip if we have a configured list and this name isn't in it
-                    if ( ! empty( $allowed_names ) && ! in_array( $name, $allowed_names, true ) ) {
+                    $cat_id = $cat['id'] ?? 0;
+                    if ( ! empty( $configured_cat_ids ) && ! in_array( $cat_id, $configured_cat_ids, true ) ) {
                         continue;
                     }
 
-                    if ( in_array( $name, $seen_names, true ) ) {
-                        continue;
-                    }
-                    $seen_names[]         = $name;
-                    $deduped_categories[] = [
-                        'id'    => $cat['id'] ?? 0,
-                        'name'  => $name,
-                        'color' => $cat['color'] ?? '#009087',
+                    $configured_categories[] = [
+                        'id'            => $cat_id,
+                        'name'          => $cat['displayName'] ?? ( $cat['name'] ?? '' ),
+                        'color'         => $cat['color'] ?? '#009087',
+                        'therapistId'   => $cat['therapistId'] ?? 0,
+                        'therapistName' => $cat['therapistName'] ?? '',
                     ];
                 }
-                if ( ! empty( $deduped_categories ) ) {
-                    $widget_attrs['data-configured-categories'] = esc_attr( wp_json_encode( $deduped_categories ) );
+
+                if ( ! empty( $configured_categories ) ) {
+                    $widget_attrs['data-configured-categories'] = esc_attr( wp_json_encode( $configured_categories ) );
                 }
             }
 
             // Fetch all therapists (main + managed users) for the provider filter.
             // Without this, the widget only shows therapists that have events
             // in the current view, missing providers without scheduled events.
-            $configured_therapists = $api->get_configured_therapists();
+            $configured_cat_ids = [];
+            if ( ! empty( $categories ) ) {
+                $configured_cat_ids = array_map( 'intval', explode( ',', $categories ) );
+            }
+
+            $configured_therapists = ! empty( $configured_cat_ids )
+                ? $api->get_configured_therapists_for_category_ids( $configured_cat_ids )
+                : $api->get_configured_therapists();
             if ( ! empty( $configured_therapists ) ) {
                 $widget_attrs['data-configured-therapists'] = esc_attr( wp_json_encode( $configured_therapists ) );
             }
         }
     }
 
-    // When the provider filter is active, don't restrict events by category
-    // IDs. The main therapist's category IDs differ from the subuser's IDs
-    // for identically named categories, so filtering by the main therapist's
-    // IDs would hide the subuser's events entirely.
-    if ( ! empty( $categories ) && $show_provider_filter !== 'true' ) {
+    $configured_cat_ids = ! empty( $categories )
+        ? array_map( 'intval', explode( ',', $categories ) )
+        : [];
+    $category_api        = new Tebuto_API( $current_user_id );
+    $selectable_categories = $category_api->is_connected()
+        ? $category_api->get_aggregated_event_categories()
+        : [];
+
+    $has_subaccount_categories = false;
+    if ( ! empty( $configured_cat_ids ) && ! is_wp_error( $selectable_categories ) && is_array( $selectable_categories ) ) {
+        foreach ( $selectable_categories as $cat ) {
+            $cat_id = $cat['id'] ?? 0;
+            if (
+                in_array( $cat_id, $configured_cat_ids, true )
+                && ! empty( $cat['isFromSubaccount'] )
+                && ! empty( $cat['widgetSelectable'] )
+            ) {
+                $has_subaccount_categories = true;
+                break;
+            }
+        }
+    }
+
+    if ( $has_subaccount_categories ) {
+        $widget_attrs['data-include-subusers']    = 'true';
+        $widget_attrs['data-show-quick-filters'] = 'true';
+
+        if ( ! is_wp_error( $selectable_categories ) && is_array( $selectable_categories ) ) {
+            $configured_categories = [];
+            foreach ( $selectable_categories as $cat ) {
+                $cat_id = $cat['id'] ?? 0;
+                if ( ! in_array( $cat_id, $configured_cat_ids, true ) ) {
+                    continue;
+                }
+                $configured_categories[] = [
+                    'id'               => $cat_id,
+                    'name'             => $cat['displayName'] ?? ( $cat['name'] ?? '' ),
+                    'color'            => $cat['color'] ?? '#009087',
+                    'therapistId'      => $cat['therapistId'] ?? 0,
+                    'therapistName'    => $cat['therapistName'] ?? '',
+                    'isFromSubaccount' => ! empty( $cat['isFromSubaccount'] ),
+                ];
+            }
+            if ( ! empty( $configured_categories ) ) {
+                $widget_attrs['data-configured-categories'] = esc_attr( wp_json_encode( $configured_categories ) );
+            }
+        }
+
+        $configured_therapists = $category_api->get_configured_therapists_for_category_ids( $configured_cat_ids );
+        if ( ! empty( $configured_therapists ) ) {
+            $widget_attrs['data-configured-therapists'] = esc_attr( wp_json_encode( $configured_therapists ) );
+        }
+    }
+
+    if ( ! empty( $categories ) ) {
         $widget_attrs['data-categories'] = esc_attr( $categories );
     }
 
