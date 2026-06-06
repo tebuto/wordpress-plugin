@@ -75,7 +75,10 @@ export default function save( { attributes } ) {
 		widgetAttributes[ 'data-show-location-quick-filter' ] = 'true';
 	}
 
-	if ( ( showProviderFilter || hasSubaccountCategories ) && configuredCategoriesJson ) {
+	if (
+		( showProviderFilter || hasSubaccountCategories ) &&
+		configuredCategoriesJson
+	) {
 		widgetAttributes[ 'data-configured-categories' ] =
 			configuredCategoriesJson;
 	}
@@ -130,7 +133,10 @@ export default function save( { attributes } ) {
 			if ( Array.isArray( configuredCategories ) ) {
 				const categoryIds = configuredCategories
 					.map( ( category ) => Number( category.id ) )
-					.filter( ( categoryId ) => Number.isFinite( categoryId ) && categoryId > 0 );
+					.filter(
+						( categoryId ) =>
+							Number.isFinite( categoryId ) && categoryId > 0
+					);
 				if ( categoryIds.length > 0 ) {
 					categoriesForEmbed = categoryIds.join( ',' );
 				}

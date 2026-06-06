@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -99,9 +99,15 @@ export default function Edit( { attributes, setAttributes } ) {
 	const ajaxUrl = window.ajaxurl || '/wp-admin/admin-ajax.php';
 
 	// Parse selected categories from string
-	const selectedCategories = categories
-		? categories.split( ',' ).map( ( id ) => parseInt( id.trim(), 10 ) )
-		: [];
+	const selectedCategories = useMemo(
+		() =>
+			categories
+				? categories
+						.split( ',' )
+						.map( ( id ) => parseInt( id.trim(), 10 ) )
+				: [],
+		[ categories ]
+	);
 
 	// Fetch categories on mount
 	useEffect( () => {
@@ -183,10 +189,7 @@ export default function Edit( { attributes, setAttributes } ) {
 		const seenTherapistIds = new Set();
 		return selectedAvailableCategories.reduce( ( therapists, category ) => {
 			const therapistId = category.therapistId;
-			if (
-				! therapistId ||
-				seenTherapistIds.has( therapistId )
-			) {
+			if ( ! therapistId || seenTherapistIds.has( therapistId ) ) {
 				return therapists;
 			}
 
@@ -200,7 +203,10 @@ export default function Edit( { attributes, setAttributes } ) {
 	}, [ shouldUseConfiguredCategories, selectedAvailableCategories ] );
 
 	useEffect( () => {
-		if ( ! shouldUseConfiguredCategories || selectedAvailableCategories.length === 0 ) {
+		if (
+			! shouldUseConfiguredCategories ||
+			selectedAvailableCategories.length === 0
+		) {
 			if ( configuredCategoriesJson ) {
 				setAttributes( { configuredCategoriesJson: '' } );
 			}
@@ -226,6 +232,7 @@ export default function Edit( { attributes, setAttributes } ) {
 		selectedAvailableCategories,
 		shouldUseConfiguredCategories,
 		configuredCategoriesJson,
+		setAttributes,
 	] );
 
 	useEffect( () => {
@@ -250,6 +257,7 @@ export default function Edit( { attributes, setAttributes } ) {
 		shouldUseConfiguredCategories,
 		configuredTherapistsForEmbed,
 		configuredTherapistsJson,
+		setAttributes,
 	] );
 
 	useEffect( () => {
@@ -259,12 +267,14 @@ export default function Edit( { attributes, setAttributes } ) {
 		) {
 			setAttributes( {
 				categories: availableCategories
-					.filter( ( category ) => isCategoryWidgetSelectable( category ) )
+					.filter( ( category ) =>
+						isCategoryWidgetSelectable( category )
+					)
 					.map( ( category ) => category.id )
 					.join( ',' ),
 			} );
 		}
-	}, [ availableCategories, categories ] );
+	}, [ availableCategories, categories, setAttributes ] );
 
 	// Toggle category selection
 	const toggleCategory = ( categoryId ) => {
@@ -296,7 +306,7 @@ export default function Edit( { attributes, setAttributes } ) {
 	};
 
 	// Load/reload widget preview
-	const loadWidgetPreview = () => {
+	const loadWidgetPreview = useCallback( () => {
 		if ( ! previewContainerRef.current || ! therapistUUID || ! widgetUrl ) {
 			return;
 		}
@@ -371,7 +381,24 @@ export default function Edit( { attributes, setAttributes } ) {
 		script.async = true;
 		widgetScriptRef.current = script;
 		previewContainerRef.current.appendChild( script );
-	};
+	}, [
+		therapistUUID,
+		widgetUrl,
+		primaryColor,
+		backgroundColor,
+		textPrimary,
+		textSecondary,
+		borderColor,
+		border,
+		inheritFont,
+		shouldUseConfiguredCategories,
+		categories,
+		hasManagedUsers,
+		showLocationQuickFilter,
+		showCategorySelectionFirst,
+		selectedAvailableCategories,
+		configuredTherapistsForEmbed,
+	] );
 
 	// Reload widget when attributes change
 	useEffect( () => {
@@ -380,24 +407,7 @@ export default function Edit( { attributes, setAttributes } ) {
 		}, 500 );
 
 		return () => clearTimeout( timer );
-	}, [
-		primaryColor,
-		backgroundColor,
-		textPrimary,
-		textSecondary,
-		borderColor,
-		border,
-		inheritFont,
-		showProviderFilter,
-		showLocationQuickFilter,
-		showCategorySelectionFirst,
-		categories,
-		shouldUseConfiguredCategories,
-		selectedAvailableCategories,
-		configuredTherapistsForEmbed,
-		hasManagedUsers,
-		therapistUUID,
-	] );
+	}, [ loadWidgetPreview ] );
 
 	if ( ! therapistUUID ) {
 		return (
