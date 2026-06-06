@@ -140,7 +140,7 @@ export default function Edit( { attributes, setAttributes } ) {
 							)
 					);
 				}
-			} catch ( error ) {
+			} catch {
 				setCategoriesError(
 					__(
 						'Verbindungsfehler beim Laden der Kategorien.',
