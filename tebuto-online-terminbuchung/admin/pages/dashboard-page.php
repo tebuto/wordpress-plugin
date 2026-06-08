@@ -13,10 +13,8 @@ defined('ABSPATH') || exit;
  * @return void
  */
 function tebuto_dashboard_page(): void {
-    $api = new Tebuto_API();
-    
-    if (!$api->is_connected()) {
-        tebuto_render_not_connected_notice();
+    $api = tebuto_require_tebuto_connection();
+    if ($api === null) {
         return;
     }
 
@@ -26,11 +24,22 @@ function tebuto_dashboard_page(): void {
     $month_start = wp_date('Y-m-01\T00:00:00');
 
     $upcoming_events = $api->get_events($today, $today_end);
+    if (is_wp_error($upcoming_events) && tebuto_maybe_render_session_expired_from_error($upcoming_events)) {
+        return;
+    }
+
     $bookings_result = $api->get_bookings([
         'start' => $month_start,
         'page_size' => 100,
     ]);
+    if (is_wp_error($bookings_result) && tebuto_maybe_render_session_expired_from_error($bookings_result)) {
+        return;
+    }
+
     $categories = $api->get_aggregated_event_categories();
+    if (is_wp_error($categories) && tebuto_maybe_render_session_expired_from_error($categories)) {
+        return;
+    }
 
     // Calculate statistics
     $stats = tebuto_calculate_dashboard_stats($bookings_result, $upcoming_events);
@@ -254,24 +263,5 @@ function tebuto_format_event_datetime(string $start, string $end): string {
     $time_end = wp_date('H:i', $end_ts);
     
     return sprintf('%s, %s - %s', $date, $time_start, $time_end);
-}
-
-/**
- * Render the "not connected" notice.
- *
- * @return void
- */
-function tebuto_render_not_connected_notice(): void {
-    ?>
-    <div class="wrap tebuto-admin-wrap">
-        <div class="tebuto-card tebuto-card-warning">
-            <h2><?php esc_html_e('Verbindung erforderlich', 'tebuto-online-terminbuchung'); ?></h2>
-            <p><?php esc_html_e('Du musst dein Tebuto-Konto verbinden, um diese Funktionen nutzen zu können.', 'tebuto-online-terminbuchung'); ?></p>
-            <a href="<?php echo esc_url(admin_url('admin.php?page=tebuto-integration')); ?>" class="button button-primary">
-                <?php esc_html_e('Jetzt verbinden', 'tebuto-online-terminbuchung'); ?>
-            </a>
-        </div>
-    </div>
-    <?php
 }
 

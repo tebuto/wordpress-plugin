@@ -124,6 +124,8 @@ class Tebuto_API {
             if ($this->refresh_access_token()) {
                 return $this->fetch_and_store_therapist_id(true);
             }
+
+            $this->session_expired_error();
             return false;
         }
         
@@ -214,7 +216,7 @@ class Tebuto_API {
      * @param array  $query    Query parameters.
      * @return array|WP_Error Response data or error.
      */
-    private function request(string $method, string $endpoint, array $data = [], array $query = []) {
+    private function request(string $method, string $endpoint, array $data = [], array $query = [], bool $is_retry = false) {
         if (!$this->access_token) {
             $this->last_error = __('Nicht mit Tebuto verbunden.', 'tebuto-online-terminbuchung');
             return new WP_Error('not_connected', $this->last_error);
@@ -270,6 +272,14 @@ class Tebuto_API {
         $body = wp_remote_retrieve_body($response);
         $decoded = json_decode($body, true);
 
+        if ($status_code === 401 && !$is_retry) {
+            if ($this->refresh_access_token()) {
+                return $this->request($method, $endpoint, $data, $query, true);
+            }
+
+            return $this->session_expired_error();
+        }
+
         if ($status_code >= 400) {
             $error_message = $decoded['message'] ?? __('API-Fehler', 'tebuto-online-terminbuchung');
             $this->last_error = $error_message;
@@ -277,6 +287,19 @@ class Tebuto_API {
         }
 
         return $decoded ?? [];
+    }
+
+    /**
+     * Build a session-expired error and clear stored OAuth tokens.
+     *
+     * @return WP_Error
+     */
+    private function session_expired_error(): WP_Error {
+        tebuto_clear_auth_tokens($this->user_id);
+        $this->access_token = null;
+        $this->last_error = __('Deine Tebuto-Sitzung ist abgelaufen. Bitte melde dich erneut an.', 'tebuto-online-terminbuchung');
+
+        return new WP_Error('session_expired', $this->last_error);
     }
 
     /**
@@ -331,6 +354,12 @@ class Tebuto_API {
         $body = json_decode(wp_remote_retrieve_body($response), true);
 
         if ($status_code !== 200 || !isset($body['access_token'])) {
+            $error_code = $body['error'] ?? '';
+            if (in_array($error_code, ['invalid_grant', 'invalid_token'], true)) {
+                tebuto_clear_auth_tokens($this->user_id);
+                $this->access_token = null;
+            }
+
             $this->last_error = $body['error_description'] ?? __('Token-Refresh fehlgeschlagen.', 'tebuto-online-terminbuchung');
             return false;
         }
@@ -355,7 +384,7 @@ class Tebuto_API {
      *
      * @return array|WP_Error
      */
-    public function who_am_i() {
+    public function who_am_i(bool $is_retry = false) {
         if (!$this->access_token) {
             return new WP_Error('not_connected', __('Nicht verbunden.', 'tebuto-online-terminbuchung'));
         }
@@ -370,6 +399,26 @@ class Tebuto_API {
 
         if (is_wp_error($response)) {
             return $response;
+        }
+
+        $status_code = wp_remote_retrieve_response_code($response);
+
+        if ($status_code === 401 && !$is_retry) {
+            if ($this->refresh_access_token()) {
+                return $this->who_am_i(true);
+            }
+
+            return $this->session_expired_error();
+        }
+
+        if ($status_code !== 200) {
+            $body = wp_remote_retrieve_body($response);
+            $this->last_error = sprintf(
+                __('API-Fehler (Status %d): %s', 'tebuto-online-terminbuchung'),
+                $status_code,
+                $body
+            );
+            return new WP_Error('api_error', $this->last_error, ['status' => $status_code]);
         }
 
         $body = wp_remote_retrieve_body($response);

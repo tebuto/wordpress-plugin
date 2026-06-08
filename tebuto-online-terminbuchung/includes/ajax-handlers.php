@@ -8,6 +8,27 @@
 defined('ABSPATH') || exit;
 
 /**
+ * Send a JSON error for failed Tebuto API calls.
+ *
+ * @param Tebuto_API $api API client.
+ * @param WP_Error   $error API error.
+ * @return void
+ */
+function tebuto_send_ajax_api_error(Tebuto_API $api, WP_Error $error): void {
+    if ($error->get_error_code() === 'session_expired') {
+        wp_send_json_error(
+            [
+                'code'    => 'session_expired',
+                'message' => $error->get_error_message(),
+            ],
+            401
+        );
+    }
+
+    wp_send_json_error($api->get_last_error() ?: $error->get_error_message(), 500);
+}
+
+/**
  * Register AJAX handlers.
  *
  * @return void
@@ -34,13 +55,23 @@ function tebuto_ajax_get_categories(): void {
     $api = new Tebuto_API();
 
     if (!$api->is_connected()) {
+        if (tebuto_is_session_expired()) {
+            wp_send_json_error(
+                [
+                    'code'    => 'session_expired',
+                    'message' => __('Deine Tebuto-Sitzung ist abgelaufen. Bitte melde dich erneut an.', 'tebuto-online-terminbuchung'),
+                ],
+                401
+            );
+        }
+
         wp_send_json_error(__('Nicht mit Tebuto verbunden.', 'tebuto-online-terminbuchung'), 401);
     }
 
     $categories = $api->get_aggregated_event_categories();
 
     if (is_wp_error($categories)) {
-        wp_send_json_error($api->get_last_error(), 500);
+        tebuto_send_ajax_api_error($api, $categories);
     }
 
     $result = [];
@@ -77,6 +108,16 @@ function tebuto_ajax_get_events(): void {
     $api = new Tebuto_API();
 
     if (!$api->is_connected()) {
+        if (tebuto_is_session_expired()) {
+            wp_send_json_error(
+                [
+                    'code'    => 'session_expired',
+                    'message' => __('Deine Tebuto-Sitzung ist abgelaufen. Bitte melde dich erneut an.', 'tebuto-online-terminbuchung'),
+                ],
+                401
+            );
+        }
+
         wp_send_json_error(__('Nicht mit Tebuto verbunden.', 'tebuto-online-terminbuchung'), 401);
     }
 
@@ -92,7 +133,7 @@ function tebuto_ajax_get_events(): void {
     $events_result = $api->get_events($start, $end);
 
     if (is_wp_error($events_result)) {
-        wp_send_json_error($api->get_last_error(), 500);
+        tebuto_send_ajax_api_error($api, $events_result);
     }
 
     $calendar_events = tebuto_transform_events_for_calendar($events_result, $category_filter, $status_filter);
@@ -285,6 +326,16 @@ function tebuto_ajax_booking_action(): void {
     $api = new Tebuto_API();
 
     if (!$api->is_connected()) {
+        if (tebuto_is_session_expired()) {
+            wp_send_json_error(
+                [
+                    'code'    => 'session_expired',
+                    'message' => __('Deine Tebuto-Sitzung ist abgelaufen. Bitte melde dich erneut an.', 'tebuto-online-terminbuchung'),
+                ],
+                401
+            );
+        }
+
         wp_send_json_error(__('Nicht mit Tebuto verbunden.', 'tebuto-online-terminbuchung'), 401);
     }
 
@@ -315,7 +366,7 @@ function tebuto_ajax_booking_action(): void {
     }
 
     if (is_wp_error($result)) {
-        wp_send_json_error($api->get_last_error(), 500);
+        tebuto_send_ajax_api_error($api, $result);
     }
 
     wp_send_json_success($result);

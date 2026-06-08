@@ -13,6 +13,11 @@ defined('ABSPATH') || exit;
  * @return void
  */
 function tebuto_shortcode_page(): void {
+    if (!tebuto_is_connected()) {
+        tebuto_render_auth_required_notice();
+        return;
+    }
+
     $current_user_id    = get_current_user_id();
     $therapist_uuid     = tebuto_get_user_meta($current_user_id, 'therapist_uuid');
     $background_color   = tebuto_get_user_meta($current_user_id, 'background_color', '#ffffff');
@@ -104,13 +109,7 @@ function tebuto_shortcode_page(): void {
         <?php endif; ?>
 
         <?php if (empty($therapist_uuid)) : ?>
-            <div class="tebuto-card tebuto-card-warning">
-                <h2><?php esc_html_e('Verbindung erforderlich', 'tebuto-online-terminbuchung'); ?></h2>
-                <p><?php esc_html_e('Du musst dich zuerst mit Tebuto verbinden, um den Shortcode zu verwenden.', 'tebuto-online-terminbuchung'); ?></p>
-                <a href="<?php echo esc_url(admin_url('admin.php?page=tebuto-integration')); ?>" class="button button-primary">
-                    <?php esc_html_e('Jetzt verbinden', 'tebuto-online-terminbuchung'); ?>
-                </a>
-            </div>
+            <?php tebuto_render_not_connected_notice(); ?>
         <?php else : ?>
             <div class="tebuto-widget-editor-layout">
                 <!-- Left Column: Settings -->

@@ -19,7 +19,7 @@
 	}
 }
 
-// Notice when not connected
+// Notice when not connected or session expired
 .tebuto-block-notice {
 	text-align: center;
 	padding: 40px 24px;
@@ -38,6 +38,15 @@
 		&:last-of-type {
 			margin-bottom: 16px;
 		}
+	}
+}
+
+.tebuto-block-notice-expired {
+	background: #fff7ed;
+	border-color: #fb923c;
+
+	p {
+		color: #9a3412;
 	}
 }
 

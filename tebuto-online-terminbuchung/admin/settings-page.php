@@ -25,18 +25,33 @@ function tebuto_admin_page(): void {
         </div>
 
         <?php if (! $is_connected) : ?>
-            <div class="tebuto-card tebuto-card-connect">
-                <div class="tebuto-card-icon">
-                    <span class="dashicons dashicons-calendar-alt"></span>
+            <?php if (tebuto_is_session_expired()) : ?>
+                <div class="tebuto-card tebuto-card-warning tebuto-auth-notice tebuto-auth-notice-expired">
+                    <div class="tebuto-card-icon">
+                        <span class="dashicons dashicons-update"></span>
+                    </div>
+                    <div class="tebuto-card-content">
+                        <h2><?php esc_html_e('Sitzung abgelaufen', 'tebuto-online-terminbuchung'); ?></h2>
+                        <p><?php esc_html_e('Deine Verbindung zu Tebuto ist abgelaufen. Melde dich erneut an, um das Plugin weiter zu nutzen. Deine Widget-Einstellungen bleiben erhalten.', 'tebuto-online-terminbuchung'); ?></p>
+                        <a href="<?php echo esc_url(tebuto_get_authorize_url()); ?>" class="button button-primary button-hero">
+                            <?php esc_html_e('Erneut bei Tebuto anmelden', 'tebuto-online-terminbuchung'); ?>
+                        </a>
+                    </div>
                 </div>
-                <div class="tebuto-card-content">
-                    <h2><?php esc_html_e('Mit Tebuto verbinden', 'tebuto-online-terminbuchung'); ?></h2>
-                    <p><?php esc_html_e('Du bist derzeit nicht mit Tebuto verbunden. Verbinde dein Konto, um öffentliche Termine auf deiner Website anzubieten.', 'tebuto-online-terminbuchung'); ?></p>
-                    <a href="<?php echo esc_url(tebuto_get_authorize_url()); ?>" class="button button-primary button-hero">
-                        <?php esc_html_e('Mit Tebuto verbinden', 'tebuto-online-terminbuchung'); ?>
-                    </a>
+            <?php else : ?>
+                <div class="tebuto-card tebuto-card-connect">
+                    <div class="tebuto-card-icon">
+                        <span class="dashicons dashicons-calendar-alt"></span>
+                    </div>
+                    <div class="tebuto-card-content">
+                        <h2><?php esc_html_e('Mit Tebuto verbinden', 'tebuto-online-terminbuchung'); ?></h2>
+                        <p><?php esc_html_e('Du bist derzeit nicht mit Tebuto verbunden. Verbinde dein Konto, um öffentliche Termine auf deiner Website anzubieten.', 'tebuto-online-terminbuchung'); ?></p>
+                        <a href="<?php echo esc_url(tebuto_get_authorize_url()); ?>" class="button button-primary button-hero">
+                            <?php esc_html_e('Mit Tebuto verbinden', 'tebuto-online-terminbuchung'); ?>
+                        </a>
+                    </div>
                 </div>
-            </div>
+            <?php endif; ?>
         <?php else : ?>
             <div class="tebuto-card tebuto-card-success">
                 <div class="tebuto-card-icon">

@@ -46,6 +46,8 @@ function tebuto_enqueue_block_editor_assets(): void {
     // Localize script with therapist data
     wp_localize_script('tebuto-terminbuchung-editor-script', 'tebutoData', [
         'uuid'            => $therapist_uuid,
+        'authState'       => tebuto_get_auth_state($current_user_id),
+        'reconnectUrl'    => tebuto_get_authorize_url(),
         'widgetUrl'       => TEBUTO_WIDGET_URL,
         'settingsUrl'     => admin_url('admin.php?page=tebuto-integration'),
         'shortcodeUrl'    => admin_url('admin.php?page=tebuto-shortcode'),

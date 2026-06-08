@@ -3,7 +3,7 @@
  * Plugin Name: Tebuto - Online-Terminbuchung
  * Plugin URI: https://tebuto.de/dokumentation/wordpress-plugin
  * Description: Integriert die Online-Terminbuchung von Tebuto in deine WordPress-Website. Verwalte Termine, Kategorien und Buchungen direkt aus WordPress.
- * Version: 2.2.2
+ * Version: 2.3.0
  * Requires at least: 5.0
  * Requires PHP: 7.4
  * Author: Tebuto GmbH
@@ -21,7 +21,7 @@ defined('ABSPATH') || exit;
 /**
  * Plugin version.
  */
-define('TEBUTO_VERSION', '2.2.2');
+define('TEBUTO_VERSION', '2.3.0');
 
 /**
  * Plugin directory path.
@@ -86,6 +86,7 @@ require_once TEBUTO_PLUGIN_PATH . 'includes/shortcode.php';
 require_once TEBUTO_PLUGIN_PATH . 'includes/ajax-handlers.php';
 
 // Admin files
+require_once TEBUTO_PLUGIN_PATH . 'admin/admin-notices.php';
 require_once TEBUTO_PLUGIN_PATH . 'admin/admin-menu.php';
 require_once TEBUTO_PLUGIN_PATH . 'admin/settings-page.php';
 require_once TEBUTO_PLUGIN_PATH . 'admin/shortcode-page.php';

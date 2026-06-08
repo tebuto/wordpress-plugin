@@ -89,6 +89,7 @@ export default function Edit( { attributes, setAttributes } ) {
 	const [ availableCategories, setAvailableCategories ] = useState( [] );
 	const [ loadingCategories, setLoadingCategories ] = useState( true );
 	const [ categoriesError, setCategoriesError ] = useState( null );
+	const [ sessionExpired, setSessionExpired ] = useState( false );
 	const [ hasManagedUsers, setHasManagedUsers ] = useState( false );
 	const [ isManagingUser, setIsManagingUser ] = useState( false );
 
@@ -98,8 +99,16 @@ export default function Edit( { attributes, setAttributes } ) {
 
 	// Get therapist UUID and other data from localized data
 	const therapistUUID = window.tebutoData?.uuid || '';
+	const authState = window.tebutoData?.authState || 'disconnected';
+	const reconnectUrl =
+		window.tebutoData?.reconnectUrl ||
+		window.tebutoData?.settingsUrl ||
+		'/wp-admin/admin.php?page=tebuto-integration';
 	const widgetUrl = window.tebutoData?.widgetUrl || '';
 	const ajaxUrl = window.ajaxurl || '/wp-admin/admin-ajax.php';
+
+	const isSessionExpired =
+		sessionExpired || authState === 'expired';
 
 	// Parse selected categories from string
 	const selectedCategories = useMemo(
@@ -135,13 +144,30 @@ export default function Edit( { attributes, setAttributes } ) {
 				if ( data.success ) {
 					setAvailableCategories( data.data );
 				} else {
-					setCategoriesError(
-						data.data ||
-							__(
-								'Kategorien konnten nicht geladen werden.',
-								'tebuto-online-terminbuchung'
-							)
-					);
+					const errorPayload = data.data;
+					const errorCode =
+						typeof errorPayload === 'object' && errorPayload !== null
+							? errorPayload.code
+							: null;
+
+					if ( errorCode === 'session_expired' ) {
+						setSessionExpired( true );
+						setCategoriesError( null );
+					} else {
+						const errorMessage =
+							typeof errorPayload === 'object' &&
+							errorPayload !== null &&
+							errorPayload.message
+								? errorPayload.message
+								: errorPayload;
+						setCategoriesError(
+							errorMessage ||
+								__(
+									'Kategorien konnten nicht geladen werden.',
+									'tebuto-online-terminbuchung'
+								)
+						);
+					}
 				}
 			} catch {
 				setCategoriesError(
@@ -351,7 +377,36 @@ export default function Edit( { attributes, setAttributes } ) {
 		return () => clearTimeout( timer );
 	}, [ loadWidgetPreview ] );
 
-	if ( ! therapistUUID ) {
+	if ( isSessionExpired ) {
+		return (
+			<div { ...blockProps }>
+				<div className="tebuto-block-notice tebuto-block-notice-expired">
+					<p>
+						<strong>
+							{ __(
+								'Sitzung abgelaufen',
+								'tebuto-online-terminbuchung'
+							) }
+						</strong>
+					</p>
+					<p>
+						{ __(
+							'Deine Verbindung zu Tebuto ist abgelaufen. Bitte melde dich erneut an, um das Widget zu konfigurieren.',
+							'tebuto-online-terminbuchung'
+						) }
+					</p>
+					<Button variant="primary" href={ reconnectUrl }>
+						{ __(
+							'Erneut bei Tebuto anmelden',
+							'tebuto-online-terminbuchung'
+						) }
+					</Button>
+				</div>
+			</div>
+		);
+	}
+
+	if ( ! therapistUUID || authState === 'disconnected' ) {
 		return (
 			<div { ...blockProps }>
 				<div className="tebuto-block-notice">
@@ -369,13 +424,7 @@ export default function Edit( { attributes, setAttributes } ) {
 							'tebuto-online-terminbuchung'
 						) }
 					</p>
-					<Button
-						variant="primary"
-						href={
-							window.tebutoData?.settingsUrl ||
-							'/wp-admin/admin.php?page=tebuto-integration'
-						}
-					>
+					<Button variant="primary" href={ reconnectUrl }>
 						{ __(
 							'Jetzt verbinden',
 							'tebuto-online-terminbuchung'

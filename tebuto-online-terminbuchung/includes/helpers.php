@@ -93,6 +93,57 @@ function tebuto_is_connected(): bool {
 }
 
 /**
+ * Whether the user previously connected but tokens were cleared (session expired).
+ *
+ * @param int|null $user_id WordPress user ID. Defaults to current user.
+ * @return bool
+ */
+function tebuto_is_session_expired(?int $user_id = null): bool {
+    $user_id = $user_id ?? get_current_user_id();
+    if ($user_id <= 0 || tebuto_is_connected()) {
+        return false;
+    }
+
+    return ! empty(tebuto_get_user_meta($user_id, 'therapist_uuid'));
+}
+
+/**
+ * Resolve auth state for admin UI and the block editor.
+ *
+ * @param int|null $user_id WordPress user ID. Defaults to current user.
+ * @return string disconnected|expired|connected
+ */
+function tebuto_get_auth_state(?int $user_id = null): string {
+    $user_id = $user_id ?? get_current_user_id();
+
+    if (tebuto_is_connected()) {
+        return 'connected';
+    }
+
+    if (tebuto_is_session_expired($user_id)) {
+        return 'expired';
+    }
+
+    return 'disconnected';
+}
+
+/**
+ * Clear stored OAuth tokens without removing widget configuration.
+ *
+ * @param int|null $user_id WordPress user ID. Defaults to current user.
+ * @return void
+ */
+function tebuto_clear_auth_tokens(?int $user_id = null): void {
+    $user_id = $user_id ?? get_current_user_id();
+    if ($user_id <= 0) {
+        return;
+    }
+
+    tebuto_delete_user_meta($user_id, 'access_token');
+    tebuto_delete_user_meta($user_id, 'refresh_token');
+}
+
+/**
  * Get therapist UUID for current user.
  *
  * @return string Therapist UUID or empty string.

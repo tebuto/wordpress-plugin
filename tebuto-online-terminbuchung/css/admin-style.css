@@ -305,6 +305,62 @@
     line-height: 1.6;
 }
 
+/* Auth notices (not connected / session expired) */
+.tebuto-auth-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 32px;
+    max-width: 720px;
+    margin-top: 8px;
+}
+
+.tebuto-auth-notice .tebuto-card-icon {
+    flex-shrink: 0;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--tebuto-radius);
+    box-shadow: var(--tebuto-shadow);
+}
+
+.tebuto-auth-notice .tebuto-card-icon .dashicons {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    color: var(--tebuto-white);
+}
+
+.tebuto-auth-notice .tebuto-card-content h2 {
+    margin: 0 0 12px 0;
+    padding: 0;
+    font-size: 22px;
+    color: var(--tebuto-text);
+}
+
+.tebuto-auth-notice .tebuto-card-content p {
+    margin: 0 0 20px 0;
+    padding: 0;
+    color: var(--tebuto-text-secondary);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.tebuto-auth-notice-expired {
+    border-left: 4px solid var(--tebuto-warning);
+    background: var(--tebuto-warning-light);
+}
+
+.tebuto-auth-notice-expired .tebuto-card-icon {
+    background: var(--tebuto-warning);
+}
+
+.tebuto-card-warning.tebuto-auth-notice:not(.tebuto-auth-notice-expired) .tebuto-card-icon {
+    background: var(--tebuto-primary);
+}
+
 /* Success Card */
 .tebuto-card-success {
     display: flex;

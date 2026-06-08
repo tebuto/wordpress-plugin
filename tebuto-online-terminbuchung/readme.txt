@@ -4,7 +4,7 @@ Tags: Praxissoftware, Terminbuchung, Therapie, Buchungswidget, Kalender
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.2.2
+Stable tag: 2.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -119,6 +119,12 @@ Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter
 
 == Changelog ==
 
+= 2.3.0 =
+* **Fix: Multi-User-Widget** – Veraltete `configured-therapists`-Option entfernt; Termine von verwalteten Konten werden nicht mehr fälschlich ausgeblendet, wenn „Termine von verwalteten Konten anzeigen“ aktiv ist
+* **Fix: Tebuto-Verbindung** – Access Tokens werden bei Ablauf automatisch erneuert, sodass Kategorien und andere API-Daten nicht mehr nach kurzer Zeit mit Fehlern abbrechen
+* **Verbesserung: Sitzung abgelaufen** – Admin-Seiten und Gutenberg-Block zeigen bei abgelaufener Verbindung eine klare Meldung mit Button zur erneuten Anmeldung statt generischer API-Fehler
+* **Verbesserung: Erneute Anmeldung** – Widget-Einstellungen bleiben beim erneuten Verbinden erhalten; nur die OAuth-Tokens werden zurückgesetzt
+
 = 2.2.2 =
 * **Verbesserung: Widget-Einstellungen** – Kategorien-Bereich steht jetzt an erster Stelle in Block-Editor und Shortcode-Seite
 * **Verbesserung: Kategorieauswahl zuerst** – Option ist in den Kategorien-Bereich integriert und wird bei nur einer ausgewählten Kategorie deaktiviert statt ausgeblendet
@@ -172,6 +178,9 @@ Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter
 * Professionelles Admin-Interface
 
 == Upgrade Notice ==
+
+= 2.3.0 =
+Wichtiges Update für Multi-User-Praxen und längere Verbindungsstabilität: behobene Subaccount-Anzeige im Widget, automatische Token-Erneuerung und klarere Meldung bei abgelaufener Tebuto-Sitzung.
 
 = 2.2.2 =
 Überarbeitete Widget-Einstellungen: Kategorien stehen jetzt an erster Stelle, die Kategorieauswahl-Option ist dort integriert und wird bei nur einer Kategorie automatisch deaktiviert.

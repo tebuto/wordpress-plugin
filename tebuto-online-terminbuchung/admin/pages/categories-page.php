@@ -13,10 +13,8 @@ defined('ABSPATH') || exit;
  * @return void
  */
 function tebuto_categories_page(): void {
-    $api = new Tebuto_API();
-    
-    if (!$api->is_connected()) {
-        tebuto_render_not_connected_notice();
+    $api = tebuto_require_tebuto_connection();
+    if ($api === null) {
         return;
     }
 
@@ -24,6 +22,9 @@ function tebuto_categories_page(): void {
     tebuto_handle_category_actions($api);
 
     $categories = $api->get_event_categories();
+    if (is_wp_error($categories) && tebuto_maybe_render_session_expired_from_error($categories)) {
+        return;
+    }
 
     ?>
     <div class="wrap tebuto-admin-wrap">

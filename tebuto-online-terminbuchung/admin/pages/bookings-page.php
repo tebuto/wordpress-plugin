@@ -13,10 +13,8 @@ defined('ABSPATH') || exit;
  * @return void
  */
 function tebuto_bookings_page(): void {
-    $api = new Tebuto_API();
-    
-    if (!$api->is_connected()) {
-        tebuto_render_not_connected_notice();
+    $api = tebuto_require_tebuto_connection();
+    if ($api === null) {
         return;
     }
 
@@ -46,7 +44,10 @@ function tebuto_bookings_page(): void {
 
     // Fetch bookings
     $bookings_result = $api->get_bookings($filters);
-    
+    if (is_wp_error($bookings_result) && tebuto_maybe_render_session_expired_from_error($bookings_result)) {
+        return;
+    }
+
     // Current time for past appointment check
     $now = time();
 
