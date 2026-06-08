@@ -62,7 +62,9 @@ const THEME_PRESETS = [
 ];
 
 function isCategoryWidgetSelectable( category ) {
-	return Boolean( category.widgetSelectable ?? category.publicBookingEnabled );
+	return Boolean(
+		category.widgetSelectable ?? category.publicBookingEnabled
+	);
 }
 
 export default function Edit( { attributes, setAttributes } ) {
@@ -107,8 +109,7 @@ export default function Edit( { attributes, setAttributes } ) {
 	const widgetUrl = window.tebutoData?.widgetUrl || '';
 	const ajaxUrl = window.ajaxurl || '/wp-admin/admin-ajax.php';
 
-	const isSessionExpired =
-		sessionExpired || authState === 'expired';
+	const isSessionExpired = sessionExpired || authState === 'expired';
 
 	// Parse selected categories from string
 	const selectedCategories = useMemo(
@@ -146,7 +147,8 @@ export default function Edit( { attributes, setAttributes } ) {
 				} else {
 					const errorPayload = data.data;
 					const errorCode =
-						typeof errorPayload === 'object' && errorPayload !== null
+						typeof errorPayload === 'object' &&
+						errorPayload !== null
 							? errorPayload.code
 							: null;
 
