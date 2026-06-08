@@ -61,6 +61,10 @@ const THEME_PRESETS = [
 	},
 ];
 
+function isCategoryWidgetSelectable( category ) {
+	return Boolean( category.widgetSelectable ?? category.publicBookingEnabled );
+}
+
 export default function Edit( { attributes, setAttributes } ) {
 	const {
 		primaryColor,
@@ -75,7 +79,6 @@ export default function Edit( { attributes, setAttributes } ) {
 		showCategorySelectionFirst,
 		categories,
 		configuredCategoriesJson,
-		configuredTherapistsJson,
 		customCss,
 	} = attributes;
 
@@ -160,9 +163,6 @@ export default function Edit( { attributes, setAttributes } ) {
 		setIsManagingUser( window.tebutoData?.isManagingUser || false );
 	}, [] );
 
-	const isCategoryWidgetSelectable = ( category ) =>
-		Boolean( category.widgetSelectable ?? category.publicBookingEnabled );
-
 	const selectedAvailableCategories = useMemo(
 		() =>
 			availableCategories.filter(
@@ -177,30 +177,6 @@ export default function Edit( { attributes, setAttributes } ) {
 	);
 	const shouldUseConfiguredCategories =
 		showProviderFilter || hasSubaccountCategoriesSelected;
-
-	const configuredTherapistsForEmbed = useMemo( () => {
-		if (
-			! shouldUseConfiguredCategories ||
-			selectedAvailableCategories.length === 0
-		) {
-			return [];
-		}
-
-		const seenTherapistIds = new Set();
-		return selectedAvailableCategories.reduce( ( therapists, category ) => {
-			const therapistId = category.therapistId;
-			if ( ! therapistId || seenTherapistIds.has( therapistId ) ) {
-				return therapists;
-			}
-
-			seenTherapistIds.add( therapistId );
-			therapists.push( {
-				id: therapistId,
-				name: category.therapistName || '',
-			} );
-			return therapists;
-		}, [] );
-	}, [ shouldUseConfiguredCategories, selectedAvailableCategories ] );
 
 	useEffect( () => {
 		if (
@@ -232,31 +208,6 @@ export default function Edit( { attributes, setAttributes } ) {
 		selectedAvailableCategories,
 		shouldUseConfiguredCategories,
 		configuredCategoriesJson,
-		setAttributes,
-	] );
-
-	useEffect( () => {
-		if ( ! shouldUseConfiguredCategories ) {
-			if ( configuredTherapistsJson ) {
-				setAttributes( { configuredTherapistsJson: '' } );
-			}
-			return;
-		}
-
-		const nextTherapistsJson =
-			configuredTherapistsForEmbed.length > 0
-				? JSON.stringify( configuredTherapistsForEmbed )
-				: '';
-
-		if ( configuredTherapistsJson !== nextTherapistsJson ) {
-			setAttributes( {
-				configuredTherapistsJson: nextTherapistsJson,
-			} );
-		}
-	}, [
-		shouldUseConfiguredCategories,
-		configuredTherapistsForEmbed,
-		configuredTherapistsJson,
 		setAttributes,
 	] );
 
@@ -358,14 +309,6 @@ export default function Edit( { attributes, setAttributes } ) {
 				} ) )
 			);
 		}
-		if (
-			shouldUseConfiguredCategories &&
-			configuredTherapistsForEmbed.length > 0
-		) {
-			script.dataset.configuredTherapists = JSON.stringify(
-				configuredTherapistsForEmbed
-			);
-		}
 
 		// Always pass explicit category selections to the API. Subaccount-owned
 		// categories use local row IDs; omitting this reverts to all manager
@@ -397,7 +340,6 @@ export default function Edit( { attributes, setAttributes } ) {
 		showLocationQuickFilter,
 		showCategorySelectionFirst,
 		selectedAvailableCategories,
-		configuredTherapistsForEmbed,
 	] );
 
 	// Reload widget when attributes change

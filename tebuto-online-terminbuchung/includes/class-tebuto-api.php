@@ -531,47 +531,6 @@ class Tebuto_API {
     }
 
     /**
-     * Resolve configured therapists for a widget category selection.
-     *
-     * @param int[] $category_ids Selected widget category IDs.
-     * @return array List of therapist entries with id and name.
-     */
-    public function get_configured_therapists_for_category_ids(array $category_ids): array {
-        if (empty($category_ids)) {
-            return [];
-        }
-
-        $aggregated = $this->get_aggregated_event_categories();
-        if (is_wp_error($aggregated) || !is_array($aggregated)) {
-            return [];
-        }
-
-        $selected_ids = array_flip(array_map('absint', $category_ids));
-        $therapists = [];
-        $seen_ids = [];
-
-        foreach ($aggregated as $category) {
-            $category_id = absint($category['id'] ?? 0);
-            if ($category_id === 0 || !isset($selected_ids[$category_id])) {
-                continue;
-            }
-
-            $therapist_id = absint($category['therapistId'] ?? 0);
-            if ($therapist_id === 0 || isset($seen_ids[$therapist_id])) {
-                continue;
-            }
-
-            $seen_ids[$therapist_id] = true;
-            $therapists[] = [
-                'id'   => $therapist_id,
-                'name' => (string) ($category['therapistName'] ?? ''),
-            ];
-        }
-
-        return $therapists;
-    }
-
-    /**
      * Aggregate widget-selectable categories for the manager account and subaccounts.
      *
      * Public categories from the main therapist plus non-inherited public categories
@@ -850,8 +809,8 @@ class Tebuto_API {
     /**
      * Get all configured therapists (main therapist + managed users' therapists).
      *
-     * Returns an array of [ 'id' => int, 'name' => string ] entries suitable
-     * for passing as data-configured-therapists to the booking widget.
+     * Used internally when aggregating subaccount categories for the widget
+     * category picker — not emitted as a booking widget data attribute.
      *
      * @return array List of therapist entries with 'id' and 'name'.
      */

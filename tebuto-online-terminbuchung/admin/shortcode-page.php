@@ -39,11 +39,6 @@ function tebuto_shortcode_page(): void {
     $has_managed_users   = $widget_capabilities['has_managed_users'];
     $is_managing_user    = $widget_capabilities['is_managing_user'];
 
-    $configured_therapists = [];
-    if ($api->is_connected() && $show_provider_filter === 'true') {
-        $configured_therapists = $api->get_configured_therapists();
-    }
-
     // Theme presets
     $presets = [
         [
@@ -344,9 +339,7 @@ function tebuto_shortcode_page(): void {
     jQuery(document).ready(function($) {
         const selectedCategories = <?php echo wp_json_encode($selected_categories); ?>;
         const ajaxNonce = '<?php echo esc_js(wp_create_nonce('tebuto_admin')); ?>';
-        let configuredTherapists = <?php echo wp_json_encode($configured_therapists); ?>;
-
-        // Default values (used to determine which params to include in shortcode)
+        let loadedCategories = null;
         const DEFAULTS = {
             primary_color: '#00B4A9',
             background_color: '#ffffff',
@@ -482,17 +475,8 @@ function tebuto_shortcode_page(): void {
 
         // Toggle switches update preview and shortcode
         $('input[type="checkbox"]').on('change', function() {
-            const refreshPreview = function() {
-                tebuto_updatePreview();
-                updateShortcodeDisplay();
-            };
-
-            if ($(this).attr('id') === 'show_provider_filter') {
-                loadConfiguredTherapists().always(refreshPreview);
-                return;
-            }
-
-            refreshPreview();
+            tebuto_updatePreview();
+            updateShortcodeDisplay();
         });
 
         // Theme presets
@@ -536,9 +520,6 @@ function tebuto_shortcode_page(): void {
         }
 
         // Categories loaded from AJAX (used by loadWidget for configured-categories)
-        var loadedCategories = null;
-
-        // Load categories for multiselect
         function loadCategories() {
             $.ajax({
                 url: ajaxurl,
@@ -610,23 +591,12 @@ function tebuto_shortcode_page(): void {
             container.find('input[type="checkbox"]').on('change', function() {
                 syncCategorySelectionFirstState();
                 syncManagedAccountEventsSwitch();
-                if (isManagedAccountEventsEnabled()) {
-                    loadConfiguredTherapists().always(function() {
-                        tebuto_updatePreview();
-                        updateShortcodeDisplay();
-                    });
-                    return;
-                }
                 tebuto_updatePreview();
                 updateShortcodeDisplay();
             });
 
             syncManagedAccountEventsSwitch();
-            if (isManagedAccountEventsEnabled()) {
-                loadConfiguredTherapists().always(updateShortcodeDisplay);
-            } else {
-                updateShortcodeDisplay();
-            }
+            updateShortcodeDisplay();
         }
 
         // Escape HTML helper
@@ -752,40 +722,6 @@ function tebuto_shortcode_page(): void {
             };
         }
 
-        function buildConfiguredTherapistsForSelection() {
-            if (!isManagedAccountEventsEnabled() || !loadedCategories || loadedCategories.length === 0) {
-                configuredTherapists = [];
-                return;
-            }
-
-            const selectedIds = getSelectedCategories()
-                .split(',')
-                .filter(Boolean)
-                .map(function(id) { return parseInt(id, 10); });
-
-            const seenTherapistIds = {};
-            configuredTherapists = [];
-
-            loadedCategories.forEach(function(category) {
-                if (!selectedIds.includes(category.id) || !category.widgetSelectable) {
-                    return;
-                }
-                if (!category.therapistId || seenTherapistIds[category.therapistId]) {
-                    return;
-                }
-                seenTherapistIds[category.therapistId] = true;
-                configuredTherapists.push({
-                    id: category.therapistId,
-                    name: category.therapistName || ''
-                });
-            });
-        }
-
-        function loadConfiguredTherapists() {
-            buildConfiguredTherapistsForSelection();
-            return $.Deferred().resolve().promise();
-        }
-
         // Load widget script
         let widgetScript = null;
 
@@ -852,11 +788,6 @@ function tebuto_shortcode_page(): void {
                 }
             }
 
-            buildConfiguredTherapistsForSelection();
-            if (managedAccountEventsEnabled && configuredTherapists.length > 0) {
-                widgetScript.dataset.configuredTherapists = JSON.stringify(configuredTherapists);
-            }
-            
             if (config.categories) {
                 widgetScript.dataset.categories = config.categories;
             }
@@ -884,10 +815,8 @@ function tebuto_shortcode_page(): void {
 
         // Initial load
         loadCategories();
-        loadConfiguredTherapists().always(function() {
-            loadWidget();
-            updateShortcodeDisplay();
-        });
+        loadWidget();
+        updateShortcodeDisplay();
     });
     </script>
     <style>

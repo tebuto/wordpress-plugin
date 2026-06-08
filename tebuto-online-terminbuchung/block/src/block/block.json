@@ -60,10 +60,6 @@
 			"type": "string",
 			"default": ""
 		},
-		"configuredTherapistsJson": {
-			"type": "string",
-			"default": ""
-		},
 		"customCss": {
 			"type": "string",
 			"default": ""

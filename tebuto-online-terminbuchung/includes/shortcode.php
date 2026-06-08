@@ -164,21 +164,6 @@ function tebuto_widget_shortcode( $atts = [] ): string {
                     $widget_attrs['data-configured-categories'] = esc_attr( wp_json_encode( $configured_categories ) );
                 }
             }
-
-            // Fetch all therapists (main + managed users) for the provider filter.
-            // Without this, the widget only shows therapists that have events
-            // in the current view, missing providers without scheduled events.
-            $configured_cat_ids = [];
-            if ( ! empty( $categories ) ) {
-                $configured_cat_ids = array_map( 'intval', explode( ',', $categories ) );
-            }
-
-            $configured_therapists = ! empty( $configured_cat_ids )
-                ? $api->get_configured_therapists_for_category_ids( $configured_cat_ids )
-                : $api->get_configured_therapists();
-            if ( ! empty( $configured_therapists ) ) {
-                $widget_attrs['data-configured-therapists'] = esc_attr( wp_json_encode( $configured_therapists ) );
-            }
         }
     }
 
@@ -228,11 +213,6 @@ function tebuto_widget_shortcode( $atts = [] ): string {
             if ( ! empty( $configured_categories ) ) {
                 $widget_attrs['data-configured-categories'] = esc_attr( wp_json_encode( $configured_categories ) );
             }
-        }
-
-        $configured_therapists = $category_api->get_configured_therapists_for_category_ids( $configured_cat_ids );
-        if ( ! empty( $configured_therapists ) ) {
-            $widget_attrs['data-configured-therapists'] = esc_attr( wp_json_encode( $configured_therapists ) );
         }
     }
 

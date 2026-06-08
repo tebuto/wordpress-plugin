@@ -12,7 +12,6 @@ export default function save( { attributes } ) {
 		showCategorySelectionFirst,
 		categories,
 		configuredCategoriesJson,
-		configuredTherapistsJson,
 		customCss,
 	} = attributes;
 
@@ -80,49 +79,6 @@ export default function save( { attributes } ) {
 	) {
 		widgetAttributes[ 'data-configured-categories' ] =
 			configuredCategoriesJson;
-	}
-
-	const configuredTherapistsFromCategories = ( () => {
-		if ( ! configuredCategoriesJson ) {
-			return '';
-		}
-		try {
-			const configuredCategories = JSON.parse( configuredCategoriesJson );
-			if ( ! Array.isArray( configuredCategories ) ) {
-				return '';
-			}
-			const seenTherapistIds = new Set();
-			const therapists = [];
-			for ( const category of configuredCategories ) {
-				const therapistId = Number( category.therapistId );
-				if (
-					! Number.isFinite( therapistId ) ||
-					therapistId <= 0 ||
-					seenTherapistIds.has( therapistId )
-				) {
-					continue;
-				}
-				seenTherapistIds.add( therapistId );
-				therapists.push( {
-					id: therapistId,
-					name: String( category.therapistName ?? '' ),
-				} );
-			}
-			return therapists.length > 0 ? JSON.stringify( therapists ) : '';
-		} catch {
-			return '';
-		}
-	} )();
-
-	const configuredTherapistsForSave =
-		configuredTherapistsFromCategories || configuredTherapistsJson || '';
-
-	if (
-		( showProviderFilter || hasSubaccountCategories ) &&
-		configuredTherapistsForSave
-	) {
-		widgetAttributes[ 'data-configured-therapists' ] =
-			configuredTherapistsForSave;
 	}
 
 	let categoriesForEmbed = categories;
