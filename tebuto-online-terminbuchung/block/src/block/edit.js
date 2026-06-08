@@ -310,11 +310,8 @@ export default function Edit( { attributes, setAttributes } ) {
 		script.dataset.borderColor = borderColor;
 		script.dataset.border = border ? 'true' : 'false';
 		script.dataset.inheritFont = inheritFont ? 'true' : 'false';
-		const embedUsesManagedAccounts =
-			shouldUseConfiguredCategories ||
-			( Boolean( categories?.trim() ) && hasManagedUsers );
 
-		if ( embedUsesManagedAccounts ) {
+		if ( shouldUseConfiguredCategories ) {
 			script.dataset.includeSubusers = 'true';
 			script.dataset.showQuickFilters = 'true';
 		}
@@ -364,7 +361,6 @@ export default function Edit( { attributes, setAttributes } ) {
 		inheritFont,
 		shouldUseConfiguredCategories,
 		categories,
-		hasManagedUsers,
 		showLocationQuickFilter,
 		showCategorySelectionFirst,
 		selectedAvailableCategories,

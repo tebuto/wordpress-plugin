@@ -4,7 +4,7 @@ Tags: Praxissoftware, Terminbuchung, Therapie, Buchungswidget, Kalender
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.3.0
+Stable tag: 2.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -119,6 +119,9 @@ Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter
 
 == Changelog ==
 
+= 2.3.1 =
+* **Fix: Gutenberg-Vorschau** – Die Live-Vorschau im Block-Editor berücksichtigt „Termine von verwalteten Konten anzeigen“ jetzt wie die veröffentlichte Seite; Termine von Unterkonten erscheinen nicht mehr, wenn die Option deaktiviert ist
+
 = 2.3.0 =
 * **Fix: Multi-User-Widget** – Veraltete `configured-therapists`-Option entfernt; Termine von verwalteten Konten werden nicht mehr fälschlich ausgeblendet, wenn „Termine von verwalteten Konten anzeigen“ aktiv ist
 * **Fix: Tebuto-Verbindung** – Access Tokens werden bei Ablauf automatisch erneuert, sodass Kategorien und andere API-Daten nicht mehr nach kurzer Zeit mit Fehlern abbrechen
@@ -178,6 +181,9 @@ Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter
 * Professionelles Admin-Interface
 
 == Upgrade Notice ==
+
+= 2.3.1 =
+Die Block-Editor-Vorschau respektiert „Termine von verwalteten Konten anzeigen“ jetzt wie die veröffentlichte Seite.
 
 = 2.3.0 =
 Wichtiges Update für Multi-User-Praxen und längere Verbindungsstabilität: behobene Subaccount-Anzeige im Widget, automatische Token-Erneuerung und klarere Meldung bei abgelaufener Tebuto-Sitzung.

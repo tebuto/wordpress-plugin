@@ -60,6 +60,7 @@ npm run dev                  # Watch block + auto-sync on tebuto-online-terminbu
 npm run build:block          # Compile Gutenberg block only
 npm run build                # Production ZIP: tebuto-online-terminbuchung.zip
 npm run lint                 # ESLint on block source
+npm run lint:fix             # Format + lint block source (same as pre-commit hook)
 npm run version:check        # Verify version fields are in sync
 npm run version:bump 2.3.0   # Bump version in all tracked files (or patch/minor/major)
 ```
@@ -67,6 +68,8 @@ npm run version:bump 2.3.0   # Bump version in all tracked files (or patch/minor
 Local WordPress: http://localhost:8000 — plugin path `wordpress/wp-content/plugins/tebuto-online-terminbuchung/`.
 
 CI (`.github/workflows/branch.yaml`): `npm ci` in `block/`, `lint:js`, `build`, `version:check`, `build.sh`.
+
+Pre-commit (Husky + `lint-staged.config.cjs`): after root `npm install`, staged `block/src/**/*.{js,jsx,ts,tsx}` is formatted and linted before each commit.
 
 ## Coding conventions
 
@@ -142,7 +145,7 @@ Release flow: bump → edit changelog stubs in `readme.txt` → merge `main` →
 ## Pre-PR checklist
 
 ```bash
-npm run lint
+npm run lint:fix
 npm run dev:build    # or npm run build for release-like verify
 npm run version:check
 ```

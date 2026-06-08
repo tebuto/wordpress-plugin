@@ -114,7 +114,10 @@ This runs `scripts/build.sh`, which compiles the block and packages the plugin i
 
 ```bash
 npm run lint
+npm run lint:fix   # format + lint (same checks as the pre-commit hook)
 ```
+
+A **pre-commit hook** (Husky + lint-staged) runs automatically after `npm install` and formats/lints staged Gutenberg block sources under `tebuto-online-terminbuchung/block/src/` before each commit — matching the CI **Lint JavaScript** step.
 
 ## Project Structure
 
@@ -142,7 +145,7 @@ wordpress/                     # Local WordPress instance (Docker volume, gitign
 
 1. Fork the repository and create a feature branch from `main`
 2. Make your changes with clear, focused commits
-3. Run `npm run lint` and `npm run dev:build` before submitting
+3. Run `npm run lint:fix` and `npm run dev:build` before submitting (or rely on the pre-commit hook for block JS)
 4. Open a pull request with a description of what changed and why
 5. Link any related GitHub issues
 

@@ -1,6 +1,6 @@
 {
   "name": "tebuto-wordpress-plugin",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "WordPress plugin for integrating Tebuto appointment booking",
   "homepage": "https://tebuto.de/dokumentation/wordpress-plugin",
   "author": "Artus Engineering GmbH",
@@ -10,7 +10,10 @@
     "version:bump": "./scripts/bump-version.sh",
     "version:check": "./scripts/bump-version.sh --check",
     "build:block": "npm --prefix tebuto-online-terminbuchung/block run build",
+    "format": "npm --prefix tebuto-online-terminbuchung/block run format",
     "lint": "npm --prefix tebuto-online-terminbuchung/block run lint:js",
+    "lint:fix": "npm run format && npm run lint",
+    "prepare": "husky",
     "start": "npm --prefix tebuto-online-terminbuchung/block run start",
     "postinstall": "npm --prefix tebuto-online-terminbuchung/block ci",
     "dev:setup": "./scripts/dev-setup.sh",
@@ -42,6 +45,8 @@
   },
   "devDependencies": {
     "chokidar-cli": "^3.0.0",
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2"
   }
 }
