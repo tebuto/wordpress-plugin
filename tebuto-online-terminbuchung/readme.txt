@@ -4,7 +4,7 @@ Tags: Praxissoftware, Terminbuchung, Therapie, Buchungswidget, Kalender
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.2.0
+Stable tag: 2.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -119,6 +119,10 @@ Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter
 
 == Changelog ==
 
+= 2.2.1 =
+* **Fix: Produktions-URLs** – Entfernt lokale Entwicklungs-Domains aus dem Plugin-Code; alle Standard-URLs verweisen auf *.tebuto.de
+* **Fix: Gutenberg-Block** – Gespeicherte Blöcke verwenden immer die Produktions-Widget-URL
+
 = 2.2.0 =
 * **NEU: Standort-Schnellfilter** – Optionaler Schnellfilter nach Standort/Ort im Buchungswidget
 * **NEU: Kategorieauswahl zuerst** – Option, Besucher:innen zuerst eine Terminart wählen zu lassen
@@ -163,6 +167,9 @@ Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter
 * Professionelles Admin-Interface
 
 == Upgrade Notice ==
+
+= 2.2.1 =
+Kleines Update: Stellt sicher, dass das Plugin ausschließlich Produktions-URLs (*.tebuto.de) verwendet.
 
 = 2.2.0 =
 Neue Widget-Optionen: Standort-Schnellfilter und Kategorieauswahl vor der Terminauswahl.

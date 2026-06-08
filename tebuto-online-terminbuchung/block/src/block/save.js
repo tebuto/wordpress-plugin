@@ -17,8 +17,7 @@ export default function save( { attributes } ) {
 	} = attributes;
 
 	const uuid = window.tebutoData?.uuid || '';
-	const widgetUrl =
-		window.tebutoData?.widgetUrl || 'https://tebuto.de/widget/booking.js';
+	const widgetUrl = 'https://tebuto.de/widget/booking.js';
 
 	// Build widget attributes
 	const widgetAttributes = {
