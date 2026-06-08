@@ -4,7 +4,7 @@ Tags: Praxissoftware, Terminbuchung, Therapie, Buchungswidget, Kalender
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -119,6 +119,11 @@ Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter
 
 == Changelog ==
 
+= 2.2.2 =
+* **Verbesserung: Widget-Einstellungen** – Kategorien-Bereich steht jetzt an erster Stelle in Block-Editor und Shortcode-Seite
+* **Verbesserung: Kategorieauswahl zuerst** – Option ist in den Kategorien-Bereich integriert und wird bei nur einer ausgewählten Kategorie deaktiviert statt ausgeblendet
+* **Verbesserung: Gutenberg-Block & Shortcode-Seite** – Einheitliche Abschnittsreihenfolge, Beschriftungen und Hilfetexte
+
 = 2.2.1 =
 * **Fix: Produktions-URLs** – Entfernt lokale Entwicklungs-Domains aus dem Plugin-Code; alle Standard-URLs verweisen auf *.tebuto.de
 * **Fix: Gutenberg-Block** – Gespeicherte Blöcke verwenden immer die Produktions-Widget-URL
@@ -167,6 +172,9 @@ Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter
 * Professionelles Admin-Interface
 
 == Upgrade Notice ==
+
+= 2.2.2 =
+Überarbeitete Widget-Einstellungen: Kategorien stehen jetzt an erster Stelle, die Kategorieauswahl-Option ist dort integriert und wird bei nur einer Kategorie automatisch deaktiviert.
 
 = 2.2.1 =
 Kleines Update: Stellt sicher, dass das Plugin ausschließlich Produktions-URLs (*.tebuto.de) verwendet.

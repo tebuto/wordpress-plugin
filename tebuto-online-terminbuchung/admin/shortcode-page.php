@@ -153,8 +153,11 @@ function tebuto_shortcode_page(): void {
                             <?php wp_nonce_field('tebuto_save_settings', 'tebuto_nonce'); ?>
                             <input type="hidden" name="tebuto_save_settings" value="1">
 
-                                <div class="tebuto-form-section" id="show_category_selection_first_section" style="display: none;">
-                                    <div class="tebuto-switch-option" id="show_category_selection_first_option">
+                                <!-- Categories Section -->
+                                <div class="tebuto-form-section">
+                                    <h3 class="tebuto-form-section-title"><?php esc_html_e('Kategorien', 'tebuto-online-terminbuchung'); ?></h3>
+
+                                    <div class="tebuto-switch-option tebuto-category-selection-first-option" id="show_category_selection_first_option">
                                         <div class="tebuto-switch-option-text">
                                             <span class="tebuto-switch-option-label"><?php esc_html_e('Kategorieauswahl als ersten Schritt', 'tebuto-online-terminbuchung'); ?></span>
                                             <span class="tebuto-switch-option-desc"><?php esc_html_e('Zeigt bei mehreren ausgewählten Kategorien zuerst eine Kategorieauswahl, bevor der Kalender erscheint.', 'tebuto-online-terminbuchung'); ?></span>
@@ -163,6 +166,18 @@ function tebuto_shortcode_page(): void {
                                             <input type="checkbox" name="show_category_selection_first" id="show_category_selection_first" value="true" <?php checked($show_category_selection_first, 'true'); ?>>
                                             <span class="tebuto-switch-slider"></span>
                                         </label>
+                                    </div>
+
+                                    <p class="description"><?php esc_html_e('Alle Kategorien werden angezeigt. Nur öffentliche Kategorien können im Widget verwendet werden.', 'tebuto-online-terminbuchung'); ?></p>
+
+                                    <div class="tebuto-form-group">
+                                        <div class="tebuto-categories-multiselect" id="tebuto-categories-container">
+                                            <div class="tebuto-loading-categories">
+                                                <span class="spinner is-active"></span>
+                                                <?php esc_html_e('Kategorien werden geladen...', 'tebuto-online-terminbuchung'); ?>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="categories_json" id="categories_json" value="<?php echo esc_attr(wp_json_encode($selected_categories)); ?>">
                                     </div>
                                 </div>
 
@@ -198,12 +213,12 @@ function tebuto_shortcode_page(): void {
                                             <p class="description"><?php esc_html_e('Buttons und Akzente', 'tebuto-online-terminbuchung'); ?></p>
                                         </div>
 
-                            <div class="tebuto-form-group">
+                                        <div class="tebuto-form-group">
                                             <label for="background_color"><?php esc_html_e('Hintergrund', 'tebuto-online-terminbuchung'); ?></label>
-                                <div class="tebuto-color-input">
-                                    <input type="color" name="background_color" id="background_color" value="<?php echo esc_attr($background_color); ?>">
-                                    <input type="text" id="background_color_hex" class="tebuto-color-hex" value="<?php echo esc_attr(strtoupper($background_color)); ?>" maxlength="7">
-                                </div>
+                                            <div class="tebuto-color-input">
+                                                <input type="color" name="background_color" id="background_color" value="<?php echo esc_attr($background_color); ?>">
+                                                <input type="text" id="background_color_hex" class="tebuto-color-hex" value="<?php echo esc_attr(strtoupper($background_color)); ?>" maxlength="7">
+                                            </div>
                                             <p class="description"><?php esc_html_e('Widget-Hintergrund', 'tebuto-online-terminbuchung'); ?></p>
                                         </div>
 
@@ -234,7 +249,7 @@ function tebuto_shortcode_page(): void {
                                             <p class="description"><?php esc_html_e('Rahmen und Trennlinien', 'tebuto-online-terminbuchung'); ?></p>
                                         </div>
                                     </div>
-                            </div>
+                                </div>
 
                                 <!-- Display Options -->
                                 <div class="tebuto-form-section">
@@ -246,7 +261,7 @@ function tebuto_shortcode_page(): void {
                                             <span class="tebuto-switch-option-desc"><?php esc_html_e('Zeigt einen Rahmen um das Widget', 'tebuto-online-terminbuchung'); ?></span>
                                         </div>
                                         <label class="tebuto-switch">
-                                    <input type="checkbox" name="border" id="border" value="true" <?php checked($border, 'true'); ?>>
+                                            <input type="checkbox" name="border" id="border" value="true" <?php checked($border, 'true'); ?>>
                                             <span class="tebuto-switch-slider"></span>
                                         </label>
                                     </div>
@@ -254,7 +269,7 @@ function tebuto_shortcode_page(): void {
                                     <div class="tebuto-switch-option">
                                         <div class="tebuto-switch-option-text">
                                             <span class="tebuto-switch-option-label"><?php esc_html_e('Schriftart übernehmen', 'tebuto-online-terminbuchung'); ?></span>
-                                            <span class="tebuto-switch-option-desc"><?php esc_html_e('Verwendet die Schriftart deiner Website anstelle der Tebuto-Schrift', 'tebuto-online-terminbuchung'); ?></span>
+                                            <span class="tebuto-switch-option-desc"><?php esc_html_e('Verwendet die Schriftart deiner Website', 'tebuto-online-terminbuchung'); ?></span>
                                         </div>
                                         <label class="tebuto-switch">
                                             <input type="checkbox" name="inherit_font" id="inherit_font" value="true" <?php checked($inherit_font, 'true'); ?>>
@@ -289,24 +304,6 @@ function tebuto_shortcode_page(): void {
                                     <?php endif; ?>
                                 </div>
 
-                                <!-- Categories Section -->
-                                <div class="tebuto-form-section">
-                                    <h3 class="tebuto-form-section-title"><?php esc_html_e('Kategorien', 'tebuto-online-terminbuchung'); ?></h3>
-                                    
-                                    <div class="tebuto-form-group">
-                                        <label for="categories"><?php esc_html_e('Angezeigte Kategorien', 'tebuto-online-terminbuchung'); ?></label>
-                                        <div class="tebuto-categories-multiselect" id="tebuto-categories-container">
-                                            <div class="tebuto-loading-categories">
-                                                <span class="spinner is-active"></span>
-                                                <?php esc_html_e('Kategorien werden geladen...', 'tebuto-online-terminbuchung'); ?>
-                                            </div>
-                                        </div>
-                                        <p class="description"><?php esc_html_e('Alle Kategorien werden angezeigt. Nur öffentliche Kategorien können im Widget verwendet werden.', 'tebuto-online-terminbuchung'); ?></p>
-                                        <!-- Hidden input to store selected category IDs -->
-                                        <input type="hidden" name="categories_json" id="categories_json" value="<?php echo esc_attr(wp_json_encode($selected_categories)); ?>">
-                                    </div>
-                                </div>
-
                                 <!-- Custom CSS Section -->
                                 <div class="tebuto-form-section">
                                     <h3 class="tebuto-form-section-title"><?php esc_html_e('Custom CSS', 'tebuto-online-terminbuchung'); ?></h3>
@@ -314,7 +311,7 @@ function tebuto_shortcode_page(): void {
                                     <div class="tebuto-form-group">
                                         <label for="custom_css"><?php esc_html_e('Eigenes CSS', 'tebuto-online-terminbuchung'); ?></label>
                                         <textarea name="custom_css" id="custom_css" rows="6" class="large-text code" placeholder="<?php esc_attr_e('/* Dein CSS hier */', 'tebuto-online-terminbuchung'); ?>"><?php echo esc_textarea($custom_css); ?></textarea>
-                                        <p class="description"><?php esc_html_e('Füge eigenes CSS hinzu, um das Widget-Design anzupassen. Verwende #tebuto-booking-widget als Selektor-Präfix.', 'tebuto-online-terminbuchung'); ?></p>
+                                        <p class="description"><?php esc_html_e('Füge eigenes CSS hinzu. Verwende #tebuto-booking-widget als Selektor-Präfix.', 'tebuto-online-terminbuchung'); ?></p>
                                     </div>
                             </div>
 
@@ -607,11 +604,11 @@ function tebuto_shortcode_page(): void {
             html += '</div>';
             container.html(html);
 
-            syncCategorySelectionFirstVisibility();
+            syncCategorySelectionFirstState();
 
             // Update preview and shortcode when category selection changes
             container.find('input[type="checkbox"]').on('change', function() {
-                syncCategorySelectionFirstVisibility();
+                syncCategorySelectionFirstState();
                 syncManagedAccountEventsSwitch();
                 if (isManagedAccountEventsEnabled()) {
                     loadConfiguredTherapists().always(function() {
@@ -666,9 +663,27 @@ function tebuto_shortcode_page(): void {
             }).length;
         }
 
-        function syncCategorySelectionFirstVisibility() {
-            const showOption = getEffectiveSelectedCategoryCount() > 1;
-            $('#show_category_selection_first_section').toggle(showOption);
+        let preservedCategorySelectionFirst = null;
+
+        function syncCategorySelectionFirstState() {
+            const canUseCategorySelection = getEffectiveSelectedCategoryCount() > 1;
+            const $option = $('#show_category_selection_first_option');
+            const $switch = $('#show_category_selection_first');
+
+            if (canUseCategorySelection) {
+                $option.removeClass('tebuto-switch-disabled');
+                $switch.prop('disabled', false);
+                if (preservedCategorySelectionFirst !== null) {
+                    $switch.prop('checked', preservedCategorySelectionFirst);
+                    preservedCategorySelectionFirst = null;
+                }
+            } else {
+                if (!$switch.prop('disabled')) {
+                    preservedCategorySelectionFirst = $switch.is(':checked');
+                }
+                $option.addClass('tebuto-switch-disabled');
+                $switch.prop('checked', false).prop('disabled', true);
+            }
         }
 
         const managedAccountEventsDefaultHelp = <?php echo wp_json_encode(
@@ -1033,6 +1048,10 @@ function tebuto_shortcode_page(): void {
         font-size: 18px;
         width: 18px;
         height: 18px;
+    }
+
+    .tebuto-category-selection-first-option {
+        margin-bottom: 16px;
     }
 
     /* Categories Multiselect */

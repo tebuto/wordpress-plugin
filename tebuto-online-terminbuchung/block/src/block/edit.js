@@ -447,32 +447,117 @@ export default function Edit( { attributes, setAttributes } ) {
 	return (
 		<>
 			<InspectorControls>
-				{ selectedAvailableCategories.length > 1 && (
-					<PanelBody
-						title={ __(
-							'Kategorieauswahl',
+				{ /* Categories */ }
+				<PanelBody
+					title={ __( 'Kategorien', 'tebuto-online-terminbuchung' ) }
+					initialOpen={ true }
+				>
+					<ToggleControl
+						label={ __(
+							'Kategorieauswahl als ersten Schritt',
 							'tebuto-online-terminbuchung'
 						) }
-						initialOpen={ true }
-					>
-						<ToggleControl
-							label={ __(
-								'Kategorieauswahl als ersten Schritt',
-								'tebuto-online-terminbuchung'
-							) }
-							help={ __(
-								'Zeigt bei mehreren ausgewählten Kategorien zuerst eine Kategorieauswahl, bevor der Kalender erscheint.',
-								'tebuto-online-terminbuchung'
-							) }
-							checked={ showCategorySelectionFirst !== false }
-							onChange={ ( value ) =>
-								setAttributes( {
-									showCategorySelectionFirst: value,
+						help={ __(
+							'Zeigt bei mehreren ausgewählten Kategorien zuerst eine Kategorieauswahl, bevor der Kalender erscheint.',
+							'tebuto-online-terminbuchung'
+						) }
+						checked={
+							selectedAvailableCategories.length > 1 &&
+							showCategorySelectionFirst !== false
+						}
+						disabled={ selectedAvailableCategories.length <= 1 }
+						onChange={ ( value ) =>
+							setAttributes( {
+								showCategorySelectionFirst: value,
+							} )
+						}
+					/>
+
+					<p className="tebuto-panel-description">
+						{ __(
+							'Alle Kategorien werden angezeigt. Nur öffentliche Kategorien können im Widget verwendet werden.',
+							'tebuto-online-terminbuchung'
+						) }
+					</p>
+
+					{ loadingCategories && (
+						<div className="tebuto-loading">
+							<Spinner />
+							<span>
+								{ __(
+									'Kategorien werden geladen…',
+									'tebuto-online-terminbuchung'
+								) }
+							</span>
+						</div>
+					) }
+
+					{ categoriesError && (
+						<p className="tebuto-error">{ categoriesError }</p>
+					) }
+
+					{ ! loadingCategories && ! categoriesError && (
+						<div className="tebuto-category-list">
+							{ availableCategories.length === 0 ? (
+								<p className="tebuto-empty">
+									{ __(
+										'Keine Kategorien vorhanden.',
+										'tebuto-online-terminbuchung'
+									) }
+								</p>
+							) : (
+								availableCategories.map( ( cat ) => {
+									const isSelectable =
+										isCategoryWidgetSelectable( cat );
+
+									return (
+										<div
+											key={ cat.id }
+											className={
+												isSelectable
+													? 'tebuto-category-item'
+													: 'tebuto-category-item tebuto-category-item--unavailable'
+											}
+										>
+											<CheckboxControl
+												label={
+													<span className="tebuto-category-label">
+														<span
+															className="tebuto-category-color"
+															style={ {
+																backgroundColor:
+																	cat.color,
+															} }
+														/>
+														{ cat.name }
+														{ ! isSelectable && (
+															<span className="tebuto-category-unavailable-hint">
+																{ __(
+																	'Nicht öffentlich',
+																	'tebuto-online-terminbuchung'
+																) }
+															</span>
+														) }
+													</span>
+												}
+												checked={
+													isSelectable &&
+													selectedCategories.includes(
+														cat.id
+													)
+												}
+												disabled={ ! isSelectable }
+												onChange={ () =>
+													toggleCategory( cat.id )
+												}
+											/>
+										</div>
+									);
 								} )
-							}
-						/>
-					</PanelBody>
-				) }
+							) }
+						</div>
+					) }
+				</PanelBody>
 
 				{ /* Theme Presets */ }
 				<PanelBody
@@ -480,7 +565,7 @@ export default function Edit( { attributes, setAttributes } ) {
 						'Farbvorlagen',
 						'tebuto-online-terminbuchung'
 					) }
-					initialOpen={ true }
+					initialOpen={ false }
 				>
 					<div className="tebuto-preset-buttons">
 						{ THEME_PRESETS.map( ( preset ) => (
@@ -706,97 +791,6 @@ export default function Edit( { attributes, setAttributes } ) {
 								} )
 							}
 						/>
-					) }
-				</PanelBody>
-
-				{ /* Categories */ }
-				<PanelBody
-					title={ __( 'Kategorien', 'tebuto-online-terminbuchung' ) }
-					initialOpen={ false }
-				>
-					<p className="tebuto-panel-description">
-						{ __(
-							'Alle Kategorien werden angezeigt. Nur öffentliche Kategorien können im Widget verwendet werden.',
-							'tebuto-online-terminbuchung'
-						) }
-					</p>
-
-					{ loadingCategories && (
-						<div className="tebuto-loading">
-							<Spinner />
-							<span>
-								{ __(
-									'Kategorien werden geladen…',
-									'tebuto-online-terminbuchung'
-								) }
-							</span>
-						</div>
-					) }
-
-					{ categoriesError && (
-						<p className="tebuto-error">{ categoriesError }</p>
-					) }
-
-					{ ! loadingCategories && ! categoriesError && (
-						<div className="tebuto-category-list">
-							{ availableCategories.length === 0 ? (
-								<p className="tebuto-empty">
-									{ __(
-										'Keine Kategorien vorhanden.',
-										'tebuto-online-terminbuchung'
-									) }
-								</p>
-							) : (
-								availableCategories.map( ( cat ) => {
-									const isSelectable =
-										isCategoryWidgetSelectable( cat );
-
-									return (
-										<div
-											key={ cat.id }
-											className={
-												isSelectable
-													? 'tebuto-category-item'
-													: 'tebuto-category-item tebuto-category-item--unavailable'
-											}
-										>
-											<CheckboxControl
-												label={
-													<span className="tebuto-category-label">
-														<span
-															className="tebuto-category-color"
-															style={ {
-																backgroundColor:
-																	cat.color,
-															} }
-														/>
-														{ cat.name }
-														{ ! isSelectable && (
-															<span className="tebuto-category-unavailable-hint">
-																{ __(
-																	'Nicht öffentlich',
-																	'tebuto-online-terminbuchung'
-																) }
-															</span>
-														) }
-													</span>
-												}
-												checked={
-													isSelectable &&
-													selectedCategories.includes(
-														cat.id
-													)
-												}
-												disabled={ ! isSelectable }
-												onChange={ () =>
-													toggleCategory( cat.id )
-												}
-											/>
-										</div>
-									);
-								} )
-							) }
-						</div>
 					) }
 				</PanelBody>
 
