@@ -44,9 +44,9 @@
     "node": ">=20"
   },
   "devDependencies": {
-    "chokidar-cli": "^3.0.0",
-    "concurrently": "^9.2.3",
-    "husky": "^9.1.7",
-    "lint-staged": "^15.5.2"
+    "chokidar-cli": "^3",
+    "concurrently": "^10",
+    "husky": "^9",
+    "lint-staged": "^17"
   }
 }
