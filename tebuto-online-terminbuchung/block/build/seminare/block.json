@@ -1,0 +1,58 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "tebuto/seminare",
+  "version": "1.0.0",
+  "title": "Tebuto Seminare",
+  "category": "widgets",
+  "description": "Mit diesem Block können Sie Seminare von Tebuto auf Ihrer Website einbinden.",
+  "example": {},
+  "attributes": {
+    "primaryColor": {
+      "type": "string",
+      "default": "#00B4A9"
+    },
+    "backgroundColor": {
+      "type": "string",
+      "default": "#ffffff"
+    },
+    "textPrimary": {
+      "type": "string",
+      "default": "#374151"
+    },
+    "textSecondary": {
+      "type": "string",
+      "default": "#6b7280"
+    },
+    "borderColor": {
+      "type": "string",
+      "default": "#E9E9E9"
+    },
+    "border": {
+      "type": "boolean",
+      "default": true
+    },
+    "inheritFont": {
+      "type": "boolean",
+      "default": false
+    },
+    "seminars": {
+      "type": "string",
+      "default": ""
+    },
+    "showPast": {
+      "type": "boolean",
+      "default": false
+    },
+    "customCss": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "supports": {
+    "html": false
+  },
+  "textdomain": "tebuto-online-terminbuchung",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css"
+}

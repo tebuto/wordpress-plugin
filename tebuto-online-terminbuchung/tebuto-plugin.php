@@ -55,6 +55,10 @@ if (!defined('TEBUTO_WIDGET_URL')) {
     define('TEBUTO_WIDGET_URL', 'https://tebuto.de/widget/booking.js');
 }
 
+if (!defined('TEBUTO_SEMINARS_WIDGET_URL')) {
+    define('TEBUTO_SEMINARS_WIDGET_URL', str_replace('booking.js', 'seminars.js', TEBUTO_WIDGET_URL));
+}
+
 /**
  * Tebuto OAuth Client ID.
  */
@@ -83,6 +87,7 @@ require_once TEBUTO_PLUGIN_PATH . 'includes/class-tebuto-api.php';
 require_once TEBUTO_PLUGIN_PATH . 'includes/oauth-callback.php';
 require_once TEBUTO_PLUGIN_PATH . 'includes/store-uuid.php';
 require_once TEBUTO_PLUGIN_PATH . 'includes/shortcode.php';
+require_once TEBUTO_PLUGIN_PATH . 'includes/seminars-shortcode.php';
 require_once TEBUTO_PLUGIN_PATH . 'includes/ajax-handlers.php';
 
 // Admin files
@@ -169,9 +174,10 @@ add_action('plugins_loaded', 'tebuto_load_textdomain');
  * @return void
  */
 function tebuto_init(): void {
-    // Register shortcode
+    // Register shortcodes
     add_shortcode('tebuto_online_terminbuchung_widget', 'tebuto_widget_shortcode');
-    
+    add_shortcode('tebuto_seminare_widget', 'tebuto_seminars_widget_shortcode');
+
     // Handle OAuth callback
     if (is_admin()) {
         add_action('admin_init', 'tebuto_handle_oauth_callback');
