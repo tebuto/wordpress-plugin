@@ -1,4 +1,4 @@
-export default function save( { attributes } ) {
+export default function save({ attributes }) {
 	const {
 		primaryColor,
 		backgroundColor,
@@ -9,56 +9,54 @@ export default function save( { attributes } ) {
 		inheritFont,
 		seminars,
 		showListFirst,
-		customCss,
-	} = attributes;
+		customCss
+	} = attributes
 
-	const uuid = window.tebutoData?.uuid || '';
-	const widgetUrl = 'https://tebuto.de/widget/seminars.js';
+	const uuid = window.tebutoData?.uuid || ''
+	const widgetUrl = 'https://tebuto.de/widget/seminars.js'
 
 	const widgetAttributes = {
 		'data-therapist-uuid': uuid,
-		'data-border': border ? 'true' : 'false',
-	};
-
-	if ( primaryColor && primaryColor !== '#00B4A9' ) {
-		widgetAttributes[ 'data-primary-color' ] = primaryColor;
+		'data-border': border ? 'true' : 'false'
 	}
 
-	if ( backgroundColor && backgroundColor !== '#ffffff' ) {
-		widgetAttributes[ 'data-background-color' ] = backgroundColor;
+	if (primaryColor && primaryColor !== '#00B4A9') {
+		widgetAttributes['data-primary-color'] = primaryColor
 	}
 
-	if ( textPrimary && textPrimary !== '#374151' ) {
-		widgetAttributes[ 'data-text-primary' ] = textPrimary;
+	if (backgroundColor && backgroundColor !== '#ffffff') {
+		widgetAttributes['data-background-color'] = backgroundColor
 	}
 
-	if ( textSecondary && textSecondary !== '#6b7280' ) {
-		widgetAttributes[ 'data-text-secondary' ] = textSecondary;
+	if (textPrimary && textPrimary !== '#374151') {
+		widgetAttributes['data-text-primary'] = textPrimary
 	}
 
-	if ( borderColor && borderColor !== '#E9E9E9' ) {
-		widgetAttributes[ 'data-border-color' ] = borderColor;
+	if (textSecondary && textSecondary !== '#6b7280') {
+		widgetAttributes['data-text-secondary'] = textSecondary
 	}
 
-	if ( inheritFont ) {
-		widgetAttributes[ 'data-inherit-font' ] = 'true';
+	if (borderColor && borderColor !== '#E9E9E9') {
+		widgetAttributes['data-border-color'] = borderColor
 	}
 
-	if ( seminars?.trim() ) {
-		widgetAttributes[ 'data-seminars' ] = seminars.trim();
+	if (inheritFont) {
+		widgetAttributes['data-inherit-font'] = 'true'
 	}
 
-	if ( showListFirst === false ) {
-		widgetAttributes[ 'data-show-list-first' ] = 'false';
+	if (seminars?.trim()) {
+		widgetAttributes['data-seminars'] = seminars.trim()
+	}
+
+	if (showListFirst === false) {
+		widgetAttributes['data-show-list-first'] = 'false'
 	}
 
 	return (
 		<>
 			<div id="tebuto-seminars-widget" />
-			<script src={ widgetUrl } { ...widgetAttributes } />
-			{ customCss && (
-				<style id="tebuto-seminars-custom-css">{ customCss }</style>
-			) }
+			<script src={widgetUrl} {...widgetAttributes} />
+			{customCss && <style id="tebuto-seminars-custom-css">{customCss}</style>}
 		</>
-	);
+	)
 }

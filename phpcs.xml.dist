@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<ruleset name="Tebuto WordPress Plugin">
+	<description>WordPress Coding Standards for the Tebuto plugin.</description>
+
+	<file>tebuto-online-terminbuchung</file>
+
+	<exclude-pattern>*/block/build/*</exclude-pattern>
+	<exclude-pattern>*/block/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/block/src/*</exclude-pattern>
+	<exclude-pattern>*/js/*</exclude-pattern>
+	<exclude-pattern>*/assets-wporg/*</exclude-pattern>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/wordpress/*</exclude-pattern>
+
+	<arg name="basepath" value="."/>
+	<arg name="extensions" value="php"/>
+	<arg name="colors"/>
+	<arg value="sp"/>
+	<arg name="parallel" value="8"/>
+
+	<!-- Warnings (direct DB in uninstall, etc.) are informational; only errors fail CI. -->
+	<config name="ignore_warnings_on_exit" value="1"/>
+	<config name="minimum_supported_wp_version" value="5.0"/>
+	<config name="testVersion" value="7.4-"/>
+
+	<rule ref="WordPress">
+		<exclude name="WordPress.Files.FileName"/>
+		<!-- Tabs/spacing already enforced; these two are high-noise style preferences. -->
+		<exclude name="WordPress.PHP.YodaConditions"/>
+		<exclude name="Squiz.Commenting.InlineComment.InvalidEndChar"/>
+	</rule>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="tebuto-online-terminbuchung"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="tebuto"/>
+				<element value="TEBUTO"/>
+			</property>
+		</properties>
+	</rule>
+</ruleset>

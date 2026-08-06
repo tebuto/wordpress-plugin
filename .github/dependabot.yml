@@ -1,7 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: npm
-    directory: /tebuto-online-terminbuchung/block
+    directory: /
     target-branch: main
     schedule:
       interval: monthly
@@ -11,6 +11,7 @@ updates:
       all:
         patterns:
           - "*"
+
   - package-ecosystem: github-actions
     directory: /
     schedule:

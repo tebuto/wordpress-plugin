@@ -5,7 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 echo "==> Installing Node dependencies..."
-npm install
+pnpm install
 
 echo "==> Starting Docker containers..."
 docker compose up -d
@@ -59,9 +59,9 @@ Next steps:
   3. Review wordpress/wp-config.local.php for Tebuto API URL overrides
 
 Development commands:
-  npm run dev:build   Build block and sync plugin to WordPress
-  npm run dev:sync    Sync plugin files without rebuilding the block
-  npm run dev         Watch block source and auto-sync on changes
-  npm run dev:down    Stop Docker containers
+  pnpm dev:build   Build block and sync plugin to WordPress
+  pnpm dev:sync    Sync plugin files without rebuilding the block
+  pnpm dev         Watch block source and auto-sync on changes
+  pnpm dev:down    Stop Docker containers
 
 EOF

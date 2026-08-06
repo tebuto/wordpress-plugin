@@ -41,7 +41,7 @@ cp -R "$SOURCE_DIR/languages" "$BUILD_DIR/$PLUGIN_SLUG/" 2>/dev/null || true
 cp "$SOURCE_DIR/readme.txt" "$BUILD_DIR/$PLUGIN_SLUG/"
 
 echo "Building Gutenberg block..."
-npm --prefix "$SOURCE_DIR/block" run build
+pnpm --dir "$ROOT_DIR" run build:block
 
 echo "Copying block assets..."
 mkdir -p "$BUILD_DIR/$PLUGIN_SLUG/block"

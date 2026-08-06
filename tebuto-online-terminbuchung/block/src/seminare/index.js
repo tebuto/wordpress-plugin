@@ -3,25 +3,18 @@
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
  */
-import { registerBlockType } from '@wordpress/blocks';
-
+import { registerBlockType } from '@wordpress/blocks'
+import metadata from './block.json'
 /**
  * Internal dependencies
  */
-import Edit from './edit';
-import save from './save';
-import metadata from './block.json';
+import Edit from './edit'
+import save from './save'
 
-registerBlockType( metadata.name, {
+registerBlockType(metadata.name, {
 	icon: {
 		src: (
-			<svg
-				width="104"
-				height="104"
-				viewBox="0 0 104 104"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-			>
+			<svg width="104" height="104" viewBox="0 0 104 104" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<title>Tebuto Seminare</title>
 				<g clipPath="url(#clip0_seminare)">
 					<path
@@ -36,7 +29,7 @@ registerBlockType( metadata.name, {
 					/>
 				</g>
 			</svg>
-		),
+		)
 	},
 
 	/**
@@ -47,5 +40,5 @@ registerBlockType( metadata.name, {
 	/**
 	 * @see ./save.js
 	 */
-	save,
-} );
+	save
+})

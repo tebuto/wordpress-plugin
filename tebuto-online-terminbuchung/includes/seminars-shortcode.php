@@ -5,7 +5,7 @@
  * @package Tebuto
  */
 
-defined('ABSPATH') || exit;
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Instanzzähler für eindeutige Container-IDs.
@@ -28,7 +28,7 @@ $tebuto_seminars_widget_instance_count = 0;
  * @param array<string, string>|string $atts Shortcode-Attribute.
  * @return string Widget-HTML.
  */
-function tebuto_seminars_widget_shortcode( $atts = [] ): string {
+function tebuto_seminars_widget_shortcode( $atts = array() ): string {
 	global $tebuto_seminars_widget_instance_count;
 
 	if ( is_admin() ) {
@@ -42,7 +42,7 @@ function tebuto_seminars_widget_shortcode( $atts = [] ): string {
 		return '<!-- Tebuto Seminars: Not connected -->';
 	}
 
-	$defaults = [
+	$defaults = array(
 		'primary_color'    => tebuto_get_user_meta( $current_user_id, 'primary_color', '#00B4A9' ),
 		'background_color' => tebuto_get_user_meta( $current_user_id, 'background_color', '#ffffff' ),
 		'text_primary'     => tebuto_get_user_meta( $current_user_id, 'text_primary', '#374151' ),
@@ -53,29 +53,34 @@ function tebuto_seminars_widget_shortcode( $atts = [] ): string {
 		'seminars'         => '',
 		'show_list_first'  => 'true',
 		'custom_css'       => tebuto_get_user_meta( $current_user_id, 'custom_css', '' ),
-	];
+	);
 
 	$parsed = shortcode_atts( $defaults, $atts, 'tebuto_seminare_widget' );
 
-	$primary_color    = sanitize_hex_color( $parsed['primary_color'] ) ?: '#00B4A9';
-	$background_color = sanitize_hex_color( $parsed['background_color'] ) ?: '#ffffff';
-	$text_primary     = sanitize_hex_color( $parsed['text_primary'] ) ?: '#374151';
-	$text_secondary   = sanitize_hex_color( $parsed['text_secondary'] ) ?: '#6b7280';
-	$border_color     = sanitize_hex_color( $parsed['border_color'] ) ?: '#E9E9E9';
+	$primary_color    = sanitize_hex_color( $parsed['primary_color'] );
+	$primary_color    = $primary_color ? $primary_color : '#00B4A9';
+	$background_color = sanitize_hex_color( $parsed['background_color'] );
+	$background_color = $background_color ? $background_color : '#ffffff';
+	$text_primary     = sanitize_hex_color( $parsed['text_primary'] );
+	$text_primary     = $text_primary ? $text_primary : '#374151';
+	$text_secondary   = sanitize_hex_color( $parsed['text_secondary'] );
+	$text_secondary   = $text_secondary ? $text_secondary : '#6b7280';
+	$border_color     = sanitize_hex_color( $parsed['border_color'] );
+	$border_color     = $border_color ? $border_color : '#E9E9E9';
 	$border           = $parsed['border'] === 'true' ? 'true' : 'false';
 	$inherit_font     = $parsed['inherit_font'] === 'true' ? 'true' : 'false';
 	$show_list_first  = $parsed['show_list_first'] === 'false' ? 'false' : 'true';
 	$seminars         = preg_replace( '/[^a-zA-Z0-9_\-,]/', '', $parsed['seminars'] );
 	$custom_css       = wp_strip_all_tags( $parsed['custom_css'] );
 
-	$tebuto_seminars_widget_instance_count++;
+	++$tebuto_seminars_widget_instance_count;
 	$instance_id = $tebuto_seminars_widget_instance_count;
 	$widget_id   = 'tebuto-seminars-widget' . ( $instance_id > 1 ? '-' . $instance_id : '' );
 
-	$widget_attrs = [
+	$widget_attrs = array(
 		'data-therapist-uuid' => esc_attr( $therapist_uuid ),
 		'data-border'         => $border,
-	];
+	);
 
 	if ( $primary_color !== '#00B4A9' ) {
 		$widget_attrs['data-primary-color'] = esc_attr( $primary_color );
@@ -114,7 +119,8 @@ function tebuto_seminars_widget_shortcode( $atts = [] ): string {
 		$attr_string .= ' ' . $key . '="' . $value . '"';
 	}
 
-	$output  = '<div id="' . esc_attr( $widget_id ) . '"></div>';
+	$output = '<div id="' . esc_attr( $widget_id ) . '"></div>';
+	// phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript -- External seminars widget must load inline with data-* attributes.
 	$output .= '<script src="' . esc_url( TEBUTO_SEMINARS_WIDGET_URL ) . '"' . $attr_string . ' async></script>';
 
 	if ( ! empty( $custom_css ) ) {

@@ -61,8 +61,8 @@
 ```bash
 git clone https://github.com/tebuto/wordpress-plugin.git
 cd wordpress-plugin
-npm install
-npm run build
+pnpm install
+pnpm build
 ```
 
 Upload the `tebuto-online-terminbuchung/` directory (or the generated `tebuto-online-terminbuchung.zip`) to `/wp-content/plugins/` and activate the plugin.
@@ -132,15 +132,15 @@ Once connected, the **Tebuto** menu provides:
 
 ## Local Development
 
-The repository includes a Docker Compose setup that runs WordPress and MariaDB locally. Plugin changes are synced into `wordpress/wp-content/plugins/` automatically via npm scripts.
+The repository includes a Docker Compose setup that runs WordPress and MariaDB locally. Plugin changes are synced into `wordpress/wp-content/plugins/` automatically via pnpm scripts.
 
 **Requirements:** [Docker](https://www.docker.com/), [Node.js](https://nodejs.org/) 20+
 
 ### First-Time Setup
 
 ```bash
-npm install
-npm run dev:setup
+pnpm install
+pnpm dev:setup
 ```
 
 This will:
@@ -156,25 +156,25 @@ Complete the WordPress installation in your browser, then activate **Tebuto - On
 
 | Command | Description |
 | --- | --- |
-| `npm run dev:setup` | First-time setup: Docker + build + sync plugin |
-| `npm run dev:build` | Build block and sync plugin to local WordPress |
-| `npm run dev:sync` | Sync plugin files without rebuilding the block |
-| `npm run dev` | Watch block source and auto-sync on file changes |
-| `npm run dev:up` | Start Docker containers |
-| `npm run dev:down` | Stop Docker containers |
-| `npm run dev:logs` | Tail WordPress container logs |
+| `pnpm dev:setup` | First-time setup: Docker + build + sync plugin |
+| `pnpm dev:build` | Build block and sync plugin to local WordPress |
+| `pnpm dev:sync` | Sync plugin files without rebuilding the block |
+| `pnpm dev` | Watch block source and auto-sync on file changes |
+| `pnpm dev:up` | Start Docker containers |
+| `pnpm dev:down` | Stop Docker containers |
+| `pnpm dev:logs` | Tail WordPress container logs |
 
 Typical workflow after setup:
 
 ```bash
 # PHP or block changes — build and push to WordPress
-npm run dev:build
+pnpm dev:build
 
 # Active block development — watch + auto-sync
-npm run dev
+pnpm dev
 
 # PHP-only changes — sync without rebuilding
-npm run dev:sync
+pnpm dev:sync
 ```
 
 The plugin is installed at `wordpress/wp-content/plugins/tebuto-online-terminbuchung/`. The `wordpress/` directory is gitignored and persists between container restarts.
@@ -199,9 +199,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full development guide.
 ## Building from Source
 
 ```bash
-npm install          # Install block dependencies
-npm run build:block  # Compile the Gutenberg block
-npm run build        # Create tebuto-online-terminbuchung.zip
+pnpm install          # Install workspace dependencies
+pnpm build:block  # Compile the Gutenberg block
+pnpm build        # Create tebuto-online-terminbuchung.zip
 ```
 
 ## Related Projects

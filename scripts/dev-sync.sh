@@ -22,7 +22,7 @@ fi
 
 if [ "$SKIP_BUILD" = false ]; then
 	echo "Building Gutenberg block..."
-	npm --prefix "$SOURCE_DIR/block" run build
+	pnpm --dir "$ROOT_DIR" run build:block
 fi
 
 mkdir -p "$TARGET_DIR"
@@ -32,7 +32,6 @@ rsync -a --delete --delete-excluded \
 	--exclude='block/node_modules/' \
 	--exclude='block/src/' \
 	--exclude='block/package.json' \
-	--exclude='block/package-lock.json' \
 	--exclude='.svn/' \
 	--exclude='assets-wporg/' \
 	"$SOURCE_DIR/" "$TARGET_DIR/"

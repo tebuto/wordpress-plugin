@@ -3,6 +3,7 @@ wordpress/
 
 # Dependencies
 node_modules/
+vendor/
 
 # Build artifacts
 .build/
@@ -16,3 +17,6 @@ node_modules/
 
 # Local tooling
 .playwright-mcp/
+
+# npm lockfiles (this repo uses pnpm)
+package-lock.json

@@ -7,6 +7,8 @@ Thank you for your interest in contributing to the Tebuto WordPress plugin!
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) 20 or higher
+- [pnpm](https://pnpm.io/) 11 or higher
+- [PHP](https://www.php.net/) 7.4+ and [Composer](https://getcomposer.org/) (for PHPCS)
 - [Docker](https://www.docker.com/) (optional, for local WordPress)
 - A [Tebuto](https://tebuto.de) account for testing the booking flow
 
@@ -15,17 +17,18 @@ Thank you for your interest in contributing to the Tebuto WordPress plugin!
 ```bash
 git clone https://github.com/tebuto/wordpress-plugin.git
 cd wordpress-plugin
-npm install
+pnpm install
+composer install
 ```
 
-This installs dependencies for the Gutenberg block and development tooling.
+This installs Node workspace dependencies (including the Gutenberg block) and PHP lint tooling.
 
 ### Local WordPress with Docker
 
 #### First-Time Setup
 
 ```bash
-npm run dev:setup
+pnpm dev:setup
 ```
 
 This single command:
@@ -41,15 +44,15 @@ Complete the WordPress installation in your browser, then activate the plugin un
 
 | Command | Description |
 | --- | --- |
-| `npm run dev:setup` | First-time setup (Docker + build + sync) |
-| `npm run dev:build` | Build block and sync plugin to local WordPress |
-| `npm run dev:sync` | Sync plugin files without rebuilding the block |
-| `npm run dev` | Watch block source and auto-sync on changes |
-| `npm run dev:up` | Start Docker containers |
-| `npm run dev:down` | Stop Docker containers |
-| `npm run dev:logs` | Tail WordPress container logs |
+| `pnpm dev:setup` | First-time setup (Docker + build + sync) |
+| `pnpm dev:build` | Build block and sync plugin to local WordPress |
+| `pnpm dev:sync` | Sync plugin files without rebuilding the block |
+| `pnpm dev` | Watch block source and auto-sync on changes |
+| `pnpm dev:up` | Start Docker containers |
+| `pnpm dev:down` | Stop Docker containers |
+| `pnpm dev:logs` | Tail WordPress container logs |
 
-After the initial setup, use `npm run dev:build` whenever you want to push changes to the local WordPress instance. For active development, `npm run dev` watches the block and syncs automatically; use `npm run dev:sync` for PHP-only changes.
+After the initial setup, use `pnpm dev:build` whenever you want to push changes to the local WordPress instance. For active development, `pnpm dev` watches the block and syncs automatically; use `pnpm dev:sync` for PHP-only changes.
 
 The sync script (`scripts/dev-sync.sh`) rsyncs from `tebuto-online-terminbuchung/` to the Docker WordPress plugins directory, excluding `block/node_modules`, `block/src`, and `.svn`.
 
@@ -86,38 +89,40 @@ Connect via **Tebuto → Verbindung** in wp-admin (full-page OAuth redirect). Th
 
 ```bash
 # Build block and copy plugin into the Docker WordPress instance
-npm run dev:build
+pnpm dev:build
 
 # Sync PHP/assets only (skip block rebuild)
-npm run dev:sync
+pnpm dev:sync
 
 # Watch block source and auto-sync on changes
-npm run dev
+pnpm dev
 ```
 
 ### Build the Gutenberg Block (without syncing)
 
 ```bash
-npm run build:block
-npm run start   # watch mode
+pnpm build:block
+pnpm start   # watch mode
 ```
 
 ### Build a Distributable ZIP
 
 ```bash
-npm run build
+pnpm build
 ```
 
 This runs `scripts/build.sh`, which compiles the block and packages the plugin into `tebuto-online-terminbuchung.zip`.
 
-### Lint JavaScript
+### Lint
 
 ```bash
-npm run lint
-npm run lint:fix   # format + lint (same checks as the pre-commit hook)
+pnpm lint
+pnpm lint:js      # Biome only
+pnpm lint:php     # PHPCS / WordPress Coding Standards only
+pnpm lint:fix   # format JS + autofix PHP + lint entire codebase (also the pre-commit hook)
 ```
 
-A **pre-commit hook** (Husky + lint-staged) runs automatically after `npm install` and formats/lints staged Gutenberg block sources under `tebuto-online-terminbuchung/block/src/` before each commit — matching the CI **Lint JavaScript** step.
+A **pre-commit hook** (Husky) runs `pnpm lint:fix` so the full tree stays Biome/PHPCS-clean on every commit — matching the CI **Lint** step.
 
 ## Project Structure
 
@@ -137,21 +142,21 @@ wordpress/                     # Local WordPress instance (Docker volume, gitign
 
 ## Coding Standards
 
-- **PHP**: Follow [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/). The `.editorconfig` uses tabs for PHP.
-- **JavaScript**: ESLint via `@wordpress/scripts` (`npm run lint`).
+- **PHP**: [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/) via PHPCS (`pnpm lint:php`). The `.editorconfig` uses tabs for PHP.
+- **JavaScript**: Biome (`pnpm lint:js` / `pnpm format`). Block bundling still uses `@wordpress/scripts`.
 - **YAML**: 2-space indentation per `.editorconfig`.
 
 ## Pull Requests
 
 1. Fork the repository and create a feature branch from `main`
 2. Make your changes with clear, focused commits
-3. Run `npm run lint:fix` and `npm run dev:build` before submitting (or rely on the pre-commit hook for block JS)
+3. Run `pnpm lint:fix` and `pnpm dev:build` before submitting (or rely on the pre-commit hook)
 4. Open a pull request with a description of what changed and why
 5. Link any related GitHub issues
 
 ## Releasing to WordPress.org
 
-Releases are automated via GitHub Actions when a GitHub Release is published. The workflow builds production-only artifacts (no `block/src/`, `package-lock.json`, or `node_modules`) and deploys them to the WordPress.org SVN repository.
+Releases are automated via GitHub Actions when a GitHub Release is published. The workflow builds production-only artifacts (no `block/src/`, `pnpm-lock.yaml`, or `node_modules`) and deploys them to the WordPress.org SVN repository.
 
 ### Prerequisites
 
@@ -167,8 +172,8 @@ Add these repository secrets under **Settings → Secrets and variables → Acti
 1. Bump the version everywhere in one step:
 
    ```bash
-   npm run version:bump 2.2.0
-   # or: npm run version:bump minor
+   pnpm version:bump 2.2.0
+   # or: pnpm version:bump minor
    ```
 
    This updates `tebuto-plugin.php`, `readme.txt` (`Stable tag` + changelog/upgrade notice stubs), and `package.json`. Edit the changelog stubs in `readme.txt` before merging.
@@ -176,8 +181,8 @@ Add these repository secrets under **Settings → Secrets and variables → Acti
 2. Verify sync and build locally:
 
    ```bash
-   npm run version:check
-   npm run build
+   pnpm version:check
+   pnpm build
    ```
 
 3. Merge to `main`

@@ -14,24 +14,35 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v7
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
           node-version: "20"
-          cache: npm
-          cache-dependency-path: tebuto-online-terminbuchung/block/package-lock.json
+          cache: pnpm
 
-      - name: Install dependencies
-        working-directory: tebuto-online-terminbuchung/block
-        run: npm ci
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          tools: composer
+          coverage: none
 
-      - name: Lint JavaScript
-        working-directory: tebuto-online-terminbuchung/block
-        run: npm run lint:js
+      - name: Install Node dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Lint
+        run: pnpm run lint
 
       - name: Build Gutenberg block
-        working-directory: tebuto-online-terminbuchung/block
-        run: npm run build
+        run: pnpm run build:block
 
       - name: Verify version consistency
         run: ./scripts/bump-version.sh --check

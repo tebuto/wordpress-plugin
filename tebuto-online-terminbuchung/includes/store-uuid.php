@@ -5,7 +5,7 @@
  * @package Tebuto
  */
 
-defined('ABSPATH') || exit;
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Fetch and store therapist data from Tebuto API.
@@ -14,51 +14,54 @@ defined('ABSPATH') || exit;
  * @param string $access_token OAuth access token.
  * @return bool True on success, false on failure.
  */
-function tebuto_store_therapist_uuid(int $user_id, string $access_token): bool {
-    $whoami_url = TEBUTO_API_URL . '/who-am-i';
+function tebuto_store_therapist_uuid( int $user_id, string $access_token ): bool {
+	$whoami_url = TEBUTO_API_URL . '/who-am-i';
 
-    $response = wp_remote_get($whoami_url, [
-        'headers' => [
-            'Authorization' => 'Bearer ' . $access_token,
-        ],
-        'timeout'   => 30,
-        'sslverify' => TEBUTO_SSL_VERIFY,
-    ]);
+	$response = wp_remote_get(
+		$whoami_url,
+		array(
+			'headers'   => array(
+				'Authorization' => 'Bearer ' . $access_token,
+			),
+			'timeout'   => 30,
+			'sslverify' => TEBUTO_SSL_VERIFY,
+		)
+	);
 
-    if (is_wp_error($response)) {
-        return false;
-    }
+	if ( is_wp_error( $response ) ) {
+		return false;
+	}
 
-    $status_code = wp_remote_retrieve_response_code($response);
-    if ($status_code !== 200) {
-        return false;
-    }
+	$status_code = wp_remote_retrieve_response_code( $response );
+	if ( $status_code !== 200 ) {
+		return false;
+	}
 
-    $response_body = json_decode(wp_remote_retrieve_body($response), true);
+	$response_body = json_decode( wp_remote_retrieve_body( $response ), true );
 
-    if (! isset($response_body['therapists'][0]['therapist'])) {
-        return false;
-    }
+	if ( ! isset( $response_body['therapists'][0]['therapist'] ) ) {
+		return false;
+	}
 
-    $therapist = $response_body['therapists'][0]['therapist'];
+	$therapist = $response_body['therapists'][0]['therapist'];
 
-    // Store UUID for widget
-    if (isset($therapist['uuid'])) {
-        $uuid = sanitize_text_field($therapist['uuid']);
-        tebuto_update_user_meta($user_id, 'therapist_uuid', $uuid);
-    }
+	// Store UUID for widget
+	if ( isset( $therapist['uuid'] ) ) {
+		$uuid = sanitize_text_field( $therapist['uuid'] );
+		tebuto_update_user_meta( $user_id, 'therapist_uuid', $uuid );
+	}
 
-    // Store ID for API calls
-    if (isset($therapist['id'])) {
-        $id = absint($therapist['id']);
-        tebuto_update_user_meta($user_id, 'therapist_id', $id);
-    }
+	// Store ID for API calls
+	if ( isset( $therapist['id'] ) ) {
+		$id = absint( $therapist['id'] );
+		tebuto_update_user_meta( $user_id, 'therapist_id', $id );
+	}
 
-    // Store therapist name
-    if (isset($therapist['name'])) {
-        $name = sanitize_text_field($therapist['name']);
-        tebuto_update_user_meta($user_id, 'therapist_name', $name);
-    }
+	// Store therapist name
+	if ( isset( $therapist['name'] ) ) {
+		$name = sanitize_text_field( $therapist['name'] );
+		tebuto_update_user_meta( $user_id, 'therapist_name', $name );
+	}
 
-    return true;
+	return true;
 }

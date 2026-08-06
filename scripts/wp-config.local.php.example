@@ -3,7 +3,7 @@
  * Local Tebuto development overrides.
  *
  * Copy this file to wordpress/wp-config.local.php and adjust as needed.
- * It is loaded automatically after running npm run dev:setup.
+ * It is loaded automatically after running pnpm dev:setup.
  */
 
 define( 'TEBUTO_API_URL', 'https://therapists.api.tebuto.local' );
