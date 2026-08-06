@@ -162,6 +162,24 @@ function tebuto_clear_seminars_feature_cache( ?int $user_id = null ): void {
 }
 
 /**
+ * Whether seminars are enabled for a Tebuto-connected account.
+ *
+ * Uses the cached therapist feature flag (no API call). Defaults to the
+ * connected account so frontend shortcode/block checks work for visitors.
+ *
+ * @param int|null $user_id WordPress user ID. Defaults to connected account.
+ * @return bool
+ */
+function tebuto_seminars_feature_enabled_for_account( ?int $user_id = null ): bool {
+	$user_id = $user_id ?? tebuto_get_connected_user_id();
+	if ( $user_id <= 0 ) {
+		return false;
+	}
+
+	return (string) tebuto_get_user_meta( $user_id, 'feature_seminars_access' ) === '1';
+}
+
+/**
  * Whether the current user should see the Seminars admin UI.
  *
  * Uses a cached therapist feature flag (no API call). Refresh via
@@ -174,7 +192,7 @@ function tebuto_user_can_access_seminars_admin(): bool {
 		return false;
 	}
 
-	return (string) tebuto_get_user_meta( get_current_user_id(), 'feature_seminars_access' ) === '1';
+	return tebuto_seminars_feature_enabled_for_account( get_current_user_id() );
 }
 
 /**

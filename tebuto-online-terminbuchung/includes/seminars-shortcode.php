@@ -35,6 +35,10 @@ function tebuto_seminars_widget_shortcode( $atts = array() ): string {
 		return '';
 	}
 
+	if ( ! tebuto_seminars_feature_enabled_for_account() ) {
+		return '<!-- Tebuto Seminars: Feature disabled -->';
+	}
+
 	$current_user_id = tebuto_get_connected_user_id();
 	$therapist_uuid  = tebuto_get_user_meta( $current_user_id, 'therapist_uuid' );
 
@@ -120,4 +124,3 @@ function tebuto_seminars_widget_shortcode( $atts = array() ): string {
 
 	return $output;
 }
-add_shortcode( 'tebuto_seminare_widget', 'tebuto_seminars_widget_shortcode' );

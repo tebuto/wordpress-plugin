@@ -14,7 +14,14 @@ defined( 'ABSPATH' ) || exit;
  */
 function tebuto_register_block(): void {
 	register_block_type( __DIR__ . '/build/block' );
-	register_block_type( __DIR__ . '/build/seminare' );
+
+	if ( is_admin() ) {
+		tebuto_maybe_refresh_seminars_feature_cache();
+	}
+
+	if ( tebuto_seminars_feature_enabled_for_account() ) {
+		register_block_type( __DIR__ . '/build/seminare' );
+	}
 }
 add_action( 'init', 'tebuto_register_block' );
 
@@ -52,21 +59,22 @@ function tebuto_get_localized_tebuto_data( int $user_id ): array {
 	$connect_url = tebuto_get_authorize_url();
 
 	return array(
-		'uuid'              => $therapist_uuid,
-		'authState'         => tebuto_get_auth_state( $user_id ),
-		'connectUrl'        => $connect_url,
-		'reconnectUrl'      => $connect_url,
-		'widgetUrl'         => TEBUTO_WIDGET_URL,
-		'seminarsWidgetUrl' => TEBUTO_SEMINARS_WIDGET_URL,
-		'shortcodeUrl'      => admin_url( 'admin.php?page=tebuto-shortcode' ),
-		'presets'           => tebuto_widget_theme_presets(),
-		'defaults'          => $theme_defaults,
-		'seminarsDefaults'  => $seminars_defaults,
-		'defaultSettings'   => $default_settings,
-		'nonce'             => wp_create_nonce( 'tebuto_admin' ),
-		'ajaxUrl'           => admin_url( 'admin-ajax.php' ),
-		'hasManagedUsers'   => $widget_capabilities['has_managed_users'],
-		'isManagingUser'    => $widget_capabilities['is_managing_user'],
+		'uuid'                   => $therapist_uuid,
+		'authState'              => tebuto_get_auth_state( $user_id ),
+		'connectUrl'             => $connect_url,
+		'reconnectUrl'           => $connect_url,
+		'widgetUrl'              => TEBUTO_WIDGET_URL,
+		'seminarsWidgetUrl'      => TEBUTO_SEMINARS_WIDGET_URL,
+		'shortcodeUrl'           => admin_url( 'admin.php?page=tebuto-shortcode' ),
+		'presets'                => tebuto_widget_theme_presets(),
+		'defaults'               => $theme_defaults,
+		'seminarsDefaults'       => $seminars_defaults,
+		'defaultSettings'        => $default_settings,
+		'nonce'                  => wp_create_nonce( 'tebuto_admin' ),
+		'ajaxUrl'                => admin_url( 'admin-ajax.php' ),
+		'hasManagedUsers'        => $widget_capabilities['has_managed_users'],
+		'isManagingUser'         => $widget_capabilities['is_managing_user'],
+		'seminarsFeatureEnabled' => tebuto_seminars_feature_enabled_for_account( $user_id ),
 	);
 }
 
@@ -76,9 +84,14 @@ function tebuto_get_localized_tebuto_data( int $user_id ): array {
  * @return void
  */
 function tebuto_enqueue_block_editor_assets(): void {
+	tebuto_maybe_refresh_seminars_feature_cache();
+
 	$tebuto_data = tebuto_get_localized_tebuto_data( get_current_user_id() );
 
 	wp_localize_script( 'tebuto-terminbuchung-editor-script', 'tebutoData', $tebuto_data );
-	wp_localize_script( 'tebuto-seminare-editor-script', 'tebutoData', $tebuto_data );
+
+	if ( wp_script_is( 'tebuto-seminare-editor-script', 'registered' ) ) {
+		wp_localize_script( 'tebuto-seminare-editor-script', 'tebutoData', $tebuto_data );
+	}
 }
 add_action( 'enqueue_block_editor_assets', 'tebuto_enqueue_block_editor_assets' );

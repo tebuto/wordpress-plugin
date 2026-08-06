@@ -11,9 +11,10 @@ export default function useSeminars() {
 	const data = getTebutoData()
 	const therapistUuid = data.uuid || ''
 	const ajaxUrl = data.ajaxUrl || window.ajaxurl || '/wp-admin/admin-ajax.php'
+	const seminarsFeatureEnabled = data.seminarsFeatureEnabled === true
 
 	useEffect(() => {
-		if (!therapistUuid) {
+		if (!therapistUuid || !seminarsFeatureEnabled) {
 			setLoading(false)
 			return
 		}
@@ -72,7 +73,7 @@ export default function useSeminars() {
 		return () => {
 			cancelled = true
 		}
-	}, [therapistUuid, ajaxUrl])
+	}, [therapistUuid, ajaxUrl, seminarsFeatureEnabled])
 
 	return { seminars, loading, error, sessionExpired, setSessionExpired }
 }

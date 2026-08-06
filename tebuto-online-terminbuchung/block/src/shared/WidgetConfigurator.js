@@ -294,6 +294,8 @@ function VariantTabs({ variant, onVariantChange }) {
 		return null
 	}
 
+	const seminarsFeatureEnabled = getTebutoData().seminarsFeatureEnabled === true
+
 	return (
 		<div
 			className="tebuto-widget-variant-tabs"
@@ -313,19 +315,21 @@ function VariantTabs({ variant, onVariantChange }) {
 			>
 				{__('Termine', 'tebuto-online-terminbuchung')}
 			</button>
-			<button
-				type="button"
-				role="tab"
-				aria-selected={variant === 'seminars'}
-				className={
-					variant === 'seminars'
-						? 'tebuto-widget-variant-tab tebuto-widget-variant-tab--active'
-						: 'tebuto-widget-variant-tab'
-				}
-				onClick={() => onVariantChange('seminars')}
-			>
-				{__('Seminare', 'tebuto-online-terminbuchung')}
-			</button>
+			{seminarsFeatureEnabled && (
+				<button
+					type="button"
+					role="tab"
+					aria-selected={variant === 'seminars'}
+					className={
+						variant === 'seminars'
+							? 'tebuto-widget-variant-tab tebuto-widget-variant-tab--active'
+							: 'tebuto-widget-variant-tab'
+					}
+					onClick={() => onVariantChange('seminars')}
+				>
+					{__('Seminare', 'tebuto-online-terminbuchung')}
+				</button>
+			)}
 		</div>
 	)
 }
@@ -442,10 +446,13 @@ function AdminConfigurator({ variant, attributes, setAttributes, onVariantChange
  * }} props
  */
 export default function WidgetConfigurator({ variant, surface, attributes, setAttributes, onVariantChange }) {
+	const seminarsFeatureEnabled = getTebutoData().seminarsFeatureEnabled === true
+	const resolvedVariant = variant === 'seminars' && !seminarsFeatureEnabled ? 'booking' : variant
+
 	if (surface === 'admin') {
 		return (
 			<AdminConfigurator
-				variant={variant}
+				variant={resolvedVariant}
 				attributes={attributes}
 				setAttributes={setAttributes}
 				onVariantChange={onVariantChange}
@@ -453,5 +460,5 @@ export default function WidgetConfigurator({ variant, surface, attributes, setAt
 		)
 	}
 
-	return <InspectorConfigurator variant={variant} attributes={attributes} setAttributes={setAttributes} />
+	return <InspectorConfigurator variant={resolvedVariant} attributes={attributes} setAttributes={setAttributes} />
 }

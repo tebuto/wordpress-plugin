@@ -81,6 +81,14 @@ function tebuto_ajax_require_api(): ?Tebuto_API {
 function tebuto_ajax_get_seminars(): void {
 	check_ajax_referer( 'tebuto_admin', 'nonce' );
 
+	if ( ! tebuto_seminars_feature_enabled_for_account() ) {
+		wp_send_json_error(
+			array(
+				'message' => __( 'Seminare sind für dieses Konto nicht aktiviert.', 'tebuto-online-terminbuchung' ),
+			)
+		);
+	}
+
 	$api = tebuto_ajax_require_api();
 	if ( $api === null ) {
 		return;
