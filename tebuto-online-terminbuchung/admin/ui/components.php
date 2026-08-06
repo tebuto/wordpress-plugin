@@ -19,6 +19,7 @@ function tebuto_ui_fullheight_pages(): array {
 		'tebuto-main',
 		'tebuto-bookings',
 		'tebuto-categories',
+		'tebuto-seminars',
 		'tebuto-shortcode',
 	);
 }
@@ -53,11 +54,12 @@ add_filter( 'admin_body_class', 'tebuto_ui_admin_body_class' );
 /**
  * Open a Tebuto admin page shell.
  *
- * @param array{title?: string, page_class?: string, fullheight?: bool, actions_html?: string} $args Page args.
+ * @param array{title?: string, title_meta_html?: string, page_class?: string, fullheight?: bool, actions_html?: string} $args Page args.
  * @return void
  */
 function tebuto_ui_page_open( array $args = array() ): void {
 	$title      = isset( $args['title'] ) ? (string) $args['title'] : '';
+	$title_meta = isset( $args['title_meta_html'] ) ? (string) $args['title_meta_html'] : '';
 	$page_class = isset( $args['page_class'] ) ? (string) $args['page_class'] : '';
 	$actions    = isset( $args['actions_html'] ) ? (string) $args['actions_html'] : '';
 
@@ -68,8 +70,15 @@ function tebuto_ui_page_open( array $args = array() ): void {
 
 	echo '<div class="' . esc_attr( implode( ' ', $wrap_classes ) ) . '">';
 	echo '<div class="tebuto-header">';
-	if ( $title !== '' ) {
-		echo '<h1>' . esc_html( $title ) . '</h1>';
+	if ( $title !== '' || $title_meta !== '' ) {
+		echo '<div class="tebuto-header-title">';
+		if ( $title !== '' ) {
+			echo '<h1>' . esc_html( $title ) . '</h1>';
+		}
+		if ( $title_meta !== '' ) {
+			echo $title_meta; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Caller must escape.
+		}
+		echo '</div>';
 	}
 	if ( $actions !== '' ) {
 		echo '<div class="tebuto-header-actions">' . $actions . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Caller must escape.

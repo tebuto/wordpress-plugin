@@ -812,6 +812,321 @@ class Tebuto_API {
 	}
 
 	// =========================================================================
+	// SEMINARS
+	// =========================================================================
+
+	/**
+	 * List all seminars for the connected therapist.
+	 *
+	 * @return array|WP_Error
+	 */
+	public function get_seminars() {
+		return $this->request( 'GET', 'therapists/' . $this->therapist_id . '/seminars' );
+	}
+
+	/**
+	 * Get a single seminar including occurrences.
+	 *
+	 * @param int $seminar_id Seminar ID.
+	 * @return array|WP_Error
+	 */
+	public function get_seminar( int $seminar_id ) {
+		return $this->request( 'GET', 'therapists/' . $this->therapist_id . '/seminars/' . $seminar_id );
+	}
+
+	/**
+	 * Create a seminar (requires a nested first occurrence).
+	 *
+	 * @param array $data CreateSeminarPayload.
+	 * @return array|WP_Error
+	 */
+	public function create_seminar( array $data ) {
+		return $this->request( 'POST', 'therapists/' . $this->therapist_id . '/seminars', $data );
+	}
+
+	/**
+	 * Update a seminar.
+	 *
+	 * @param int   $seminar_id Seminar ID.
+	 * @param array $data       UpdateSeminarPayload.
+	 * @return array|WP_Error
+	 */
+	public function update_seminar( int $seminar_id, array $data ) {
+		return $this->request( 'PATCH', 'therapists/' . $this->therapist_id . '/seminars/' . $seminar_id, $data );
+	}
+
+	/**
+	 * Delete a seminar.
+	 *
+	 * @param int $seminar_id Seminar ID.
+	 * @return array|WP_Error
+	 */
+	public function delete_seminar( int $seminar_id ) {
+		return $this->request( 'DELETE', 'therapists/' . $this->therapist_id . '/seminars/' . $seminar_id );
+	}
+
+	/**
+	 * Upload a seminar banner image (multipart field name: file).
+	 *
+	 * @param int   $seminar_id Seminar ID.
+	 * @param array $file       $_FILES entry with name, type, tmp_name, size, error.
+	 * @return array|WP_Error
+	 */
+	public function upload_seminar_banner( int $seminar_id, array $file ) {
+		$allowed_types = array( 'image/png', 'image/jpeg', 'image/webp' );
+		$max_size      = 5 * 1024 * 1024;
+
+		if ( empty( $file['tmp_name'] ) || ! is_uploaded_file( $file['tmp_name'] ) ) {
+			return new WP_Error( 'invalid_file', __( 'Keine gültige Datei hochgeladen.', 'tebuto-online-terminbuchung' ) );
+		}
+
+		$file_type = isset( $file['type'] ) ? (string) $file['type'] : '';
+		if ( ! in_array( $file_type, $allowed_types, true ) ) {
+			return new WP_Error( 'invalid_file_type', __( 'Nur PNG, JPEG oder WebP erlaubt.', 'tebuto-online-terminbuchung' ) );
+		}
+
+		if ( isset( $file['size'] ) && (int) $file['size'] > $max_size ) {
+			return new WP_Error( 'file_too_large', __( 'Die Datei darf maximal 5 MB groß sein.', 'tebuto-online-terminbuchung' ) );
+		}
+
+		return $this->request_multipart(
+			'POST',
+			'therapists/' . $this->therapist_id . '/seminars/' . $seminar_id . '/banner',
+			$file
+		);
+	}
+
+	/**
+	 * List occurrences for a seminar.
+	 *
+	 * @param int $seminar_id Seminar ID.
+	 * @return array|WP_Error
+	 */
+	public function get_seminar_occurrences( int $seminar_id ) {
+		return $this->request( 'GET', 'therapists/' . $this->therapist_id . '/seminars/' . $seminar_id . '/occurrences' );
+	}
+
+	/**
+	 * Create an occurrence for a seminar.
+	 *
+	 * @param int   $seminar_id Seminar ID.
+	 * @param array $data       CreateSeminarOccurrencePayload.
+	 * @return array|WP_Error
+	 */
+	public function create_seminar_occurrence( int $seminar_id, array $data ) {
+		return $this->request( 'POST', 'therapists/' . $this->therapist_id . '/seminars/' . $seminar_id . '/occurrences', $data );
+	}
+
+	/**
+	 * Update occurrence settings (not sessions or status).
+	 *
+	 * @param int   $occurrence_id Occurrence ID.
+	 * @param array $data          UpdateSeminarOccurrencePayload.
+	 * @return array|WP_Error
+	 */
+	public function update_seminar_occurrence( int $occurrence_id, array $data ) {
+		return $this->request( 'PATCH', 'therapists/' . $this->therapist_id . '/seminars/occurrences/' . $occurrence_id, $data );
+	}
+
+	/**
+	 * Replace the sessions list of an occurrence.
+	 *
+	 * @param int   $occurrence_id Occurrence ID.
+	 * @param array $sessions      SeminarSessionPayload[].
+	 * @return array|WP_Error
+	 */
+	public function update_seminar_occurrence_sessions( int $occurrence_id, array $sessions ) {
+		return $this->request(
+			'PUT',
+			'therapists/' . $this->therapist_id . '/seminars/occurrences/' . $occurrence_id . '/sessions',
+			array(
+				'sessions' => $sessions,
+			)
+		);
+	}
+
+	/**
+	 * Set occurrence publication status (draft|published|cancelled).
+	 *
+	 * @param int    $occurrence_id Occurrence ID.
+	 * @param string $status        New status.
+	 * @return array|WP_Error
+	 */
+	public function set_seminar_occurrence_status( int $occurrence_id, string $status ) {
+		return $this->request(
+			'POST',
+			'therapists/' . $this->therapist_id . '/seminars/occurrences/' . $occurrence_id . '/status',
+			array(
+				'status' => $status,
+			)
+		);
+	}
+
+	/**
+	 * Cancel an occurrence.
+	 *
+	 * @param int         $occurrence_id Occurrence ID.
+	 * @param string|null $reason        Optional cancellation reason.
+	 * @return array|WP_Error
+	 */
+	public function cancel_seminar_occurrence( int $occurrence_id, ?string $reason = null ) {
+		$data = array();
+		if ( $reason !== null && $reason !== '' ) {
+			$data['reason'] = $reason;
+		}
+
+		return $this->request(
+			'POST',
+			'therapists/' . $this->therapist_id . '/seminars/occurrences/' . $occurrence_id . '/cancel',
+			$data
+		);
+	}
+
+	/**
+	 * Reorder occurrences within a seminar.
+	 *
+	 * @param int   $seminar_id     Seminar ID.
+	 * @param array $occurrence_ids Ordered occurrence IDs.
+	 * @return array|WP_Error
+	 */
+	public function reorder_seminar_occurrences( int $seminar_id, array $occurrence_ids ) {
+		return $this->request(
+			'PUT',
+			'therapists/' . $this->therapist_id . '/seminars/' . $seminar_id . '/occurrences/order',
+			array(
+				'occurrenceIds' => array_map( 'absint', $occurrence_ids ),
+			)
+		);
+	}
+
+	/**
+	 * List registrations for an occurrence.
+	 *
+	 * @param int $occurrence_id Occurrence ID.
+	 * @return array|WP_Error
+	 */
+	public function get_seminar_registrations( int $occurrence_id ) {
+		return $this->request( 'GET', 'therapists/' . $this->therapist_id . '/seminars/occurrences/' . $occurrence_id . '/registrations' );
+	}
+
+	/**
+	 * Whether the seminars feature is available and enabled for this therapist.
+	 *
+	 * @return array{enabled: bool, available: bool}|WP_Error
+	 */
+	public function is_seminars_feature_enabled() {
+		$therapist = $this->get_therapist();
+		if ( is_wp_error( $therapist ) ) {
+			return $therapist;
+		}
+
+		$features = isset( $therapist['features'] ) && is_array( $therapist['features'] ) ? $therapist['features'] : array();
+
+		$result = array(
+			'enabled'   => ! empty( $features['featureSeminarsEnabled'] ),
+			'available' => ! empty( $features['featureSeminarsAvailable'] ),
+		);
+
+		tebuto_store_seminars_feature_cache( $result, $this->user_id );
+
+		return $result;
+	}
+
+	/**
+	 * Make a multipart/form-data API request (for file uploads).
+	 *
+	 * @param string $method   HTTP method.
+	 * @param string $endpoint Relative endpoint.
+	 * @param array  $file     $_FILES entry.
+	 * @param bool   $is_retry Whether this is a retry after token refresh.
+	 * @return array|WP_Error
+	 */
+	private function request_multipart( string $method, string $endpoint, array $file, bool $is_retry = false ) {
+		if ( ! $this->access_token ) {
+			$this->last_error = __( 'Nicht mit Tebuto verbunden.', 'tebuto-online-terminbuchung' );
+			return new WP_Error( 'not_connected', $this->last_error );
+		}
+
+		if ( ! $this->therapist_id ) {
+			$this->fetch_and_store_therapist_id();
+		}
+
+		if ( ! $this->therapist_id ) {
+			if ( empty( $this->last_error ) ) {
+				$this->last_error = __( 'Therapeuten-ID nicht gefunden. Bitte verbinde dich erneut mit Tebuto.', 'tebuto-online-terminbuchung' );
+			}
+			return new WP_Error( 'no_therapist_id', $this->last_error );
+		}
+
+		if ( ! $this->ensure_valid_token() ) {
+			$this->last_error = __( 'Token konnte nicht erneuert werden.', 'tebuto-online-terminbuchung' );
+			return new WP_Error( 'token_refresh_failed', $this->last_error );
+		}
+
+		$boundary  = wp_generate_password( 24, false );
+		$filename  = isset( $file['name'] ) ? (string) $file['name'] : 'banner';
+		$file_type = isset( $file['type'] ) ? (string) $file['type'] : 'application/octet-stream';
+		$contents  = file_get_contents( $file['tmp_name'] ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reading uploaded temp file.
+
+		if ( $contents === false ) {
+			$this->last_error = __( 'Datei konnte nicht gelesen werden.', 'tebuto-online-terminbuchung' );
+			return new WP_Error( 'file_read_error', $this->last_error );
+		}
+
+		$body  = '--' . $boundary . "\r\n";
+		$body .= 'Content-Disposition: form-data; name="file"; filename="' . $filename . "\"\r\n";
+		$body .= 'Content-Type: ' . $file_type . "\r\n\r\n";
+		$body .= $contents . "\r\n";
+		$body .= '--' . $boundary . "--\r\n";
+
+		$url  = TEBUTO_API_URL . '/' . $endpoint;
+		$args = array(
+			'method'    => $method,
+			'headers'   => array(
+				'Authorization' => 'Bearer ' . $this->access_token,
+				'Content-Type'  => 'multipart/form-data; boundary=' . $boundary,
+			),
+			'body'      => $body,
+			'timeout'   => 60,
+			'sslverify' => TEBUTO_SSL_VERIFY,
+		);
+
+		$response = wp_remote_request( $url, $args );
+
+		if ( is_wp_error( $response ) ) {
+			$this->last_error = $response->get_error_message();
+			return $response;
+		}
+
+		$status_code = wp_remote_retrieve_response_code( $response );
+		$body_raw    = wp_remote_retrieve_body( $response );
+		$decoded     = json_decode( $body_raw, true );
+
+		if ( $status_code === 401 && ! $is_retry ) {
+			if ( $this->refresh_access_token() ) {
+				return $this->request_multipart( $method, $endpoint, $file, true );
+			}
+
+			return $this->session_expired_error();
+		}
+
+		if ( $status_code >= 400 ) {
+			$error_message    = is_array( $decoded ) && isset( $decoded['message'] ) ? $decoded['message'] : __( 'API-Fehler', 'tebuto-online-terminbuchung' );
+			$this->last_error = $error_message;
+			return new WP_Error(
+				'api_error',
+				$error_message,
+				array(
+					'status'   => $status_code,
+					'response' => $decoded,
+				)
+			);
+		}
+
+		return is_array( $decoded ) ? $decoded : array();
+	}
+
+	// =========================================================================
 	// CLIENTS
 	// =========================================================================
 

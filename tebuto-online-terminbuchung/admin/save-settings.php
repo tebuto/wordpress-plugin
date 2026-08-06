@@ -46,6 +46,7 @@ function tebuto_save_settings(): void {
 		tebuto_delete_user_meta( $current_user_id, 'show_location_quick_filter' );
 		tebuto_delete_user_meta( $current_user_id, 'show_category_selection_first' );
 		tebuto_delete_user_meta( $current_user_id, 'custom_css' );
+		tebuto_clear_seminars_feature_cache( $current_user_id );
 
 		wp_safe_redirect( admin_url( 'admin.php?page=tebuto-main&disconnected=1' ) );
 		exit;

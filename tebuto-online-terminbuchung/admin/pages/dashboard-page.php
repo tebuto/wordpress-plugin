@@ -46,7 +46,11 @@ function tebuto_dashboard_page(): void {
 	// Calculate statistics
 	$stats = tebuto_calculate_dashboard_stats( $bookings_result, $upcoming_events );
 
-	$disconnect_form  = '<form method="post" class="tebuto-disconnect-form">';
+	$disconnect_form  = '<form method="post" class="tebuto-disconnect-form"';
+	$disconnect_form .= ' data-tebuto-confirm="' . esc_attr( __( 'Möchtest du die Verbindung wirklich trennen?', 'tebuto-online-terminbuchung' ) ) . '"';
+	$disconnect_form .= ' data-tebuto-confirm-title="' . esc_attr( __( 'Verbindung trennen', 'tebuto-online-terminbuchung' ) ) . '"';
+	$disconnect_form .= ' data-tebuto-confirm-label="' . esc_attr( __( 'Trennen', 'tebuto-online-terminbuchung' ) ) . '"';
+	$disconnect_form .= ' data-tebuto-confirm-danger="1">';
 	$disconnect_form .= wp_nonce_field( 'tebuto_disconnect', 'tebuto_nonce', true, false );
 	$disconnect_form .= '<input type="hidden" name="tebuto_disconnect" value="1">';
 	$disconnect_form .= tebuto_ui_button(
@@ -55,7 +59,6 @@ function tebuto_dashboard_page(): void {
 			'type'    => 'submit',
 			'variant' => 'ghost',
 			'color'   => 'danger',
-			'onclick' => "return confirm('" . esc_js( __( 'Möchtest du die Verbindung wirklich trennen?', 'tebuto-online-terminbuchung' ) ) . "');",
 		)
 	);
 	$disconnect_form .= '</form>';

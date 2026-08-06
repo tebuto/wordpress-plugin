@@ -1,5 +1,5 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor'
-import { Button, PanelBody, TextareaControl, TextControl } from '@wordpress/components'
+import { Button, PanelBody, TextareaControl } from '@wordpress/components'
 import { __ } from '@wordpress/i18n'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { buildShortcode } from './attributeMap'
@@ -8,9 +8,11 @@ import ColorSettings from './components/ColorSettings'
 import ConnectionPlaceholder from './components/ConnectionPlaceholder'
 import CustomCssPanel from './components/CustomCssPanel'
 import DisplayOptions from './components/DisplayOptions'
+import SeminarPicker from './components/SeminarPicker'
 import ThemePresetPicker from './components/ThemePresetPicker'
 import { getTebutoData } from './theme'
 import useCategories from './useCategories'
+import useSeminars from './useSeminars'
 import useWidgetPreview from './useWidgetPreview'
 
 export function isCategoryWidgetSelectable(category) {
@@ -106,6 +108,40 @@ function useBookingCategorySync(attributes, setAttributes, availableCategories) 
 	}
 }
 
+function useSeminarSync(attributes, setAttributes) {
+	const { seminars } = attributes
+
+	const selectedSeminars = useMemo(
+		() =>
+			seminars
+				? seminars
+						.split(',')
+						.map((slug) => slug.trim())
+						.filter(Boolean)
+				: [],
+		[seminars]
+	)
+
+	const toggleSeminar = (slug) => {
+		if (!slug) {
+			return
+		}
+
+		const newSelected = selectedSeminars.includes(slug)
+			? selectedSeminars.filter((entry) => entry !== slug)
+			: [...selectedSeminars, slug]
+
+		setAttributes({
+			seminars: newSelected.join(',')
+		})
+	}
+
+	return {
+		selectedSeminars,
+		toggleSeminar
+	}
+}
+
 function ConfiguratorPanels({
 	variant,
 	attributes,
@@ -116,9 +152,14 @@ function ConfiguratorPanels({
 	selectedCategories,
 	selectedAvailableCategories,
 	hasSubaccountCategoriesSelected,
-	toggleCategory
+	toggleCategory,
+	availableSeminars,
+	loadingSeminars,
+	seminarsError,
+	selectedSeminars,
+	toggleSeminar
 }) {
-	const { showCategorySelectionFirst, seminars, customCss } = attributes
+	const { showCategorySelectionFirst, customCss } = attributes
 
 	return (
 		<>
@@ -141,14 +182,12 @@ function ConfiguratorPanels({
 				</PanelBody>
 			) : (
 				<PanelBody title={__('Seminare', 'tebuto-online-terminbuchung')} initialOpen={true}>
-					<TextControl
-						label={__('Seminar-Slugs (optional)', 'tebuto-online-terminbuchung')}
-						help={__(
-							'Kommagetrennte Slugs, z. B. einführung,aufbaukurs. Leer lassen, um alle Seminare anzuzeigen.',
-							'tebuto-online-terminbuchung'
-						)}
-						value={seminars || ''}
-						onChange={(value) => setAttributes({ seminars: value })}
+					<SeminarPicker
+						seminars={availableSeminars}
+						selected={selectedSeminars}
+						onToggle={toggleSeminar}
+						loading={loadingSeminars}
+						error={seminarsError}
 					/>
 				</PanelBody>
 			)}
@@ -180,7 +219,13 @@ function InspectorConfigurator({ variant, attributes, setAttributes }) {
 		variant === 'seminars' ? data.seminarsWidgetUrl || 'https://tebuto.de/widget/seminars.js' : data.widgetUrl || ''
 
 	const { categories: availableCategories, loading, error, sessionExpired } = useCategories()
-	const isSessionExpired = sessionExpired || authState === 'expired'
+	const {
+		seminars: availableSeminars,
+		loading: loadingSeminars,
+		error: seminarsError,
+		sessionExpired: seminarsSessionExpired
+	} = useSeminars()
+	const isSessionExpired = sessionExpired || seminarsSessionExpired || authState === 'expired'
 	const isDisconnected = !therapistUuid || authState === 'disconnected'
 
 	const bookingSync = useBookingCategorySync(
@@ -188,6 +233,7 @@ function InspectorConfigurator({ variant, attributes, setAttributes }) {
 		setAttributes,
 		variant === 'booking' ? availableCategories : []
 	)
+	const seminarSync = useSeminarSync(attributes, setAttributes)
 
 	useWidgetPreview(previewContainerRef, {
 		variant,
@@ -224,6 +270,11 @@ function InspectorConfigurator({ variant, attributes, setAttributes }) {
 					selectedAvailableCategories={bookingSync.selectedAvailableCategories}
 					hasSubaccountCategoriesSelected={bookingSync.hasSubaccountCategoriesSelected}
 					toggleCategory={bookingSync.toggleCategory}
+					availableSeminars={availableSeminars}
+					loadingSeminars={loadingSeminars}
+					seminarsError={seminarsError}
+					selectedSeminars={seminarSync.selectedSeminars}
+					toggleSeminar={seminarSync.toggleSeminar}
 				/>
 			</InspectorControls>
 
@@ -246,7 +297,13 @@ function AdminConfigurator({ variant, attributes, setAttributes }) {
 		variant === 'seminars' ? data.seminarsWidgetUrl || 'https://tebuto.de/widget/seminars.js' : data.widgetUrl || ''
 
 	const { categories: availableCategories, loading, error, sessionExpired } = useCategories()
-	const isSessionExpired = sessionExpired || authState === 'expired'
+	const {
+		seminars: availableSeminars,
+		loading: loadingSeminars,
+		error: seminarsError,
+		sessionExpired: seminarsSessionExpired
+	} = useSeminars()
+	const isSessionExpired = sessionExpired || seminarsSessionExpired || authState === 'expired'
 	const isDisconnected = !therapistUuid || authState === 'disconnected'
 
 	const bookingSync = useBookingCategorySync(
@@ -254,6 +311,7 @@ function AdminConfigurator({ variant, attributes, setAttributes }) {
 		setAttributes,
 		variant === 'booking' ? availableCategories : []
 	)
+	const seminarSync = useSeminarSync(attributes, setAttributes)
 
 	useWidgetPreview(previewContainerRef, {
 		variant,
@@ -295,6 +353,11 @@ function AdminConfigurator({ variant, attributes, setAttributes }) {
 					selectedAvailableCategories={bookingSync.selectedAvailableCategories}
 					hasSubaccountCategoriesSelected={bookingSync.hasSubaccountCategoriesSelected}
 					toggleCategory={bookingSync.toggleCategory}
+					availableSeminars={availableSeminars}
+					loadingSeminars={loadingSeminars}
+					seminarsError={seminarsError}
+					selectedSeminars={seminarSync.selectedSeminars}
+					toggleSeminar={seminarSync.toggleSeminar}
 				/>
 
 				<PanelBody title={__('Shortcode', 'tebuto-online-terminbuchung')} initialOpen={true}>

@@ -81,139 +81,141 @@ function tebuto_bookings_page(): void {
 						<span class="dashicons dashicons-calendar-alt"></span>
 						<span><?php esc_html_e( 'Zeitraum', 'tebuto-online-terminbuchung' ); ?></span>
 					</div>
-					<div class="tebuto-date-presets">
-						<?php
-						$today       = wp_date( 'Y-m-d' );
-						$week_start  = wp_date( 'Y-m-d', strtotime( 'monday this week' ) );
-						$week_end    = wp_date( 'Y-m-d', strtotime( 'sunday this week' ) );
-						$month_start = wp_date( 'Y-m-01' );
-						$month_end   = wp_date( 'Y-m-t' );
-						$next_7      = wp_date( 'Y-m-d', strtotime( '+7 days' ) );
-						$next_30     = wp_date( 'Y-m-d', strtotime( '+30 days' ) );
+					<div class="tebuto-date-controls">
+						<div class="tebuto-date-presets">
+							<?php
+							$today       = wp_date( 'Y-m-d' );
+							$week_start  = wp_date( 'Y-m-d', strtotime( 'monday this week' ) );
+							$week_end    = wp_date( 'Y-m-d', strtotime( 'sunday this week' ) );
+							$month_start = wp_date( 'Y-m-01' );
+							$month_end   = wp_date( 'Y-m-t' );
+							$next_7      = wp_date( 'Y-m-d', strtotime( '+7 days' ) );
+							$next_30     = wp_date( 'Y-m-d', strtotime( '+30 days' ) );
 
-						$presets = array(
-							'today'  => array(
-								'label' => __( 'Heute', 'tebuto-online-terminbuchung' ),
-								'from'  => $today,
-								'to'    => $today,
-								'icon'  => 'dashicons-marker',
-							),
-							'week'   => array(
-								'label' => __( 'Diese Woche', 'tebuto-online-terminbuchung' ),
-								'from'  => $week_start,
-								'to'    => $week_end,
-								'icon'  => 'dashicons-calendar',
-							),
-							'month'  => array(
-								'label' => __( 'Dieser Monat', 'tebuto-online-terminbuchung' ),
-								'from'  => $month_start,
-								'to'    => $month_end,
-								'icon'  => 'dashicons-calendar-alt',
-							),
-							'next7'  => array(
-								'label' => __( 'Nächste 7 Tage', 'tebuto-online-terminbuchung' ),
-								'from'  => $today,
-								'to'    => $next_7,
-								'icon'  => 'dashicons-arrow-right-alt',
-							),
-							'next30' => array(
-								'label' => __( 'Nächste 30 Tage', 'tebuto-online-terminbuchung' ),
-								'from'  => $today,
-								'to'    => $next_30,
-								'icon'  => 'dashicons-arrow-right-alt2',
-							),
-						);
+							$presets = array(
+								'today'  => array(
+									'label' => __( 'Heute', 'tebuto-online-terminbuchung' ),
+									'from'  => $today,
+									'to'    => $today,
+									'icon'  => 'dashicons-marker',
+								),
+								'week'   => array(
+									'label' => __( 'Diese Woche', 'tebuto-online-terminbuchung' ),
+									'from'  => $week_start,
+									'to'    => $week_end,
+									'icon'  => 'dashicons-calendar',
+								),
+								'month'  => array(
+									'label' => __( 'Dieser Monat', 'tebuto-online-terminbuchung' ),
+									'from'  => $month_start,
+									'to'    => $month_end,
+									'icon'  => 'dashicons-calendar-alt',
+								),
+								'next7'  => array(
+									'label' => __( 'Nächste 7 Tage', 'tebuto-online-terminbuchung' ),
+									'from'  => $today,
+									'to'    => $next_7,
+									'icon'  => 'dashicons-arrow-right-alt',
+								),
+								'next30' => array(
+									'label' => __( 'Nächste 30 Tage', 'tebuto-online-terminbuchung' ),
+									'from'  => $today,
+									'to'    => $next_30,
+									'icon'  => 'dashicons-arrow-right-alt2',
+								),
+							);
 
-						foreach ( $presets as $key => $preset ) :
-							$is_active = ( $date_from === $preset['from'] && $date_to === $preset['to'] );
-							?>
-							<button type="button" 
-								class="tebuto-date-preset <?php echo $is_active ? 'active' : ''; ?>"
-								data-from="<?php echo esc_attr( $preset['from'] ); ?>"
-								data-to="<?php echo esc_attr( $preset['to'] ); ?>">
-								<?php echo esc_html( $preset['label'] ); ?>
-							</button>
-						<?php endforeach; ?>
-					</div>
-					
-					<div class="tebuto-date-range">
-						<div class="tebuto-date-input-group">
-							<label for="date_from"><?php esc_html_e( 'Von', 'tebuto-online-terminbuchung' ); ?></label>
-							<div class="tebuto-date-input-wrapper">
-								<span class="dashicons dashicons-calendar"></span>
-								<input type="date" name="date_from" id="date_from" value="<?php echo esc_attr( $date_from ); ?>">
+							foreach ( $presets as $key => $preset ) :
+								$is_active = ( $date_from === $preset['from'] && $date_to === $preset['to'] );
+								?>
+								<button type="button" 
+									class="tebuto-date-preset <?php echo $is_active ? 'active' : ''; ?>"
+									data-from="<?php echo esc_attr( $preset['from'] ); ?>"
+									data-to="<?php echo esc_attr( $preset['to'] ); ?>">
+									<?php echo esc_html( $preset['label'] ); ?>
+								</button>
+							<?php endforeach; ?>
+						</div>
+
+						<div class="tebuto-date-range">
+							<div class="tebuto-date-input-group">
+								<label for="date_from"><?php esc_html_e( 'Von', 'tebuto-online-terminbuchung' ); ?></label>
+								<div class="tebuto-date-input-wrapper">
+									<span class="dashicons dashicons-calendar"></span>
+									<input type="date" name="date_from" id="date_from" value="<?php echo esc_attr( $date_from ); ?>">
+								</div>
 							</div>
-						</div>
-						<div class="tebuto-date-range-separator">
-							<span class="dashicons dashicons-arrow-right-alt"></span>
-						</div>
-						<div class="tebuto-date-input-group">
-							<label for="date_to"><?php esc_html_e( 'Bis', 'tebuto-online-terminbuchung' ); ?></label>
-							<div class="tebuto-date-input-wrapper">
-								<span class="dashicons dashicons-calendar"></span>
-								<input type="date" name="date_to" id="date_to" value="<?php echo esc_attr( $date_to ); ?>">
+							<div class="tebuto-date-range-separator">
+								<span class="dashicons dashicons-arrow-right-alt"></span>
+							</div>
+							<div class="tebuto-date-input-group">
+								<label for="date_to"><?php esc_html_e( 'Bis', 'tebuto-online-terminbuchung' ); ?></label>
+								<div class="tebuto-date-input-wrapper">
+									<span class="dashicons dashicons-calendar"></span>
+									<input type="date" name="date_to" id="date_to" value="<?php echo esc_attr( $date_to ); ?>">
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 
-				<!-- Status Filter -->
-				<div class="tebuto-filter-section">
+				<!-- Status Filter + Actions -->
+				<div class="tebuto-filter-section tebuto-filter-section--status">
 					<div class="tebuto-filter-section-header">
 						<span class="dashicons dashicons-tag"></span>
 						<span><?php esc_html_e( 'Status', 'tebuto-online-terminbuchung' ); ?></span>
 					</div>
-					<div class="tebuto-status-chips">
-						<?php
-						$statuses = array(
-							''          => array(
-								'label' => __( 'Alle', 'tebuto-online-terminbuchung' ),
-								'color' => 'default',
-							),
-							'booked'    => array(
-								'label' => __( 'Unbestätigt', 'tebuto-online-terminbuchung' ),
-								'color' => 'warning',
-							),
-							'approved'  => array(
-								'label' => __( 'Bestätigt', 'tebuto-online-terminbuchung' ),
-								'color' => 'success',
-							),
-							'cancelled' => array(
-								'label' => __( 'Abgesagt', 'tebuto-online-terminbuchung' ),
-								'color' => 'danger',
-							),
-							'rejected'  => array(
-								'label' => __( 'Abgelehnt', 'tebuto-online-terminbuchung' ),
-								'color' => 'danger',
-							),
-							'outage'    => array(
-								'label' => __( 'Ausfall', 'tebuto-online-terminbuchung' ),
-								'color' => 'muted',
-							),
-						);
+					<div class="tebuto-status-row">
+						<div class="tebuto-status-chips">
+							<?php
+							$statuses = array(
+								''          => array(
+									'label' => __( 'Alle', 'tebuto-online-terminbuchung' ),
+									'color' => 'default',
+								),
+								'booked'    => array(
+									'label' => __( 'Unbestätigt', 'tebuto-online-terminbuchung' ),
+									'color' => 'warning',
+								),
+								'approved'  => array(
+									'label' => __( 'Bestätigt', 'tebuto-online-terminbuchung' ),
+									'color' => 'success',
+								),
+								'cancelled' => array(
+									'label' => __( 'Abgesagt', 'tebuto-online-terminbuchung' ),
+									'color' => 'danger',
+								),
+								'rejected'  => array(
+									'label' => __( 'Abgelehnt', 'tebuto-online-terminbuchung' ),
+									'color' => 'danger',
+								),
+								'outage'    => array(
+									'label' => __( 'Ausfall', 'tebuto-online-terminbuchung' ),
+									'color' => 'muted',
+								),
+							);
 
-						foreach ( $statuses as $value => $status ) :
-							$is_selected = ( $current_status === $value );
-							?>
-							<label class="tebuto-status-chip tebuto-status-chip-<?php echo esc_attr( $status['color'] ); ?> <?php echo $is_selected ? 'active' : ''; ?>">
-								<input type="radio" name="status" value="<?php echo esc_attr( $value ); ?>" <?php checked( $current_status, $value ); ?>>
-								<span class="tebuto-status-chip-dot"></span>
-								<span class="tebuto-status-chip-label"><?php echo esc_html( $status['label'] ); ?></span>
-							</label>
-						<?php endforeach; ?>
+							foreach ( $statuses as $value => $status ) :
+								$is_selected = ( $current_status === $value );
+								?>
+								<label class="tebuto-status-chip tebuto-status-chip-<?php echo esc_attr( $status['color'] ); ?> <?php echo $is_selected ? 'active' : ''; ?>">
+									<input type="radio" name="status" value="<?php echo esc_attr( $value ); ?>" <?php checked( $current_status, $value ); ?>>
+									<span class="tebuto-status-chip-dot"></span>
+									<span class="tebuto-status-chip-label"><?php echo esc_html( $status['label'] ); ?></span>
+								</label>
+							<?php endforeach; ?>
+						</div>
+						<div class="tebuto-filter-actions-bar">
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=tebuto-bookings' ) ); ?>" class="tebuto-filter-reset">
+								<span class="dashicons dashicons-image-rotate"></span>
+								<?php esc_html_e( 'Zurücksetzen', 'tebuto-online-terminbuchung' ); ?>
+							</a>
+							<button type="submit" class="tebuto-filter-submit">
+								<span class="dashicons dashicons-search"></span>
+								<?php esc_html_e( 'Filter anwenden', 'tebuto-online-terminbuchung' ); ?>
+							</button>
+						</div>
 					</div>
-				</div>
-
-				<!-- Actions -->
-				<div class="tebuto-filter-actions-bar">
-					<button type="submit" class="tebuto-filter-submit">
-						<span class="dashicons dashicons-search"></span>
-						<?php esc_html_e( 'Filter anwenden', 'tebuto-online-terminbuchung' ); ?>
-					</button>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=tebuto-bookings' ) ); ?>" class="tebuto-filter-reset">
-						<span class="dashicons dashicons-image-rotate"></span>
-						<?php esc_html_e( 'Zurücksetzen', 'tebuto-online-terminbuchung' ); ?>
-					</a>
 				</div>
 			</form>
 		</div>
@@ -296,23 +298,23 @@ function tebuto_bookings_page(): void {
 										<div class="tebuto-booking-actions">
 											<?php if ( ! $is_past ) : ?>
 												<?php if ( $booking['event']['status'] === 'booked' && ! $booking['isConfirmed'] ) : ?>
-													<button type="button" class="button button-small button-primary tebuto-confirm-booking" 
+													<button type="button" class="button button-small button-primary tebuto-btn tebuto-btn--solid tebuto-btn--primary tebuto-btn--sm tebuto-confirm-booking" 
 														data-booking-id="<?php echo esc_attr( $booking['id'] ); ?>">
 														<?php esc_html_e( 'Bestätigen', 'tebuto-online-terminbuchung' ); ?>
 													</button>
-													<button type="button" class="button button-small tebuto-reject-booking" 
+													<button type="button" class="button button-small tebuto-btn tebuto-btn--outline tebuto-btn--danger tebuto-btn--sm tebuto-reject-booking" 
 														data-booking-id="<?php echo esc_attr( $booking['id'] ); ?>">
 														<?php esc_html_e( 'Ablehnen', 'tebuto-online-terminbuchung' ); ?>
 													</button>
 												<?php elseif ( $booking['event']['status'] === 'approved' ) : ?>
-													<button type="button" class="button button-small tebuto-cancel-booking" 
+													<button type="button" class="button button-small tebuto-btn tebuto-btn--outline tebuto-btn--danger tebuto-btn--sm tebuto-cancel-booking" 
 														data-booking-id="<?php echo esc_attr( $booking['id'] ); ?>">
 														<?php esc_html_e( 'Absagen', 'tebuto-online-terminbuchung' ); ?>
 													</button>
 												<?php endif; ?>
 											<?php endif; ?>
 											
-											<button type="button" class="button button-small tebuto-view-booking" 
+											<button type="button" class="button button-small tebuto-btn tebuto-btn--outline tebuto-btn--neutral tebuto-btn--sm tebuto-view-booking" 
 												data-booking="<?php echo esc_attr( wp_json_encode( $booking ) ); ?>">
 												<?php esc_html_e( 'Details', 'tebuto-online-terminbuchung' ); ?>
 											</button>
@@ -338,7 +340,7 @@ function tebuto_bookings_page(): void {
 						// Previous
 						if ( $current_page > 1 ) :
 							?>
-							<a href="<?php echo esc_url( add_query_arg( 'paged', $current_page - 1, $base_url ) ); ?>" class="button">
+							<a href="<?php echo esc_url( add_query_arg( 'paged', $current_page - 1, $base_url ) ); ?>" class="button tebuto-btn tebuto-btn--outline tebuto-btn--neutral">
 								&laquo; <?php esc_html_e( 'Zurück', 'tebuto-online-terminbuchung' ); ?>
 							</a>
 						<?php endif; ?>
@@ -369,7 +371,7 @@ function tebuto_bookings_page(): void {
 						// Next
 						if ( $current_page < $bookings_result['totalPages'] ) :
 							?>
-							<a href="<?php echo esc_url( add_query_arg( 'paged', $current_page + 1, $base_url ) ); ?>" class="button">
+							<a href="<?php echo esc_url( add_query_arg( 'paged', $current_page + 1, $base_url ) ); ?>" class="button tebuto-btn tebuto-btn--outline tebuto-btn--neutral">
 								<?php esc_html_e( 'Weiter', 'tebuto-online-terminbuchung' ); ?> &raquo;
 							</a>
 						<?php endif; ?>
@@ -388,7 +390,7 @@ function tebuto_bookings_page(): void {
 				<div class="tebuto-modal-body" id="tebuto-booking-modal-body">
 				</div>
 				<div class="tebuto-modal-footer">
-					<button type="button" class="button tebuto-modal-close-btn"><?php esc_html_e( 'Schließen', 'tebuto-online-terminbuchung' ); ?></button>
+					<button type="button" class="button tebuto-btn tebuto-btn--outline tebuto-btn--neutral tebuto-modal-close-btn"><?php esc_html_e( 'Schließen', 'tebuto-online-terminbuchung' ); ?></button>
 				</div>
 			</div>
 		</div>

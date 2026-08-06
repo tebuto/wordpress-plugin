@@ -4,7 +4,7 @@ Tags: Praxissoftware, Terminbuchung, Therapie, Buchungswidget, Kalender
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.4.0
+Stable tag: 2.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,6 +22,7 @@ Mit diesem Plugin bindest du die **Online-Terminbuchung** deines Tebuto-Kontos i
 * **WordPress-Dashboard** – Übersicht über anstehende Termine direkt im Admin-Bereich
 * **Buchungsverwaltung** – Buchungen einsehen, bestätigen und absagen
 * **Kategorienverwaltung** – Terminkategorien aus WordPress heraus verwalten
+* **Seminarverwaltung** – Seminare und Veranstaltungen anlegen, bearbeiten und im Widget auswählen
 * **Anpassbare Darstellung** – Farben, Theme-Presets, Kategorienfilter, Schnellfilter und eigenes CSS
 * **Multi-User-Praxen** – Anbieterfilter für Praxen mit mehreren Therapeut:innen
 * **Mehrere Widgets pro Seite** – Verschiedene Konfigurationen über Shortcode-Attribute
@@ -119,6 +120,11 @@ Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter
 
 == Changelog ==
 
+= 2.5.0 =
+* **Seminare im Admin** – Neue Seite „Seminare“ mit Akkordeon-Liste, Veranstaltungs-Detailseite, CRUD für Seminare (inkl. Banner und Beschreibung) sowie bearbeitbaren Veranstaltungs-Einstellungen und Terminen
+* **Seminar-Auswahl im Block** – Der Seminarblick zeigt jetzt die verfügbaren Seminare per Checkbox statt freier Slug-Eingabe
+* Teilnehmer einer Veranstaltung werden schreibgeschützt angezeigt
+
 = 2.4.0 =
 * TODO: Add changelog entries
 
@@ -187,6 +193,9 @@ Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter
 * Professionelles Admin-Interface
 
 == Upgrade Notice ==
+
+= 2.5.0 =
+Seminarverwaltung im WordPress-Admin und Seminar-Auswahl im Gutenberg-Block/Shortcode-Konfigurator.
 
 = 2.4.0 =
 TODO: Add upgrade notice

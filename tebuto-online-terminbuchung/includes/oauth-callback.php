@@ -90,6 +90,7 @@ function tebuto_handle_oauth_callback(): void {
 	tebuto_update_user_meta( $current_user_id, 'refresh_token', $refresh_token );
 
 	tebuto_store_therapist_uuid( $current_user_id, $access_token );
+	tebuto_refresh_seminars_feature_cache();
 
 	// Redirect to dashboard after successful connection
 	wp_safe_redirect( admin_url( 'admin.php?page=tebuto-main&connected=1' ) );

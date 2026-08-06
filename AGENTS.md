@@ -166,6 +166,7 @@ pnpm version:check
 | `tebuto-main` | Dashboard |
 | `tebuto-bookings` | Buchungen |
 | `tebuto-categories` | Kategorien |
+| `tebuto-seminars` | Seminare |
 | `tebuto-shortcode` | Shortcode / widget settings |
 | `tebuto-integration` | Hidden OAuth callback landing (not in menu) |
 

@@ -65,7 +65,7 @@ function tebuto_categories_page(): void {
 					<div class="tebuto-empty-state">
 						<span class="dashicons dashicons-category"></span>
 						<p><?php esc_html_e( 'Noch keine Kategorien vorhanden.', 'tebuto-online-terminbuchung' ); ?></p>
-						<button type="button" class="button button-primary" id="tebuto-add-category-btn-empty">
+						<button type="button" class="button button-primary tebuto-btn tebuto-btn--solid tebuto-btn--primary" id="tebuto-add-category-btn-empty">
 							<?php esc_html_e( 'Erste Kategorie erstellen', 'tebuto-online-terminbuchung' ); ?>
 						</button>
 					</div>
@@ -114,11 +114,15 @@ function tebuto_categories_page(): void {
 									</td>
 									<td>
 										<div class="tebuto-action-buttons">
-											<button type="button" class="button button-small tebuto-edit-category" 
+											<button type="button" class="button button-small tebuto-btn tebuto-btn--outline tebuto-btn--neutral tebuto-btn--sm tebuto-edit-category" 
 												data-category="<?php echo esc_attr( wp_json_encode( $category ) ); ?>">
 												<?php esc_html_e( 'Bearbeiten', 'tebuto-online-terminbuchung' ); ?>
 											</button>
-											<form method="post" style="display: inline;" onsubmit="return confirm('<?php echo esc_js( __( 'Kategorie wirklich löschen?', 'tebuto-online-terminbuchung' ) ); ?>');">
+											<form method="post" style="display: inline;"
+												data-tebuto-confirm="<?php echo esc_attr( __( 'Kategorie wirklich löschen?', 'tebuto-online-terminbuchung' ) ); ?>"
+												data-tebuto-confirm-title="<?php echo esc_attr( __( 'Kategorie löschen', 'tebuto-online-terminbuchung' ) ); ?>"
+												data-tebuto-confirm-label="<?php echo esc_attr( __( 'Löschen', 'tebuto-online-terminbuchung' ) ); ?>"
+												data-tebuto-confirm-danger="1">
 												<?php wp_nonce_field( 'tebuto_category_action', 'tebuto_category_nonce' ); ?>
 												<input type="hidden" name="tebuto_action" value="delete_category">
 												<input type="hidden" name="category_id" value="<?php echo esc_attr( $category['id'] ); ?>">
@@ -263,8 +267,8 @@ function tebuto_categories_page(): void {
 					</div>
 
 					<div class="tebuto-modal-footer">
-						<button type="button" class="button tebuto-modal-close-btn"><?php esc_html_e( 'Abbrechen', 'tebuto-online-terminbuchung' ); ?></button>
-						<button type="submit" class="button button-primary" id="tebuto-category-submit">
+						<button type="button" class="button tebuto-btn tebuto-btn--outline tebuto-btn--neutral tebuto-modal-close-btn"><?php esc_html_e( 'Abbrechen', 'tebuto-online-terminbuchung' ); ?></button>
+						<button type="submit" class="button button-primary tebuto-btn tebuto-btn--solid tebuto-btn--primary" id="tebuto-category-submit">
 							<?php esc_html_e( 'Kategorie erstellen', 'tebuto-online-terminbuchung' ); ?>
 						</button>
 					</div>

@@ -142,6 +142,106 @@ function tebuto_clear_auth_tokens( ?int $user_id = null ): void {
 
 	tebuto_delete_user_meta( $user_id, 'access_token' );
 	tebuto_delete_user_meta( $user_id, 'refresh_token' );
+	tebuto_clear_seminars_feature_cache( $user_id );
+}
+
+/**
+ * Clear the cached seminars feature-access flag.
+ *
+ * @param int|null $user_id WordPress user ID. Defaults to current user.
+ * @return void
+ */
+function tebuto_clear_seminars_feature_cache( ?int $user_id = null ): void {
+	$user_id = $user_id ?? get_current_user_id();
+	if ( $user_id <= 0 ) {
+		return;
+	}
+
+	tebuto_delete_user_meta( $user_id, 'feature_seminars_access' );
+	tebuto_delete_user_meta( $user_id, 'feature_seminars_access_checked_at' );
+}
+
+/**
+ * Whether the current user should see the Seminars admin UI.
+ *
+ * Uses a cached therapist feature flag (no API call). Refresh via
+ * tebuto_refresh_seminars_feature_cache() after connect / on Tebuto admin pages.
+ *
+ * @return bool
+ */
+function tebuto_user_can_access_seminars_admin(): bool {
+	if ( ! current_user_can( 'manage_options' ) || ! tebuto_is_connected() ) {
+		return false;
+	}
+
+	return (string) tebuto_get_user_meta( get_current_user_id(), 'feature_seminars_access' ) === '1';
+}
+
+/**
+ * Persist the seminars feature-access cache from an API result.
+ *
+ * Access follows the API guard: only `featureSeminarsEnabled` matters.
+ * `featureSeminarsAvailable` is a platform env gate for new activations and
+ * must not hide the admin for therapists who already have seminars enabled.
+ *
+ * @param array{enabled?: bool, available?: bool} $feature Feature flags.
+ * @param int|null                                $user_id WordPress user ID.
+ * @return bool Whether access is allowed.
+ */
+function tebuto_store_seminars_feature_cache( array $feature, ?int $user_id = null ): bool {
+	$user_id = $user_id ?? get_current_user_id();
+	if ( $user_id <= 0 ) {
+		return false;
+	}
+
+	$allowed = ! empty( $feature['enabled'] );
+	tebuto_update_user_meta( $user_id, 'feature_seminars_access', $allowed ? '1' : '0' );
+	tebuto_update_user_meta( $user_id, 'feature_seminars_access_checked_at', (string) time() );
+
+	return $allowed;
+}
+
+/**
+ * Refresh the seminars feature-access cache from the Tebuto API.
+ *
+ * @param Tebuto_API|null $api Optional existing API client.
+ * @return bool Whether access is allowed after refresh (previous cache kept on API error).
+ */
+function tebuto_refresh_seminars_feature_cache( ?Tebuto_API $api = null ): bool {
+	if ( ! tebuto_is_connected() ) {
+		tebuto_clear_seminars_feature_cache();
+		return false;
+	}
+
+	$api     = $api ?? new Tebuto_API();
+	$feature = $api->is_seminars_feature_enabled();
+
+	if ( is_wp_error( $feature ) ) {
+		return tebuto_user_can_access_seminars_admin();
+	}
+
+	return ! empty( $feature['enabled'] );
+}
+
+/**
+ * Refresh the seminars feature cache when stale (default 15 minutes).
+ *
+ * @param int $max_age Maximum cache age in seconds.
+ * @return void
+ */
+function tebuto_maybe_refresh_seminars_feature_cache( int $max_age = 900 ): void {
+	if ( ! tebuto_is_connected() || ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	$checked_at = absint( tebuto_get_user_meta( get_current_user_id(), 'feature_seminars_access_checked_at' ) );
+	$cached     = tebuto_get_user_meta( get_current_user_id(), 'feature_seminars_access' );
+
+	if ( $cached !== '' && $checked_at > 0 && ( time() - $checked_at ) < $max_age ) {
+		return;
+	}
+
+	tebuto_refresh_seminars_feature_cache();
 }
 
 /**

@@ -54,6 +54,20 @@ function tebuto_add_admin_menu(): void {
 		'tebuto_categories_page'
 	);
 
+	// Submenu: Seminars (visible only when the feature is enabled for the connected account)
+	add_submenu_page(
+		'tebuto-main',
+		__( 'Seminare', 'tebuto-online-terminbuchung' ),
+		__( 'Seminare', 'tebuto-online-terminbuchung' ),
+		'manage_options',
+		'tebuto-seminars',
+		'tebuto_seminars_page'
+	);
+
+	if ( ! tebuto_user_can_access_seminars_admin() ) {
+		remove_submenu_page( 'tebuto-main', 'tebuto-seminars' );
+	}
+
 	// Submenu: Shortcode
 	add_submenu_page(
 		'tebuto-main',

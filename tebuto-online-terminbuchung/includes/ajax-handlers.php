@@ -38,8 +38,165 @@ function tebuto_register_ajax_handlers(): void {
 	add_action( 'wp_ajax_tebuto_get_events', 'tebuto_ajax_get_events' );
 	add_action( 'wp_ajax_tebuto_booking_action', 'tebuto_ajax_booking_action' );
 	add_action( 'wp_ajax_tebuto_get_categories', 'tebuto_ajax_get_categories' );
+	add_action( 'wp_ajax_tebuto_get_seminars', 'tebuto_ajax_get_seminars' );
+	add_action( 'wp_ajax_tebuto_get_seminar_occurrences', 'tebuto_ajax_get_seminar_occurrences' );
+	add_action( 'wp_ajax_tebuto_seminar_occurrence_action', 'tebuto_ajax_seminar_occurrence_action' );
 }
 add_action( 'init', 'tebuto_register_ajax_handlers' );
+
+/**
+ * Require a connected Tebuto API client for AJAX handlers.
+ *
+ * @return Tebuto_API|null
+ */
+function tebuto_ajax_require_api(): ?Tebuto_API {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( __( 'Keine Berechtigung.', 'tebuto-online-terminbuchung' ), 403 );
+	}
+
+	$api = new Tebuto_API();
+
+	if ( ! $api->is_connected() ) {
+		if ( tebuto_is_session_expired() ) {
+			wp_send_json_error(
+				array(
+					'code'    => 'session_expired',
+					'message' => __( 'Deine Tebuto-Sitzung ist abgelaufen. Bitte melde dich erneut an.', 'tebuto-online-terminbuchung' ),
+				),
+				401
+			);
+		}
+
+		wp_send_json_error( __( 'Nicht mit Tebuto verbunden.', 'tebuto-online-terminbuchung' ), 401 );
+	}
+
+	return $api;
+}
+
+/**
+ * AJAX handler: list seminars for the block/widget picker.
+ *
+ * @return void
+ */
+function tebuto_ajax_get_seminars(): void {
+	check_ajax_referer( 'tebuto_admin', 'nonce' );
+
+	$api = tebuto_ajax_require_api();
+	if ( $api === null ) {
+		return;
+	}
+
+	$seminars = $api->get_seminars();
+	if ( is_wp_error( $seminars ) ) {
+		tebuto_send_ajax_api_error( $api, $seminars );
+	}
+
+	$result = array();
+	if ( is_array( $seminars ) ) {
+		foreach ( $seminars as $seminar ) {
+			$result[] = array(
+				'id'                => absint( $seminar['id'] ?? 0 ),
+				'slug'              => (string) ( $seminar['slug'] ?? '' ),
+				'title'             => (string) ( $seminar['title'] ?? __( 'Unbenannt', 'tebuto-online-terminbuchung' ) ),
+				'publicPageEnabled' => ! empty( $seminar['publicPageEnabled'] ),
+				'isInherited'       => ! empty( $seminar['isInherited'] ),
+			);
+		}
+	}
+
+	wp_send_json_success( $result );
+}
+
+/**
+ * AJAX handler: lazy-load occurrences for a seminar accordion row.
+ *
+ * @return void
+ */
+function tebuto_ajax_get_seminar_occurrences(): void {
+	check_ajax_referer( 'tebuto_admin', 'nonce' );
+
+	$api = tebuto_ajax_require_api();
+	if ( $api === null ) {
+		return;
+	}
+
+	$seminar_id = isset( $_POST['seminar_id'] ) ? absint( $_POST['seminar_id'] ) : 0;
+	if ( $seminar_id < 1 ) {
+		wp_send_json_error( __( 'Ungültige Seminar-ID.', 'tebuto-online-terminbuchung' ), 400 );
+	}
+
+	$occurrences = $api->get_seminar_occurrences( $seminar_id );
+	if ( is_wp_error( $occurrences ) ) {
+		tebuto_send_ajax_api_error( $api, $occurrences );
+	}
+
+	wp_send_json_success( is_array( $occurrences ) ? $occurrences : array() );
+}
+
+/**
+ * AJAX handler: publish / unpublish / cancel / reorder occurrences.
+ *
+ * @return void
+ */
+function tebuto_ajax_seminar_occurrence_action(): void {
+	check_ajax_referer( 'tebuto_admin', 'nonce' );
+
+	$api = tebuto_ajax_require_api();
+	if ( $api === null ) {
+		return;
+	}
+
+	$action        = isset( $_POST['occurrence_action'] ) ? sanitize_text_field( wp_unslash( $_POST['occurrence_action'] ) ) : '';
+	$occurrence_id = isset( $_POST['occurrence_id'] ) ? absint( $_POST['occurrence_id'] ) : 0;
+	$seminar_id    = isset( $_POST['seminar_id'] ) ? absint( $_POST['seminar_id'] ) : 0;
+
+	$result = null;
+
+	switch ( $action ) {
+		case 'publish':
+			if ( $occurrence_id < 1 ) {
+				wp_send_json_error( __( 'Fehlende Parameter.', 'tebuto-online-terminbuchung' ), 400 );
+			}
+			$result = $api->set_seminar_occurrence_status( $occurrence_id, 'published' );
+			break;
+		case 'unpublish':
+			if ( $occurrence_id < 1 ) {
+				wp_send_json_error( __( 'Fehlende Parameter.', 'tebuto-online-terminbuchung' ), 400 );
+			}
+			$result = $api->set_seminar_occurrence_status( $occurrence_id, 'draft' );
+			break;
+		case 'cancel':
+			if ( $occurrence_id < 1 ) {
+				wp_send_json_error( __( 'Fehlende Parameter.', 'tebuto-online-terminbuchung' ), 400 );
+			}
+			$reason = isset( $_POST['reason'] ) ? sanitize_textarea_field( wp_unslash( $_POST['reason'] ) ) : '';
+			$result = $api->cancel_seminar_occurrence( $occurrence_id, $reason !== '' ? $reason : null );
+			break;
+		case 'reorder':
+			if ( $seminar_id < 1 || empty( $_POST['occurrence_ids'] ) ) {
+				wp_send_json_error( __( 'Fehlende Parameter.', 'tebuto-online-terminbuchung' ), 400 );
+			}
+			$raw_ids = wp_unslash( $_POST['occurrence_ids'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			if ( is_string( $raw_ids ) ) {
+				$decoded = json_decode( $raw_ids, true );
+				$raw_ids = is_array( $decoded ) ? $decoded : explode( ',', $raw_ids );
+			}
+			if ( ! is_array( $raw_ids ) ) {
+				wp_send_json_error( __( 'Ungültige Reihenfolge.', 'tebuto-online-terminbuchung' ), 400 );
+			}
+			$ids    = array_map( 'absint', $raw_ids );
+			$result = $api->reorder_seminar_occurrences( $seminar_id, $ids );
+			break;
+		default:
+			wp_send_json_error( __( 'Unbekannte Aktion.', 'tebuto-online-terminbuchung' ), 400 );
+	}
+
+	if ( is_wp_error( $result ) ) {
+		tebuto_send_ajax_api_error( $api, $result );
+	}
+
+	wp_send_json_success( $result );
+}
 
 /**
  * AJAX handler: Get categories for multiselect.

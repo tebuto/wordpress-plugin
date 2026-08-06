@@ -22,6 +22,11 @@
     border-bottom: 1px solid var(--tebuto-border);
 }
 
+.tebuto-header-title {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
 .tebuto-header h1 {
     margin: 0;
     font-size: 28px;
@@ -312,17 +317,101 @@
 
 /* WP native primary on Tebuto pages */
 .tebuto-admin-wrap .button.button-primary,
-.wp-core-ui .tebuto-admin-wrap .button.button-primary {
+.wp-core-ui .tebuto-admin-wrap .button.button-primary,
+.tebuto-modal .button.button-primary,
+.wp-core-ui .tebuto-modal .button.button-primary {
     background: var(--tebuto-primary-brand);
     border-color: var(--tebuto-primary-brand);
+    color: var(--tebuto-white);
+    box-shadow: none;
+    text-shadow: none;
 }
 
 .tebuto-admin-wrap .button.button-primary:hover,
 .tebuto-admin-wrap .button.button-primary:focus,
 .wp-core-ui .tebuto-admin-wrap .button.button-primary:hover,
-.wp-core-ui .tebuto-admin-wrap .button.button-primary:focus {
+.wp-core-ui .tebuto-admin-wrap .button.button-primary:focus,
+.tebuto-modal .button.button-primary:hover,
+.tebuto-modal .button.button-primary:focus,
+.wp-core-ui .tebuto-modal .button.button-primary:hover,
+.wp-core-ui .tebuto-modal .button.button-primary:focus {
     background: var(--tebuto-primary-hover);
     border-color: var(--tebuto-primary-hover);
+    color: var(--tebuto-white);
+    box-shadow: none;
+}
+
+/*
+ * WP native secondary/default buttons → Tebuto outline neutral (secondary-gray).
+ * Skip anything that already carries an explicit tebuto-btn* variant.
+ */
+.tebuto-admin-wrap .button:not(.button-primary):not([class*="tebuto-btn"]),
+.wp-core-ui .tebuto-admin-wrap .button:not(.button-primary):not([class*="tebuto-btn"]),
+.tebuto-modal .button:not(.button-primary):not([class*="tebuto-btn"]),
+.wp-core-ui .tebuto-modal .button:not(.button-primary):not([class*="tebuto-btn"]) {
+    background: var(--tebuto-white);
+    border-color: var(--tebuto-border-secondary);
+    color: var(--tebuto-foreground-secondary);
+    box-shadow: none;
+    text-shadow: none;
+}
+
+.tebuto-admin-wrap .button:not(.button-primary):not([class*="tebuto-btn"]):hover,
+.tebuto-admin-wrap .button:not(.button-primary):not([class*="tebuto-btn"]):focus,
+.wp-core-ui .tebuto-admin-wrap .button:not(.button-primary):not([class*="tebuto-btn"]):hover,
+.wp-core-ui .tebuto-admin-wrap .button:not(.button-primary):not([class*="tebuto-btn"]):focus,
+.tebuto-modal .button:not(.button-primary):not([class*="tebuto-btn"]):hover,
+.tebuto-modal .button:not(.button-primary):not([class*="tebuto-btn"]):focus,
+.wp-core-ui .tebuto-modal .button:not(.button-primary):not([class*="tebuto-btn"]):hover,
+.wp-core-ui .tebuto-modal .button:not(.button-primary):not([class*="tebuto-btn"]):focus {
+    background: var(--tebuto-surface);
+    border-color: var(--tebuto-foreground-tertiary);
+    color: var(--tebuto-foreground);
+    box-shadow: none;
+}
+
+.tebuto-admin-wrap .button:not(.button-primary):not([class*="tebuto-btn"]):disabled,
+.tebuto-admin-wrap .button:not(.button-primary):not([class*="tebuto-btn"])[disabled],
+.tebuto-modal .button:not(.button-primary):not([class*="tebuto-btn"]):disabled,
+.tebuto-modal .button:not(.button-primary):not([class*="tebuto-btn"])[disabled] {
+    opacity: 0.55;
+    color: var(--tebuto-foreground-secondary);
+    border-color: var(--tebuto-border-secondary);
+    background: var(--tebuto-white);
+}
+
+/* Text/link buttons and content links — no WP admin blue */
+.tebuto-admin-wrap .button-link,
+.tebuto-admin-wrap .button-link-delete,
+.tebuto-modal .button-link,
+.wp-core-ui .tebuto-admin-wrap .button-link,
+.wp-core-ui .tebuto-modal .button-link {
+    color: var(--tebuto-primary-brand);
+    box-shadow: none;
+}
+
+.tebuto-admin-wrap .button-link:hover,
+.tebuto-admin-wrap .button-link:focus,
+.tebuto-modal .button-link:hover,
+.tebuto-modal .button-link:focus,
+.wp-core-ui .tebuto-admin-wrap .button-link:hover,
+.wp-core-ui .tebuto-modal .button-link:hover {
+    color: var(--tebuto-primary-hover);
+}
+
+.tebuto-admin-wrap .tebuto-table a:not(.button):not(.tebuto-btn),
+.tebuto-admin-wrap .tebuto-occurrences-table a:not(.button):not(.tebuto-btn),
+.tebuto-admin-wrap .tebuto-accordion-content a:not(.button):not(.tebuto-btn) {
+    color: var(--tebuto-text, #111827);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.tebuto-admin-wrap .tebuto-table a:not(.button):not(.tebuto-btn):hover,
+.tebuto-admin-wrap .tebuto-occurrences-table a:not(.button):not(.tebuto-btn):hover,
+.tebuto-admin-wrap .tebuto-accordion-content a:not(.button):not(.tebuto-btn):hover {
+    color: var(--tebuto-text, #111827);
+    text-decoration: underline;
 }
 
 .tebuto-admin-wrap .button-hero {
@@ -902,6 +991,7 @@
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    align-items: center;
 }
 
 .tebuto-actions-col {
@@ -1335,7 +1425,7 @@
 }
 
 .tebuto-filter-section {
-    padding: 20px 24px;
+    padding: 14px 20px;
     border-bottom: 1px solid var(--tebuto-border-light);
 }
 
@@ -1347,7 +1437,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
     font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
@@ -1362,11 +1452,21 @@
     color: var(--tebuto-primary-brand);
 }
 
+.tebuto-date-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+}
+
 .tebuto-date-presets {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 8px;
-    margin-bottom: 16px;
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
 }
 
 .tebuto-date-preset {
@@ -1404,21 +1504,27 @@
 
 .tebuto-date-range {
     display: flex;
-    align-items: flex-end;
-    gap: 12px;
+    align-items: center;
+    gap: 10px;
+    flex: 0 1 auto;
+    margin-left: auto;
 }
 
 .tebuto-date-input-group {
-    flex: 1;
+    flex: 0 1 auto;
     display: flex;
-    flex-direction: column;
-    gap: 6px;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
 }
 
 .tebuto-date-input-group label {
     font-size: 12px;
     font-weight: 600;
     color: var(--tebuto-text-secondary);
+    margin: 0;
+    white-space: nowrap;
 }
 
 .tebuto-date-input-wrapper {
@@ -1464,7 +1570,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-bottom: 10px;
+    padding: 0;
     color: var(--tebuto-text-muted);
 }
 
@@ -1477,14 +1583,23 @@
 .tebuto-status-chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.tebuto-status-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 16px;
 }
 
 .tebuto-status-chip {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 16px;
+    padding: 8px 12px;
     background: var(--tebuto-bg);
     border: 2px solid transparent;
     border-radius: var(--tebuto-radius-sm);
@@ -1570,36 +1685,39 @@
 .tebuto-filter-actions-bar {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 16px 24px;
-    background: var(--tebuto-bg);
-    border-top: 1px solid var(--tebuto-border-light);
+    justify-content: flex-end;
+    gap: 8px;
+    flex: 0 0 auto;
+    margin-left: auto;
+    padding: 0;
+    background: transparent;
+    border-top: none;
 }
 
 .tebuto-filter-submit {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
+    gap: 6px;
+    padding: 8px 16px;
     background: var(--tebuto-primary-brand);
     border: none;
     border-radius: var(--tebuto-radius-sm);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--tebuto-white);
     cursor: pointer;
     transition: all var(--tebuto-transition);
-    box-shadow: 0 2px 4px rgba(0, 144, 135, 0.25);
+    box-shadow: none;
 }
 
 .tebuto-filter-submit:hover {
     background: var(--tebuto-primary-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 144, 135, 0.35);
+    transform: none;
+    box-shadow: none;
 }
 
 .tebuto-filter-submit:active {
-    transform: translateY(0);
+    transform: none;
 }
 
 .tebuto-filter-submit .dashicons {
@@ -1612,11 +1730,11 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 12px 20px;
+    padding: 8px 14px;
     background: transparent;
     border: 1px solid var(--tebuto-border);
     border-radius: var(--tebuto-radius-sm);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--tebuto-text-secondary);
     text-decoration: none;
@@ -1655,6 +1773,10 @@
     padding: 20px;
 }
 
+body.tebuto-modal-open {
+    overflow: hidden;
+}
+
 .tebuto-modal-content {
     background: var(--tebuto-white);
     border-radius: var(--tebuto-radius);
@@ -1669,6 +1791,10 @@
 
 .tebuto-modal-lg {
     max-width: 640px;
+}
+
+.tebuto-modal-xl {
+    max-width: 760px;
 }
 
 .tebuto-modal-content form {
@@ -1713,6 +1839,9 @@
 }
 
 .tebuto-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     padding: 24px;
     overflow-y: auto;
     flex: 1;
@@ -1737,6 +1866,30 @@
 
 .tebuto-modal-details p:last-child {
     margin-bottom: 0;
+}
+
+.tebuto-confirm-message {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--tebuto-text);
+}
+
+#tebuto-confirm-prompt[hidden] {
+    display: none !important;
+}
+
+.wp-core-ui #tebuto-confirm-ok.tebuto-btn--danger {
+    background: var(--tebuto-danger);
+    border-color: var(--tebuto-danger);
+    color: var(--tebuto-white);
+}
+
+.wp-core-ui #tebuto-confirm-ok.tebuto-btn--danger:hover,
+.wp-core-ui #tebuto-confirm-ok.tebuto-btn--danger:focus {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: var(--tebuto-white);
 }
 
 .tebuto-booking-details h4 {
@@ -1765,19 +1918,21 @@
 }
 
 .tebuto-modal-section {
-    margin-bottom: 24px;
-    padding-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 0;
+    padding: 0 0 24px;
     border-bottom: 1px solid var(--tebuto-border-light);
 }
 
 .tebuto-modal-section:last-child {
-    margin-bottom: 0;
     padding-bottom: 0;
     border-bottom: none;
 }
 
 .tebuto-modal-section h4 {
-    margin: 0 0 16px;
+    margin: 0;
     font-size: 13px;
     font-weight: 600;
     text-transform: uppercase;
@@ -1785,10 +1940,20 @@
     color: var(--tebuto-text-secondary);
 }
 
+.tebuto-modal-section > .tebuto-field-hint {
+    margin: 0;
+}
+
 .tebuto-modal-row {
     display: flex;
     gap: 16px;
     align-items: flex-start;
+    width: 100%;
+}
+
+.tebuto-modal-row > .tebuto-modal-field {
+    flex: 1 1 0;
+    min-width: 0;
 }
 
 .tebuto-modal-row-3 {
@@ -1801,6 +1966,7 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+    min-width: 0;
 }
 
 .tebuto-modal-field-grow {
@@ -1820,14 +1986,35 @@
 
 .tebuto-modal-field input[type="text"],
 .tebuto-modal-field input[type="number"],
+.tebuto-modal-field input[type="datetime-local"],
+.tebuto-modal-field input[type="date"],
+.tebuto-modal-field input[type="time"],
+.tebuto-modal-field input[type="file"],
 .tebuto-modal-field textarea,
 .tebuto-modal-field select {
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
     padding: 10px 12px;
     border: 1px solid var(--tebuto-border);
     border-radius: var(--tebuto-radius-xs);
     font-size: 14px;
+    line-height: 1.4;
+    color: var(--tebuto-text);
     background: var(--tebuto-white);
     transition: border-color var(--tebuto-transition), box-shadow var(--tebuto-transition);
+}
+
+.tebuto-modal-field select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M1.4.6 6 5.2 10.6.6 12 2 6 8 0 2z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+.tebuto-modal-field input[type="file"] {
+    padding: 8px 12px;
 }
 
 .tebuto-modal-field input:focus,
@@ -1847,6 +2034,22 @@
 .tebuto-modal-field textarea {
     resize: vertical;
     min-height: 60px;
+}
+
+.tebuto-modal-field .wp-editor-wrap,
+.tebuto-modal-field .mce-tinymce,
+.tebuto-modal-field .wp-editor-container {
+    width: 100%;
+    max-width: none;
+}
+
+.tebuto-modal-field .wp-editor-area {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+.tebuto-modal-field .mce-edit-area iframe {
+    min-height: 180px;
 }
 
 .tebuto-modal-field-checkbox {
@@ -1946,9 +2149,21 @@
    ========================================================================== */
 
 @media (max-width: 768px) {
+    .tebuto-date-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
     .tebuto-date-range {
         flex-direction: column;
         gap: 16px;
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .tebuto-date-input-group {
+        min-width: 0;
+        width: 100%;
     }
 
     .tebuto-date-range-separator {
@@ -1973,9 +2188,16 @@
         font-size: 12px;
     }
 
-    .tebuto-filter-actions-bar {
+    .tebuto-status-row {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .tebuto-filter-actions-bar {
+        flex-direction: row;
+        justify-content: flex-end;
+        margin-left: 0;
+        width: 100%;
     }
 
     .tebuto-filter-submit,
@@ -2034,8 +2256,9 @@
         grid-template-columns: 1fr;
     }
 
-    .tebuto-action-buttons {
+    .tebuto-page-bookings .tebuto-action-buttons {
         flex-direction: column;
+        align-items: stretch;
     }
 
     .tebuto-modal-content {
