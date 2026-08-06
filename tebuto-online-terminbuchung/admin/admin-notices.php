@@ -10,25 +10,45 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Render the "not connected" notice.
  *
+ * @param bool $just_disconnected Whether the user just disconnected.
  * @return void
  */
-function tebuto_render_not_connected_notice(): void {
-	?>
-	<div class="wrap tebuto-admin-wrap">
-		<div class="tebuto-card tebuto-card-warning tebuto-auth-notice">
-			<div class="tebuto-card-icon">
-				<span class="dashicons dashicons-admin-plugins"></span>
-			</div>
-			<div class="tebuto-card-content">
-				<h2><?php esc_html_e( 'Verbindung erforderlich', 'tebuto-online-terminbuchung' ); ?></h2>
-				<p><?php esc_html_e( 'Du musst dein Tebuto-Konto verbinden, um diese Funktionen nutzen zu können.', 'tebuto-online-terminbuchung' ); ?></p>
-				<a href="<?php echo esc_url( tebuto_get_authorize_url() ); ?>" class="button button-primary button-hero">
-					<?php esc_html_e( 'Mit Tebuto verbinden', 'tebuto-online-terminbuchung' ); ?>
-				</a>
-			</div>
-		</div>
-	</div>
-	<?php
+function tebuto_render_not_connected_notice( bool $just_disconnected = false ): void {
+	$title = $just_disconnected
+		? __( 'Verbindung getrennt', 'tebuto-online-terminbuchung' )
+		: __( 'Verbindung erforderlich', 'tebuto-online-terminbuchung' );
+	$body  = $just_disconnected
+		? __( 'Die Verbindung zu Tebuto wurde getrennt. Verbinde dein Konto erneut, um das Plugin weiter zu nutzen.', 'tebuto-online-terminbuchung' )
+		: __( 'Du musst dein Tebuto-Konto verbinden, um diese Funktionen nutzen zu können.', 'tebuto-online-terminbuchung' );
+
+	$actions = tebuto_ui_button(
+		array(
+			'label'   => __( 'Mit Tebuto verbinden', 'tebuto-online-terminbuchung' ),
+			'href'    => tebuto_get_authorize_url(),
+			'variant' => 'solid',
+			'color'   => 'primary',
+			'size'    => 'lg',
+			'class'   => 'button-hero',
+		)
+	);
+
+	tebuto_ui_page_open(
+		array(
+			'title'      => __( 'Tebuto', 'tebuto-online-terminbuchung' ),
+			'page_class' => 'tebuto-page-auth',
+			'fullheight' => true,
+		)
+	);
+	echo tebuto_ui_admonition( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		array(
+			'title'        => $title,
+			'body'         => $body,
+			'tone'         => 'warning',
+			'icon'         => 'dashicons-admin-plugins',
+			'actions_html' => $actions,
+		)
+	);
+	tebuto_ui_page_close();
 }
 
 /**
@@ -37,22 +57,35 @@ function tebuto_render_not_connected_notice(): void {
  * @return void
  */
 function tebuto_render_session_expired_notice(): void {
-	?>
-	<div class="wrap tebuto-admin-wrap">
-		<div class="tebuto-card tebuto-card-warning tebuto-auth-notice tebuto-auth-notice-expired">
-			<div class="tebuto-card-icon">
-				<span class="dashicons dashicons-update"></span>
-			</div>
-			<div class="tebuto-card-content">
-				<h2><?php esc_html_e( 'Sitzung abgelaufen', 'tebuto-online-terminbuchung' ); ?></h2>
-				<p><?php esc_html_e( 'Deine Verbindung zu Tebuto ist abgelaufen. Bitte melde dich erneut an, um Termine, Kategorien und Widget-Einstellungen zu verwalten.', 'tebuto-online-terminbuchung' ); ?></p>
-				<a href="<?php echo esc_url( tebuto_get_authorize_url() ); ?>" class="button button-primary button-hero">
-					<?php esc_html_e( 'Erneut bei Tebuto anmelden', 'tebuto-online-terminbuchung' ); ?>
-				</a>
-			</div>
-		</div>
-	</div>
-	<?php
+	$actions = tebuto_ui_button(
+		array(
+			'label'   => __( 'Erneut bei Tebuto anmelden', 'tebuto-online-terminbuchung' ),
+			'href'    => tebuto_get_authorize_url(),
+			'variant' => 'solid',
+			'color'   => 'primary',
+			'size'    => 'lg',
+			'class'   => 'button-hero',
+		)
+	);
+
+	tebuto_ui_page_open(
+		array(
+			'title'      => __( 'Tebuto', 'tebuto-online-terminbuchung' ),
+			'page_class' => 'tebuto-page-auth',
+			'fullheight' => true,
+		)
+	);
+	echo tebuto_ui_admonition( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		array(
+			'title'        => __( 'Sitzung abgelaufen', 'tebuto-online-terminbuchung' ),
+			'body'         => __( 'Deine Verbindung zu Tebuto ist abgelaufen. Bitte melde dich erneut an, um Termine, Kategorien und Widget-Einstellungen zu verwalten.', 'tebuto-online-terminbuchung' ),
+			'tone'         => 'warning',
+			'icon'         => 'dashicons-update',
+			'class'        => 'tebuto-auth-notice-expired',
+			'actions_html' => $actions,
+		)
+	);
+	tebuto_ui_page_close();
 }
 
 /**
@@ -66,7 +99,9 @@ function tebuto_render_auth_required_notice(): void {
 		return;
 	}
 
-	tebuto_render_not_connected_notice();
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only flash flag from post-disconnect redirect.
+	$just_disconnected = isset( $_GET['disconnected'] ) && (string) $_GET['disconnected'] === '1';
+	tebuto_render_not_connected_notice( $just_disconnected );
 }
 
 /**

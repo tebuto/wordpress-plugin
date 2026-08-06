@@ -9,7 +9,6 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Enqueue global admin styles for menu icon.
- * This is loaded on all admin pages to ensure the menu icon displays correctly.
  *
  * @return void
  */
@@ -18,7 +17,7 @@ function tebuto_enqueue_global_admin_assets(): void {
 		'tebuto-admin-menu-icon',
 		TEBUTO_PLUGIN_URL . 'css/admin-menu-icon.css',
 		array(),
-		TEBUTO_VERSION
+		tebuto_asset_version( 'css/admin-menu-icon.css' )
 	);
 }
 add_action( 'admin_enqueue_scripts', 'tebuto_enqueue_global_admin_assets' );
@@ -30,36 +29,41 @@ add_action( 'admin_enqueue_scripts', 'tebuto_enqueue_global_admin_assets' );
  * @return void
  */
 function tebuto_enqueue_admin_assets( string $hook_suffix ): void {
-	// Only load on Tebuto admin pages
 	if ( strpos( $hook_suffix, 'tebuto' ) === false ) {
 		return;
 	}
 
-	// Enqueue admin styles
-	$style_path = TEBUTO_PLUGIN_PATH . 'css/admin-style.css';
 	wp_enqueue_style(
-		'tebuto-admin-style',
-		TEBUTO_PLUGIN_URL . 'css/admin-style.css',
+		'tebuto-tokens',
+		TEBUTO_PLUGIN_URL . 'css/tebuto-tokens.css',
 		array(),
-		file_exists( $style_path ) ? (string) filemtime( $style_path ) : TEBUTO_VERSION
+		tebuto_asset_version( 'css/tebuto-tokens.css' )
 	);
 
-	// Enqueue WordPress color picker
-	wp_enqueue_style( 'wp-color-picker' );
+	wp_enqueue_style(
+		'tebuto-components',
+		TEBUTO_PLUGIN_URL . 'css/tebuto-components.css',
+		array( 'tebuto-tokens' ),
+		tebuto_asset_version( 'css/tebuto-components.css' )
+	);
 
-	// Enqueue dashicons
+	wp_enqueue_style(
+		'tebuto-pages',
+		TEBUTO_PLUGIN_URL . 'css/tebuto-pages.css',
+		array( 'tebuto-components' ),
+		tebuto_asset_version( 'css/tebuto-pages.css' )
+	);
+
 	wp_enqueue_style( 'dashicons' );
 
-	// Enqueue admin scripts
 	wp_enqueue_script(
 		'tebuto-admin-script',
 		TEBUTO_PLUGIN_URL . 'js/admin-script.js',
-		array( 'jquery', 'wp-color-picker' ),
-		TEBUTO_VERSION,
+		array( 'jquery' ),
+		tebuto_asset_version( 'js/admin-script.js' ),
 		true
 	);
 
-	// Localize script with data
 	wp_localize_script(
 		'tebuto-admin-script',
 		'tebutoAdmin',
@@ -92,6 +96,83 @@ function tebuto_enqueue_admin_assets( string $hook_suffix ): void {
 				'price'           => __( 'Preis', 'tebuto-online-terminbuchung' ),
 				'confirmed'       => __( 'Bestätigt', 'tebuto-online-terminbuchung' ),
 			),
+		)
+	);
+
+	if ( strpos( $hook_suffix, 'tebuto-shortcode' ) !== false ) {
+		tebuto_enqueue_widget_settings_assets();
+	}
+}
+add_action( 'admin_enqueue_scripts', 'tebuto_enqueue_admin_assets' );
+
+/**
+ * Enqueue the shared React widget settings app on the shortcode page.
+ *
+ * @return void
+ */
+function tebuto_enqueue_widget_settings_assets(): void {
+	$asset_file = TEBUTO_PLUGIN_PATH . 'block/build/widget-settings/index.asset.php';
+	if ( ! file_exists( $asset_file ) ) {
+		return;
+	}
+
+	$asset = include $asset_file;
+	$deps  = isset( $asset['dependencies'] ) && is_array( $asset['dependencies'] ) ? $asset['dependencies'] : array();
+	$ver   = isset( $asset['version'] ) ? (string) $asset['version'] : tebuto_asset_version( 'block/build/widget-settings/index.js' );
+
+	wp_enqueue_style( 'wp-components' );
+
+	wp_enqueue_script(
+		'tebuto-widget-settings',
+		TEBUTO_PLUGIN_URL . 'block/build/widget-settings/index.js',
+		$deps,
+		$ver,
+		true
+	);
+
+	$style_path = TEBUTO_PLUGIN_PATH . 'block/build/widget-settings/index.css';
+	if ( file_exists( $style_path ) ) {
+		wp_enqueue_style(
+			'tebuto-widget-settings-style',
+			TEBUTO_PLUGIN_URL . 'block/build/widget-settings/index.css',
+			array( 'wp-components' ),
+			$ver
+		);
+	}
+
+	$editor_css = TEBUTO_PLUGIN_PATH . 'block/build/block/index.css';
+	if ( file_exists( $editor_css ) ) {
+		wp_enqueue_style(
+			'tebuto-block-editor-style',
+			TEBUTO_PLUGIN_URL . 'block/build/block/index.css',
+			array( 'wp-components' ),
+			tebuto_asset_version( 'block/build/block/index.css' )
+		);
+	}
+
+	wp_localize_script(
+		'tebuto-widget-settings',
+		'tebutoData',
+		tebuto_get_localized_tebuto_data( get_current_user_id() )
+	);
+
+	$saved = tebuto_widget_settings_for_user( get_current_user_id(), 'booking' );
+	wp_localize_script(
+		'tebuto-widget-settings',
+		'tebutoWidgetSettings',
+		array(
+			'primaryColor'               => $saved['primary_color'],
+			'backgroundColor'            => $saved['background_color'],
+			'textPrimary'                => $saved['text_primary'],
+			'textSecondary'              => $saved['text_secondary'],
+			'borderColor'                => $saved['border_color'],
+			'border'                     => $saved['border'] === 'true',
+			'inheritFont'                => $saved['inherit_font'] === 'true',
+			'showProviderFilter'         => $saved['show_provider_filter'] === 'true',
+			'showLocationQuickFilter'    => $saved['show_location_quick_filter'] === 'true',
+			'showCategorySelectionFirst' => $saved['show_category_selection_first'] !== 'false',
+			'categories'                 => $saved['categories'],
+			'customCss'                  => $saved['custom_css'],
 		)
 	);
 }

@@ -83,6 +83,7 @@ define( 'TEBUTO_META_PREFIX', 'tebuto_online_terminbuchung_' );
  * Include required files.
  */
 require_once TEBUTO_PLUGIN_PATH . 'includes/helpers.php';
+require_once TEBUTO_PLUGIN_PATH . 'includes/widget-theme.php';
 require_once TEBUTO_PLUGIN_PATH . 'includes/class-tebuto-api.php';
 require_once TEBUTO_PLUGIN_PATH . 'includes/oauth-callback.php';
 require_once TEBUTO_PLUGIN_PATH . 'includes/store-uuid.php';
@@ -91,6 +92,7 @@ require_once TEBUTO_PLUGIN_PATH . 'includes/seminars-shortcode.php';
 require_once TEBUTO_PLUGIN_PATH . 'includes/ajax-handlers.php';
 
 // Admin files
+require_once TEBUTO_PLUGIN_PATH . 'admin/ui/components.php';
 require_once TEBUTO_PLUGIN_PATH . 'admin/admin-notices.php';
 require_once TEBUTO_PLUGIN_PATH . 'admin/admin-menu.php';
 require_once TEBUTO_PLUGIN_PATH . 'admin/settings-page.php';

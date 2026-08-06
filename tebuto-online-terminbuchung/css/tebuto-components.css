@@ -1,0 +1,2045 @@
+/**
+ * Tebuto shared admin UI components.
+ *
+ * @package Tebuto
+ */
+
+/* ==========================================================================
+   Admin Wrap & Header
+   ========================================================================== */
+
+.tebuto-admin-wrap {
+    max-width: 1400px;
+    margin: 24px 24px 40px 2px;
+}
+
+.tebuto-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--tebuto-border);
+}
+
+.tebuto-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--tebuto-text);
+    letter-spacing: -0.02em;
+}
+
+.tebuto-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tebuto-header-actions .button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tebuto-header-actions .button .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.tebuto-disconnect-form {
+    display: inline;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.wp-core-ui .tebuto-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 0;
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    border-radius: var(--tebuto-radius-sm);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: none;
+    transition:
+        background-color var(--tebuto-transition),
+        border-color var(--tebuto-transition),
+        color var(--tebuto-transition),
+        box-shadow var(--tebuto-transition);
+}
+
+.wp-core-ui .tebuto-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--tebuto-primary-subtle);
+}
+
+.wp-core-ui .tebuto-btn:disabled,
+.wp-core-ui .tebuto-btn[disabled] {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.wp-core-ui .tebuto-btn--sm {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+.wp-core-ui .tebuto-btn--lg {
+    padding: 12px 24px;
+    font-size: 15px;
+}
+
+/* Solid */
+.wp-core-ui .tebuto-btn--solid.tebuto-btn--primary {
+    background: var(--tebuto-primary-brand);
+    border-color: var(--tebuto-primary-brand);
+    color: var(--tebuto-white);
+}
+
+.wp-core-ui .tebuto-btn--solid.tebuto-btn--primary:hover,
+.wp-core-ui .tebuto-btn--solid.tebuto-btn--primary:focus {
+    background: var(--tebuto-primary-hover);
+    border-color: var(--tebuto-primary-hover);
+    color: var(--tebuto-white);
+}
+
+.wp-core-ui .tebuto-btn--solid.tebuto-btn--neutral {
+    background: var(--tebuto-foreground-secondary);
+    border-color: var(--tebuto-foreground-secondary);
+    color: var(--tebuto-white);
+}
+
+.wp-core-ui .tebuto-btn--solid.tebuto-btn--neutral:hover,
+.wp-core-ui .tebuto-btn--solid.tebuto-btn--neutral:focus {
+    background: var(--tebuto-foreground);
+    border-color: var(--tebuto-foreground);
+    color: var(--tebuto-white);
+}
+
+.wp-core-ui .tebuto-btn--solid.tebuto-btn--success {
+    background: var(--tebuto-success);
+    border-color: var(--tebuto-success);
+    color: var(--tebuto-white);
+}
+
+.wp-core-ui .tebuto-btn--solid.tebuto-btn--success:hover,
+.wp-core-ui .tebuto-btn--solid.tebuto-btn--success:focus {
+    background: #15803d;
+    border-color: #15803d;
+    color: var(--tebuto-white);
+}
+
+.wp-core-ui .tebuto-btn--solid.tebuto-btn--warning {
+    background: var(--tebuto-warning);
+    border-color: var(--tebuto-warning);
+    color: var(--tebuto-white);
+}
+
+.wp-core-ui .tebuto-btn--solid.tebuto-btn--warning:hover,
+.wp-core-ui .tebuto-btn--solid.tebuto-btn--warning:focus {
+    background: #b45309;
+    border-color: #b45309;
+    color: var(--tebuto-white);
+}
+
+.wp-core-ui .tebuto-btn--solid.tebuto-btn--danger {
+    background: var(--tebuto-danger);
+    border-color: var(--tebuto-danger);
+    color: var(--tebuto-white);
+}
+
+.wp-core-ui .tebuto-btn--solid.tebuto-btn--danger:hover,
+.wp-core-ui .tebuto-btn--solid.tebuto-btn--danger:focus {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: var(--tebuto-white);
+}
+
+/* Outline */
+.wp-core-ui .tebuto-btn--outline.tebuto-btn--primary {
+    background: var(--tebuto-white);
+    border-color: var(--tebuto-primary-brand);
+    color: var(--tebuto-primary-brand);
+}
+
+.wp-core-ui .tebuto-btn--outline.tebuto-btn--primary:hover,
+.wp-core-ui .tebuto-btn--outline.tebuto-btn--primary:focus {
+    background: var(--tebuto-primary-50);
+    border-color: var(--tebuto-primary-hover);
+    color: var(--tebuto-primary-hover);
+}
+
+.wp-core-ui .tebuto-btn--outline.tebuto-btn--neutral {
+    background: var(--tebuto-white);
+    border-color: var(--tebuto-border-secondary);
+    color: var(--tebuto-foreground-secondary);
+}
+
+.wp-core-ui .tebuto-btn--outline.tebuto-btn--neutral:hover,
+.wp-core-ui .tebuto-btn--outline.tebuto-btn--neutral:focus {
+    background: var(--tebuto-surface);
+    border-color: var(--tebuto-foreground-tertiary);
+    color: var(--tebuto-foreground);
+}
+
+.wp-core-ui .tebuto-btn--outline.tebuto-btn--success {
+    background: var(--tebuto-white);
+    border-color: var(--tebuto-success-border);
+    color: var(--tebuto-success);
+}
+
+.wp-core-ui .tebuto-btn--outline.tebuto-btn--success:hover,
+.wp-core-ui .tebuto-btn--outline.tebuto-btn--success:focus {
+    background: var(--tebuto-success-subtle);
+    border-color: var(--tebuto-success);
+    color: #15803d;
+}
+
+.wp-core-ui .tebuto-btn--outline.tebuto-btn--warning {
+    background: var(--tebuto-white);
+    border-color: var(--tebuto-warning-border);
+    color: var(--tebuto-warning);
+}
+
+.wp-core-ui .tebuto-btn--outline.tebuto-btn--warning:hover,
+.wp-core-ui .tebuto-btn--outline.tebuto-btn--warning:focus {
+    background: var(--tebuto-warning-subtle);
+    border-color: var(--tebuto-warning);
+    color: #b45309;
+}
+
+.wp-core-ui .tebuto-btn--outline.tebuto-btn--danger {
+    background: var(--tebuto-white);
+    border-color: var(--tebuto-danger-border);
+    color: var(--tebuto-danger);
+}
+
+.wp-core-ui .tebuto-btn--outline.tebuto-btn--danger:hover,
+.wp-core-ui .tebuto-btn--outline.tebuto-btn--danger:focus {
+    background: var(--tebuto-danger-subtle);
+    border-color: #dc2626;
+    color: #dc2626;
+}
+
+/* Ghost */
+.wp-core-ui .tebuto-btn--ghost.tebuto-btn--primary {
+    background: transparent;
+    border-color: transparent;
+    color: var(--tebuto-primary-brand);
+}
+
+.wp-core-ui .tebuto-btn--ghost.tebuto-btn--primary:hover,
+.wp-core-ui .tebuto-btn--ghost.tebuto-btn--primary:focus {
+    background: var(--tebuto-primary-subtle);
+    color: var(--tebuto-primary-hover);
+}
+
+.wp-core-ui .tebuto-btn--ghost.tebuto-btn--neutral {
+    background: transparent;
+    border-color: transparent;
+    color: var(--tebuto-foreground-tertiary);
+}
+
+.wp-core-ui .tebuto-btn--ghost.tebuto-btn--neutral:hover,
+.wp-core-ui .tebuto-btn--ghost.tebuto-btn--neutral:focus {
+    background: var(--tebuto-surface);
+    color: var(--tebuto-foreground);
+}
+
+.wp-core-ui .tebuto-btn--ghost.tebuto-btn--success {
+    background: transparent;
+    border-color: transparent;
+    color: var(--tebuto-success);
+}
+
+.wp-core-ui .tebuto-btn--ghost.tebuto-btn--success:hover,
+.wp-core-ui .tebuto-btn--ghost.tebuto-btn--success:focus {
+    background: var(--tebuto-success-subtle);
+    color: #15803d;
+}
+
+.wp-core-ui .tebuto-btn--ghost.tebuto-btn--warning {
+    background: transparent;
+    border-color: transparent;
+    color: var(--tebuto-warning);
+}
+
+.wp-core-ui .tebuto-btn--ghost.tebuto-btn--warning:hover,
+.wp-core-ui .tebuto-btn--ghost.tebuto-btn--warning:focus {
+    background: var(--tebuto-warning-subtle);
+    color: #b45309;
+}
+
+.wp-core-ui .tebuto-btn--ghost.tebuto-btn--danger {
+    background: transparent;
+    border-color: transparent;
+    color: var(--tebuto-danger);
+}
+
+.wp-core-ui .tebuto-btn--ghost.tebuto-btn--danger:hover,
+.wp-core-ui .tebuto-btn--ghost.tebuto-btn--danger:focus {
+    background: var(--tebuto-danger-subtle);
+    color: #dc2626;
+}
+
+/* Legacy alias: solid danger */
+.wp-core-ui .button.tebuto-btn-danger,
+.wp-core-ui .tebuto-btn-danger {
+    background: var(--tebuto-danger);
+    border-color: var(--tebuto-danger);
+    color: var(--tebuto-white);
+}
+
+.wp-core-ui .button.tebuto-btn-danger:hover,
+.wp-core-ui .button.tebuto-btn-danger:focus,
+.wp-core-ui .tebuto-btn-danger:hover,
+.wp-core-ui .tebuto-btn-danger:focus {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: var(--tebuto-white);
+}
+
+/* WP native primary on Tebuto pages */
+.tebuto-admin-wrap .button.button-primary,
+.wp-core-ui .tebuto-admin-wrap .button.button-primary {
+    background: var(--tebuto-primary-brand);
+    border-color: var(--tebuto-primary-brand);
+}
+
+.tebuto-admin-wrap .button.button-primary:hover,
+.tebuto-admin-wrap .button.button-primary:focus,
+.wp-core-ui .tebuto-admin-wrap .button.button-primary:hover,
+.wp-core-ui .tebuto-admin-wrap .button.button-primary:focus {
+    background: var(--tebuto-primary-hover);
+    border-color: var(--tebuto-primary-hover);
+}
+
+.tebuto-admin-wrap .button-hero {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    font-size: 15px;
+    height: auto;
+}
+
+.tebuto-admin-wrap .button-hero .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+/* ==========================================================================
+   Cards
+   ========================================================================== */
+
+.tebuto-card {
+    background: var(--tebuto-white);
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius);
+    box-shadow: var(--tebuto-shadow);
+    overflow: hidden;
+}
+
+.tebuto-card > h2 {
+    margin: 0;
+    padding: 24px 28px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--tebuto-text);
+}
+
+.tebuto-card > p {
+    margin: 8px 0 0;
+    padding: 0 28px;
+    color: var(--tebuto-text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.tebuto-card > .button {
+    margin: 20px 28px 28px;
+}
+
+.tebuto-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--tebuto-border-light);
+    background: var(--tebuto-bg);
+}
+
+.tebuto-card-header h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--tebuto-text);
+}
+
+.tebuto-card-body {
+    padding: 24px;
+}
+
+.tebuto-card-warning {
+    border-color: var(--tebuto-warning-border);
+    background: var(--tebuto-warning-subtle);
+    padding: 32px;
+}
+
+.tebuto-card-warning h2 {
+    margin: 0 0 12px 0;
+    padding: 0;
+    color: #92400e;
+    font-size: 20px;
+}
+
+.tebuto-card-warning p {
+    margin: 0 0 20px 0;
+    padding: 0;
+    color: #78350f;
+    font-size: 15px;
+}
+
+.tebuto-card-warning .button {
+    margin: 0;
+}
+
+.tebuto-card-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tebuto-card-content h2 {
+    margin: 0 0 12px 0;
+    padding: 0;
+}
+
+.tebuto-card-content p {
+    margin: 0 0 20px 0;
+    padding: 0;
+}
+
+/* ==========================================================================
+   Admonition & Auth Notice
+   ========================================================================== */
+
+.tebuto-admonition {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 20px;
+    border-radius: var(--tebuto-radius-sm);
+    border: 1px solid transparent;
+    border-left-width: 8px;
+}
+
+.tebuto-admonition--warning {
+    background: var(--tebuto-warning-subtle);
+    border-color: var(--tebuto-warning-border);
+    color: #78350f;
+}
+
+.tebuto-admonition--info {
+    background: var(--tebuto-info-light);
+    border-color: var(--tebuto-info);
+    color: #1e40af;
+}
+
+.tebuto-admonition--success {
+    background: var(--tebuto-success-subtle);
+    border-color: var(--tebuto-success-border);
+    color: #166534;
+}
+
+.tebuto-admonition--danger {
+    background: var(--tebuto-danger-subtle);
+    border-color: var(--tebuto-danger-border);
+    color: #991b1b;
+}
+
+.tebuto-auth-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 32px;
+    max-width: 720px;
+    margin-top: 8px;
+    border-left-width: 8px;
+    border-left-style: solid;
+}
+
+.tebuto-auth-notice .tebuto-card-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--tebuto-radius);
+    box-shadow: var(--tebuto-shadow);
+}
+
+.tebuto-auth-notice .tebuto-card-icon .dashicons {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    color: var(--tebuto-white);
+}
+
+.tebuto-auth-notice .tebuto-card-content h2 {
+    margin: 0 0 12px 0;
+    padding: 0;
+    font-size: 22px;
+    color: var(--tebuto-text);
+}
+
+.tebuto-auth-notice .tebuto-card-content p {
+    margin: 0 0 20px 0;
+    padding: 0;
+    color: var(--tebuto-text-secondary);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.tebuto-auth-notice-expired {
+    border-left-color: var(--tebuto-warning-border);
+    background: var(--tebuto-warning-subtle);
+}
+
+.tebuto-auth-notice-expired .tebuto-card-icon {
+    background: var(--tebuto-warning);
+}
+
+.tebuto-card-warning.tebuto-auth-notice:not(.tebuto-auth-notice-expired) {
+    border-left-color: var(--tebuto-primary-brand);
+}
+
+.tebuto-card-warning.tebuto-auth-notice:not(.tebuto-auth-notice-expired) .tebuto-card-icon {
+    background: var(--tebuto-primary-brand);
+}
+
+.tebuto-info-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    background: var(--tebuto-info-light);
+    border-radius: var(--tebuto-radius-sm);
+    border-left: 8px solid var(--tebuto-info);
+    margin-top: 8px;
+}
+
+.tebuto-info-box .dashicons {
+    color: var(--tebuto-info);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.tebuto-info-box p {
+    margin: 0;
+    font-size: 13px;
+    color: #1e40af;
+    line-height: 1.5;
+}
+
+.tebuto-outage-fee-warning {
+    display: flex;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--tebuto-warning-subtle);
+    border: 1px solid var(--tebuto-warning-border);
+    border-left-width: 8px;
+    border-radius: var(--tebuto-radius-sm);
+    margin-top: 16px;
+}
+
+.tebuto-outage-fee-warning .dashicons {
+    color: #856404;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.tebuto-outage-fee-warning p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #856404;
+}
+
+/* ==========================================================================
+   Statistics Cards
+   ========================================================================== */
+
+.tebuto-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.tebuto-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px;
+    background: var(--tebuto-white);
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius);
+    box-shadow: var(--tebuto-shadow);
+    transition: transform var(--tebuto-transition), box-shadow var(--tebuto-transition);
+}
+
+.tebuto-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--tebuto-shadow-md);
+}
+
+.tebuto-stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--tebuto-radius);
+    flex-shrink: 0;
+}
+
+.tebuto-stat-icon .dashicons {
+    width: 28px;
+    height: 28px;
+    font-size: 28px;
+    color: var(--tebuto-white);
+}
+
+.tebuto-stat-icon-primary {
+    background: linear-gradient(135deg, var(--tebuto-primary-brand) 0%, var(--tebuto-primary-hover) 100%);
+}
+
+.tebuto-stat-icon-success {
+    background: linear-gradient(135deg, var(--tebuto-success-border) 0%, var(--tebuto-success) 100%);
+}
+
+.tebuto-stat-icon-warning {
+    background: linear-gradient(135deg, var(--tebuto-warning-border) 0%, var(--tebuto-warning) 100%);
+}
+
+.tebuto-stat-icon-info {
+    background: linear-gradient(135deg, var(--tebuto-info) 0%, #2563eb 100%);
+}
+
+.tebuto-stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tebuto-stat-number {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--tebuto-text);
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.tebuto-stat-label {
+    font-size: 14px;
+    color: var(--tebuto-text-secondary);
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   Event & Booking Lists
+   ========================================================================== */
+
+.tebuto-event-list,
+.tebuto-booking-list,
+.tebuto-category-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tebuto-event-item,
+.tebuto-booking-item,
+.tebuto-category-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    margin: 0 -24px;
+    border-bottom: 1px solid var(--tebuto-border-light);
+    transition: background var(--tebuto-transition);
+}
+
+.tebuto-event-item:first-child,
+.tebuto-booking-item:first-child,
+.tebuto-category-item:first-child {
+    margin-top: -24px;
+    padding-top: 24px;
+}
+
+.tebuto-event-item:last-child,
+.tebuto-booking-item:last-child,
+.tebuto-category-item:last-child {
+    border-bottom: none;
+    margin-bottom: -24px;
+    padding-bottom: 24px;
+}
+
+.tebuto-event-item:hover,
+.tebuto-booking-item:hover,
+.tebuto-category-item:hover {
+    background: var(--tebuto-bg);
+}
+
+.tebuto-category-item--unavailable {
+    opacity: 0.55;
+    cursor: default;
+}
+
+.tebuto-category-item--unavailable:hover {
+    background: transparent;
+}
+
+.tebuto-category-unavailable-hint {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--tebuto-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.tebuto-event-color {
+    width: 5px;
+    height: 48px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.tebuto-category-color {
+    width: 4px;
+    align-self: stretch;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.tebuto-event-info,
+.tebuto-booking-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.tebuto-category-list .tebuto-category-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.tebuto-category-list .tebuto-badge {
+    flex-shrink: 0;
+}
+
+.tebuto-category-badges {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.tebuto-event-title,
+.tebuto-booking-client,
+.tebuto-category-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tebuto-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tebuto-event-time,
+.tebuto-booking-category,
+.tebuto-booking-time,
+.tebuto-category-meta {
+    font-size: 13px;
+    color: var(--tebuto-text-secondary);
+}
+
+.tebuto-booking-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Badges
+   ========================================================================== */
+
+.tebuto-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.tebuto-badge-default {
+    background: var(--tebuto-bg-dark);
+    color: var(--tebuto-text-secondary);
+}
+
+.tebuto-badge-success {
+    background: var(--tebuto-success-subtle);
+    color: #166534;
+}
+
+.tebuto-badge-warning {
+    background: var(--tebuto-warning-subtle);
+    color: #92400e;
+}
+
+.tebuto-badge-danger {
+    background: var(--tebuto-danger-subtle);
+    color: #991b1b;
+}
+
+.tebuto-badge-info {
+    background: var(--tebuto-info-light);
+    color: #1d4ed8;
+}
+
+/* ==========================================================================
+   Tables
+   ========================================================================== */
+
+.tebuto-table-responsive {
+    overflow-x: auto;
+    margin: 0 -24px;
+    padding: 0 24px;
+}
+
+.tebuto-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.tebuto-table th,
+.tebuto-table td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--tebuto-border-light);
+}
+
+.tebuto-table th {
+    background: var(--tebuto-bg);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--tebuto-text-secondary);
+    white-space: nowrap;
+}
+
+.tebuto-table tbody tr {
+    transition: background var(--tebuto-transition);
+}
+
+.tebuto-table tbody tr:hover {
+    background: var(--tebuto-bg);
+}
+
+.tebuto-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.tebuto-category-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tebuto-category-name-cell > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.tebuto-category-color-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+}
+
+.tebuto-category-desc {
+    font-size: 12px;
+    color: var(--tebuto-text-muted);
+}
+
+.tebuto-action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tebuto-actions-col {
+    width: 180px;
+}
+
+.tebuto-client-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tebuto-client-email {
+    font-size: 12px;
+    color: var(--tebuto-text-muted);
+}
+
+.tebuto-table .tebuto-category-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-direction: row;
+}
+
+.tebuto-datetime-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tebuto-date {
+    font-weight: 600;
+    color: var(--tebuto-text);
+}
+
+.tebuto-time {
+    font-size: 13px;
+    color: var(--tebuto-text-secondary);
+}
+
+.tebuto-location {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--tebuto-text-secondary);
+}
+
+.tebuto-location .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--tebuto-text-muted);
+}
+
+.tebuto-booking-past {
+    opacity: 0.6;
+}
+
+.tebuto-booking-past:hover {
+    opacity: 0.8;
+}
+
+/* ==========================================================================
+   Pagination
+   ========================================================================== */
+
+.tebuto-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 24px;
+    border-top: 1px solid var(--tebuto-border-light);
+}
+
+.tebuto-pagination-info {
+    color: var(--tebuto-text-secondary);
+    font-size: 14px;
+}
+
+.tebuto-pagination-total {
+    color: var(--tebuto-text-muted);
+}
+
+/* ==========================================================================
+   Empty States, Errors, Loading
+   ========================================================================== */
+
+.tebuto-empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--tebuto-text-muted);
+    border: 2px dashed var(--tebuto-border);
+    border-radius: var(--tebuto-radius);
+    background: var(--tebuto-bg);
+}
+
+.tebuto-empty-state .dashicons {
+    font-size: 56px;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+
+.tebuto-empty,
+.tebuto-error {
+    padding: 16px;
+    margin: 0;
+    color: var(--tebuto-text-secondary);
+}
+
+.tebuto-error,
+.tebuto-error-message {
+    color: #991b1b;
+    padding: 16px 20px;
+    background: var(--tebuto-danger-subtle);
+    border-radius: var(--tebuto-radius-sm);
+    font-size: 14px;
+    border-left: 8px solid var(--tebuto-danger);
+}
+
+.tebuto-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+}
+
+.tebuto-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--tebuto-border);
+    border-top-color: var(--tebuto-primary-brand);
+    border-radius: 50%;
+    animation: tebuto-spin 0.8s linear infinite;
+}
+
+@keyframes tebuto-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==========================================================================
+   Forms
+   ========================================================================== */
+
+.tebuto-category-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.tebuto-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.tebuto-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tebuto-form-group label {
+    font-weight: 600;
+    color: var(--tebuto-text);
+    font-size: 13px;
+}
+
+.tebuto-form-group input[type="text"],
+.tebuto-form-group input[type="number"],
+.tebuto-form-group input[type="email"],
+.tebuto-form-group textarea,
+.tebuto-form-group select {
+    padding: 12px 16px;
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius-xs);
+    font-size: 14px;
+    transition: border-color var(--tebuto-transition), box-shadow var(--tebuto-transition);
+    background: var(--tebuto-white);
+}
+
+.tebuto-form-group input:focus,
+.tebuto-form-group textarea:focus,
+.tebuto-form-group select:focus {
+    border-color: var(--tebuto-primary-brand);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--tebuto-primary-subtle);
+}
+
+.tebuto-form-group input[type="color"] {
+    width: 100%;
+    height: 48px;
+    padding: 6px;
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius-xs);
+    cursor: pointer;
+}
+
+.tebuto-form-group .description {
+    font-size: 12px;
+    color: var(--tebuto-text-muted);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.tebuto-form-actions {
+    display: flex;
+    gap: 12px;
+    padding-top: 12px;
+}
+
+.tebuto-settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.tebuto-intro-text {
+    margin: 0;
+    color: var(--tebuto-text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.tebuto-field-hint {
+    font-size: 11px;
+    color: var(--tebuto-text-muted);
+    font-style: italic;
+}
+
+.tebuto-color-input {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius-xs);
+    overflow: hidden;
+    background: var(--tebuto-white);
+    transition: border-color var(--tebuto-transition), box-shadow var(--tebuto-transition);
+    width: fit-content;
+}
+
+.tebuto-color-input:focus-within {
+    border-color: var(--tebuto-primary-brand);
+    box-shadow: 0 0 0 3px var(--tebuto-primary-subtle);
+}
+
+.tebuto-color-input input[type="color"] {
+    width: 38px;
+    height: 38px;
+    padding: 4px;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+    flex-shrink: 0;
+}
+
+.tebuto-color-input input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 2px;
+}
+
+.tebuto-color-input input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+
+.tebuto-color-hex {
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+    height: 38px;
+    border: none;
+    border-left: 1px solid var(--tebuto-border);
+    border-radius: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+    text-transform: uppercase;
+    padding: 0 10px;
+    background: var(--tebuto-white);
+    box-sizing: border-box;
+    line-height: 38px;
+}
+
+.tebuto-color-hex:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.tebuto-input-suffix {
+    display: flex;
+    align-items: stretch;
+}
+
+.tebuto-input-suffix input {
+    flex: 1;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+}
+
+.tebuto-input-suffix .tebuto-suffix {
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    background: var(--tebuto-bg);
+    border: 1px solid var(--tebuto-border);
+    border-left: none;
+    border-top-right-radius: var(--tebuto-radius-xs);
+    border-bottom-right-radius: var(--tebuto-radius-xs);
+    color: var(--tebuto-text-secondary);
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.tebuto-outage-fee-options {
+    padding-top: 0;
+}
+
+/* ==========================================================================
+   Switch
+   ========================================================================== */
+
+.tebuto-switch-option {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    background: var(--tebuto-bg);
+    border-radius: var(--tebuto-radius-sm);
+    border: 1px solid var(--tebuto-border-light);
+    margin-bottom: 12px;
+}
+
+.tebuto-switch-option:last-child {
+    margin-bottom: 0;
+}
+
+.tebuto-switch-option-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.tebuto-switch-option-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--tebuto-text);
+}
+
+.tebuto-switch-option-desc {
+    font-size: 12px;
+    color: var(--tebuto-text-secondary);
+    line-height: 1.4;
+}
+
+.tebuto-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.tebuto-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.tebuto-switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--tebuto-border-secondary);
+    transition: var(--tebuto-transition);
+    border-radius: 24px;
+}
+
+.tebuto-switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: var(--tebuto-white);
+    transition: var(--tebuto-transition);
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.tebuto-switch input:checked + .tebuto-switch-slider {
+    background-color: var(--tebuto-primary-brand);
+}
+
+.tebuto-switch input:checked + .tebuto-switch-slider:before {
+    transform: translateX(20px);
+}
+
+.tebuto-switch-disabled .tebuto-switch-slider,
+.tebuto-switch input:disabled + .tebuto-switch-slider {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* ==========================================================================
+   Bookings Filters Panel
+   ========================================================================== */
+
+.tebuto-filters-panel {
+    background: var(--tebuto-white);
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius);
+    box-shadow: var(--tebuto-shadow);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.tebuto-filters-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.tebuto-filter-section {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--tebuto-border-light);
+}
+
+.tebuto-filter-section:last-of-type {
+    border-bottom: none;
+}
+
+.tebuto-filter-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--tebuto-text-secondary);
+}
+
+.tebuto-filter-section-header .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--tebuto-primary-brand);
+}
+
+.tebuto-date-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.tebuto-date-preset {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--tebuto-bg);
+    border: 1px solid var(--tebuto-border);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--tebuto-text-secondary);
+    cursor: pointer;
+    transition: all var(--tebuto-transition);
+}
+
+.tebuto-date-preset:hover {
+    background: var(--tebuto-primary-subtle);
+    border-color: var(--tebuto-primary-brand);
+    color: var(--tebuto-primary-brand);
+}
+
+.tebuto-date-preset.active {
+    background: var(--tebuto-primary-brand);
+    border-color: var(--tebuto-primary-brand);
+    color: var(--tebuto-white);
+}
+
+.tebuto-date-preset .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+.tebuto-date-range {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.tebuto-date-input-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tebuto-date-input-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--tebuto-text-secondary);
+}
+
+.tebuto-date-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.tebuto-date-input-wrapper .dashicons {
+    position: absolute;
+    left: 12px;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--tebuto-text-muted);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.tebuto-date-input-wrapper input[type="date"] {
+    width: 100%;
+    padding: 12px 14px 12px 38px;
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--tebuto-text);
+    background: var(--tebuto-white);
+    transition: all var(--tebuto-transition);
+}
+
+.tebuto-date-input-wrapper input[type="date"]:hover {
+    border-color: var(--tebuto-primary-brand);
+}
+
+.tebuto-date-input-wrapper input[type="date"]:focus {
+    outline: none;
+    border-color: var(--tebuto-primary-brand);
+    box-shadow: 0 0 0 3px var(--tebuto-primary-subtle);
+}
+
+.tebuto-date-range-separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 10px;
+    color: var(--tebuto-text-muted);
+}
+
+.tebuto-date-range-separator .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.tebuto-status-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tebuto-status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--tebuto-bg);
+    border: 2px solid transparent;
+    border-radius: var(--tebuto-radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--tebuto-text-secondary);
+    cursor: pointer;
+    transition: all var(--tebuto-transition);
+    user-select: none;
+}
+
+.tebuto-status-chip input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.tebuto-status-chip-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.4;
+    transition: all var(--tebuto-transition);
+}
+
+.tebuto-status-chip:hover {
+    border-color: var(--tebuto-border);
+    background: var(--tebuto-white);
+}
+
+.tebuto-status-chip.active {
+    border-color: currentColor;
+    background: var(--tebuto-white);
+    box-shadow: var(--tebuto-shadow);
+}
+
+.tebuto-status-chip.active .tebuto-status-chip-dot {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.tebuto-status-chip-default {
+    color: var(--tebuto-text-secondary);
+}
+
+.tebuto-status-chip-default.active {
+    border-color: var(--tebuto-text-secondary);
+}
+
+.tebuto-status-chip-warning {
+    color: var(--tebuto-warning);
+}
+
+.tebuto-status-chip-warning.active {
+    background: var(--tebuto-warning-subtle);
+}
+
+.tebuto-status-chip-success {
+    color: var(--tebuto-success);
+}
+
+.tebuto-status-chip-success.active {
+    background: var(--tebuto-success-subtle);
+}
+
+.tebuto-status-chip-danger {
+    color: var(--tebuto-danger);
+}
+
+.tebuto-status-chip-danger.active {
+    background: var(--tebuto-danger-subtle);
+}
+
+.tebuto-status-chip-muted {
+    color: var(--tebuto-foreground-tertiary);
+}
+
+.tebuto-status-chip-muted.active {
+    background: var(--tebuto-surface);
+}
+
+.tebuto-filter-actions-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    background: var(--tebuto-bg);
+    border-top: 1px solid var(--tebuto-border-light);
+}
+
+.tebuto-filter-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--tebuto-primary-brand);
+    border: none;
+    border-radius: var(--tebuto-radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--tebuto-white);
+    cursor: pointer;
+    transition: all var(--tebuto-transition);
+    box-shadow: 0 2px 4px rgba(0, 144, 135, 0.25);
+}
+
+.tebuto-filter-submit:hover {
+    background: var(--tebuto-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 144, 135, 0.35);
+}
+
+.tebuto-filter-submit:active {
+    transform: translateY(0);
+}
+
+.tebuto-filter-submit .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.tebuto-filter-reset {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 20px;
+    background: transparent;
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--tebuto-text-secondary);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--tebuto-transition);
+}
+
+.tebuto-filter-reset:hover {
+    background: var(--tebuto-white);
+    border-color: var(--tebuto-text-secondary);
+    color: var(--tebuto-text);
+}
+
+.tebuto-filter-reset .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* ==========================================================================
+   Modal
+   ========================================================================== */
+
+.tebuto-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100000;
+    padding: 20px;
+}
+
+.tebuto-modal-content {
+    background: var(--tebuto-white);
+    border-radius: var(--tebuto-radius);
+    width: 100%;
+    max-width: 520px;
+    max-height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--tebuto-shadow-lg);
+    overflow: hidden;
+}
+
+.tebuto-modal-lg {
+    max-width: 640px;
+}
+
+.tebuto-modal-content form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.tebuto-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--tebuto-border);
+    flex-shrink: 0;
+}
+
+.tebuto-modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--tebuto-text);
+}
+
+.tebuto-modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px;
+    color: var(--tebuto-text-muted);
+    transition: color var(--tebuto-transition);
+    border-radius: var(--tebuto-radius-xs);
+}
+
+.tebuto-modal-close:hover {
+    color: var(--tebuto-text);
+    background: var(--tebuto-bg);
+}
+
+.tebuto-modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+.tebuto-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 24px;
+    border-top: 1px solid var(--tebuto-border);
+    background: var(--tebuto-bg);
+    flex-shrink: 0;
+}
+
+.tebuto-modal-details p {
+    margin: 0 0 16px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.tebuto-modal-details p:last-child {
+    margin-bottom: 0;
+}
+
+.tebuto-booking-details h4 {
+    margin: 0 0 16px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--tebuto-primary-brand);
+    border-bottom: 1px solid var(--tebuto-border);
+    padding-bottom: 12px;
+}
+
+.tebuto-detail-section {
+    margin-bottom: 24px;
+}
+
+.tebuto-detail-section:last-child {
+    margin-bottom: 0;
+}
+
+.tebuto-detail-section p {
+    margin: 0 0 10px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.tebuto-modal-section {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--tebuto-border-light);
+}
+
+.tebuto-modal-section:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.tebuto-modal-section h4 {
+    margin: 0 0 16px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--tebuto-text-secondary);
+}
+
+.tebuto-modal-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.tebuto-modal-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+}
+
+.tebuto-modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tebuto-modal-field-grow {
+    flex: 1;
+    min-width: 0;
+}
+
+.tebuto-modal-field-auto {
+    flex: 0 0 auto;
+}
+
+.tebuto-modal-field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--tebuto-text);
+}
+
+.tebuto-modal-field input[type="text"],
+.tebuto-modal-field input[type="number"],
+.tebuto-modal-field textarea,
+.tebuto-modal-field select {
+    padding: 10px 12px;
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius-xs);
+    font-size: 14px;
+    background: var(--tebuto-white);
+    transition: border-color var(--tebuto-transition), box-shadow var(--tebuto-transition);
+}
+
+.tebuto-modal-field input:focus,
+.tebuto-modal-field textarea:focus,
+.tebuto-modal-field select:focus {
+    border-color: var(--tebuto-primary-brand);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--tebuto-primary-subtle);
+}
+
+.tebuto-modal-field input[readonly] {
+    background: var(--tebuto-bg);
+    color: var(--tebuto-text-secondary);
+    cursor: not-allowed;
+}
+
+.tebuto-modal-field textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.tebuto-modal-field-checkbox {
+    padding: 12px 16px;
+    background: var(--tebuto-bg);
+    border-radius: var(--tebuto-radius-sm);
+    border: 1px solid var(--tebuto-border-light);
+}
+
+.tebuto-checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.tebuto-checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    flex-shrink: 0;
+    accent-color: var(--tebuto-primary-brand);
+}
+
+.tebuto-checkbox-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.tebuto-checkbox-text strong {
+    font-size: 14px;
+    color: var(--tebuto-text);
+}
+
+.tebuto-checkbox-text span {
+    font-size: 12px;
+    color: var(--tebuto-text-secondary);
+}
+
+/* ==========================================================================
+   Shortcode Box
+   ========================================================================== */
+
+.tebuto-shortcode-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: var(--tebuto-bg-dark);
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius-sm);
+    margin: 16px 0;
+}
+
+.tebuto-shortcode-box code,
+.tebuto-shortcode-code {
+    flex: 1;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 14px;
+    color: var(--tebuto-text);
+    background: none;
+    padding: 0;
+}
+
+.tebuto-shortcode-code {
+    display: block;
+    word-break: break-all;
+    white-space: pre-wrap;
+    max-height: 120px;
+    overflow-y: auto;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.tebuto-shortcode-box .button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.tebuto-shortcode-box .button .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.tebuto-shortcode-box .button.tebuto-copied {
+    background: var(--tebuto-success);
+    border-color: var(--tebuto-success);
+    color: var(--tebuto-white);
+}
+
+/* ==========================================================================
+   Responsive (components)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .tebuto-date-range {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .tebuto-date-range-separator {
+        display: none;
+    }
+
+    .tebuto-date-presets {
+        gap: 6px;
+    }
+
+    .tebuto-date-preset {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .tebuto-status-chips {
+        gap: 8px;
+    }
+
+    .tebuto-status-chip {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .tebuto-filter-actions-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tebuto-filter-submit,
+    .tebuto-filter-reset {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 600px) {
+    .tebuto-modal-row {
+        flex-direction: column;
+    }
+
+    .tebuto-modal-row-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .tebuto-modal-field-auto {
+        width: 100%;
+    }
+
+    .tebuto-color-input {
+        width: 100%;
+    }
+
+    .tebuto-color-hex {
+        flex: 1;
+        max-width: none;
+    }
+}
+
+@media (max-width: 782px) {
+    .tebuto-admin-wrap {
+        margin: 16px 16px 32px 2px;
+    }
+
+    .tebuto-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .tebuto-header h1 {
+        font-size: 24px;
+    }
+
+    .tebuto-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tebuto-stat-card {
+        padding: 20px;
+    }
+
+    .tebuto-form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .tebuto-action-buttons {
+        flex-direction: column;
+    }
+
+    .tebuto-modal-content {
+        width: 100%;
+        max-height: calc(100vh - 40px);
+    }
+}

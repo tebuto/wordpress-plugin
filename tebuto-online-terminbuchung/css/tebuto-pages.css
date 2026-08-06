@@ -1,0 +1,419 @@
+/**
+ * Tebuto page-specific layouts and full-height admin shell.
+ *
+ * @package Tebuto
+ */
+
+/* ==========================================================================
+   Full-height shell — keyed off body.tebuto-fullheight
+   ========================================================================== */
+
+@media (min-width: 783px) {
+    body.tebuto-fullheight {
+        overflow: hidden;
+    }
+
+    body.tebuto-fullheight #wpfooter {
+        display: none;
+    }
+
+    body.tebuto-fullheight #wpcontent,
+    body.tebuto-fullheight #wpbody {
+        height: calc(100vh - 32px);
+        overflow: hidden;
+        box-sizing: border-box;
+    }
+
+    body.tebuto-fullheight #wpbody-content {
+        display: flex;
+        flex-direction: column;
+        float: none;
+        width: auto;
+        box-sizing: border-box;
+        height: 100%;
+        max-height: 100%;
+        padding-bottom: 16px;
+        overflow: hidden;
+    }
+
+    body.tebuto-fullheight #wpbody-content > .notice,
+    body.tebuto-fullheight #wpbody-content > .updated,
+    body.tebuto-fullheight #wpbody-content > .error {
+        flex-shrink: 0;
+    }
+
+    body.tebuto-fullheight .tebuto-admin-wrap {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+        height: auto;
+        margin-top: 16px;
+        margin-bottom: 0;
+        overflow: hidden;
+        box-sizing: border-box;
+    }
+
+    body.tebuto-fullheight .tebuto-admin-wrap > .tebuto-header {
+        flex-shrink: 0;
+    }
+
+    /* Dashboard: stats fixed, cards fill remaining height and scroll inside */
+    body.tebuto-fullheight .tebuto-page-dashboard .tebuto-stats-grid {
+        flex-shrink: 0;
+    }
+
+    body.tebuto-fullheight .tebuto-page-dashboard .tebuto-dashboard-grid {
+        display: grid;
+        flex: 1 1 auto;
+        min-height: 0;
+        align-items: stretch;
+        grid-template-rows: minmax(0, 1fr);
+        overflow: hidden;
+    }
+
+    body.tebuto-fullheight .tebuto-page-dashboard .tebuto-dashboard-grid > .tebuto-card {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        height: 100%;
+        max-height: 100%;
+        overflow: hidden;
+    }
+
+    body.tebuto-fullheight .tebuto-page-dashboard .tebuto-dashboard-grid .tebuto-card-header {
+        flex-shrink: 0;
+    }
+
+    body.tebuto-fullheight .tebuto-page-dashboard .tebuto-dashboard-grid .tebuto-card-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    /* Categories / bookings: sticky thead table scroll */
+    body.tebuto-fullheight .tebuto-page-categories > .tebuto-card,
+    body.tebuto-fullheight .tebuto-page-bookings > .tebuto-card {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    body.tebuto-fullheight .tebuto-page-bookings > .tebuto-filters-panel {
+        flex-shrink: 0;
+    }
+
+    body.tebuto-fullheight .tebuto-page-categories .tebuto-table-responsive,
+    body.tebuto-fullheight .tebuto-page-bookings .tebuto-table-responsive {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        margin: 0;
+        padding: 0;
+    }
+
+    body.tebuto-fullheight .tebuto-page-categories .tebuto-table thead th,
+    body.tebuto-fullheight .tebuto-page-bookings .tebuto-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    /* Shortcode: settings column scrolls, preview pinned */
+    body.tebuto-fullheight .tebuto-page-shortcode .tebuto-widget-editor-layout {
+        flex: 1;
+        min-height: 0;
+        align-items: stretch;
+        overflow: hidden;
+    }
+
+    body.tebuto-fullheight .tebuto-page-shortcode .tebuto-widget-settings-column {
+        min-height: 0;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    body.tebuto-fullheight .tebuto-page-shortcode .tebuto-widget-preview-column {
+        position: static;
+        top: auto;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    body.tebuto-fullheight .tebuto-page-shortcode .tebuto-widget-preview-column > .tebuto-card {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    body.tebuto-fullheight .tebuto-page-shortcode #tebuto-widget-preview-container {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+    }
+
+    body.tebuto-fullheight .tebuto-page-shortcode #tebuto-widget-settings-form {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    body.tebuto-fullheight .tebuto-page-shortcode .tebuto-widget-settings-app,
+    body.tebuto-fullheight .tebuto-page-shortcode .tebuto-widget-settings-layout {
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    body.tebuto-fullheight .tebuto-page-shortcode .tebuto-widget-settings-controls {
+        min-height: 0;
+        overflow-y: auto;
+    }
+
+    body.tebuto-fullheight .tebuto-page-shortcode .tebuto-widget-settings-preview {
+        min-height: 0;
+        overflow: auto;
+    }
+
+    body.tebuto-fullheight .tebuto-page-shortcode .tebuto-form-actions {
+        flex-shrink: 0;
+        padding-top: 12px;
+    }
+}
+
+/* ==========================================================================
+   Dashboard
+   ========================================================================== */
+
+.tebuto-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+@media (max-width: 1200px) {
+    .tebuto-dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 783px) and (max-width: 1200px) {
+    body.tebuto-fullheight .tebuto-page-dashboard .tebuto-dashboard-grid {
+        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    }
+}
+
+/* ==========================================================================
+   Shortcode / Widget Editor
+   ========================================================================== */
+
+.tebuto-widget-editor-layout {
+    display: grid;
+    grid-template-columns: minmax(380px, 480px) 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+@media (max-width: 1200px) {
+    .tebuto-widget-editor-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .tebuto-widget-preview-column {
+        order: -1;
+    }
+}
+
+.tebuto-widget-settings-column {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.tebuto-widget-preview-column {
+    position: sticky;
+    top: 32px;
+}
+
+.tebuto-preview-header {
+    margin-bottom: 16px;
+}
+
+.tebuto-preview-header h2 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--tebuto-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#tebuto-widget-preview-container {
+    min-height: 500px;
+}
+
+#tebuto-widget-preview-container #tebuto-booking-widget {
+    max-width: 100%;
+}
+
+.tebuto-form-section {
+    margin-bottom: 28px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--tebuto-border-light);
+}
+
+.tebuto-form-section:last-of-type {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.tebuto-form-section-title {
+    margin: 0 0 16px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--tebuto-text);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tebuto-theme-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tebuto-preset-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--tebuto-bg);
+    border: 2px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius-sm);
+    cursor: pointer;
+    transition: all var(--tebuto-transition);
+}
+
+.tebuto-preset-btn:hover {
+    border-color: var(--tebuto-primary-brand);
+    background: var(--tebuto-white);
+}
+
+.tebuto-preset-btn.active {
+    border-color: var(--tebuto-primary-brand);
+    background: var(--tebuto-primary-subtle);
+}
+
+.tebuto-preset-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.tebuto-preset-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--tebuto-text);
+}
+
+.tebuto-color-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+@media (max-width: 500px) {
+    .tebuto-color-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.tebuto-color-grid .tebuto-form-group {
+    margin-bottom: 0;
+}
+
+.tebuto-category-selection-first-option {
+    margin-bottom: 16px;
+}
+
+.tebuto-categories-multiselect {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid var(--tebuto-border);
+    border-radius: var(--tebuto-radius-sm);
+    background: var(--tebuto-white);
+}
+
+.tebuto-loading-categories {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px;
+    color: var(--tebuto-text-secondary);
+}
+
+.tebuto-loading-categories .spinner {
+    float: none;
+    margin: 0;
+}
+
+.tebuto-category-checkboxes {
+    padding: 8px 0;
+}
+
+.tebuto-category-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background var(--tebuto-transition);
+}
+
+.tebuto-category-checkbox:hover {
+    background: var(--tebuto-bg);
+}
+
+.tebuto-category-checkbox--unavailable {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.tebuto-category-checkbox--unavailable:hover {
+    background: transparent;
+}
+
+.tebuto-category-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.tebuto-category-checkbox .tebuto-category-name {
+    font-size: 14px;
+    color: var(--tebuto-text);
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    font-weight: 400;
+}
+
+#custom_css {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    resize: vertical;
+}

@@ -27,19 +27,32 @@ function tebuto_categories_page(): void {
 	}
 
 	?>
-	<div class="wrap tebuto-admin-wrap tebuto-page-categories">
-		<div class="tebuto-header">
-			<h1><?php esc_html_e( 'Terminkategorien', 'tebuto-online-terminbuchung' ); ?></h1>
-			<div class="tebuto-header-actions">
-				<button type="button" class="button button-primary" id="tebuto-add-category-btn">
-					<span class="dashicons dashicons-plus-alt2"></span>
-					<?php esc_html_e( 'Neue Kategorie', 'tebuto-online-terminbuchung' ); ?>
-				</button>
-				<a href="<?php echo esc_url( admin_url( 'admin.php?page=tebuto-main' ) ); ?>" class="button">
-					<?php esc_html_e( '← Dashboard', 'tebuto-online-terminbuchung' ); ?>
-				</a>
-			</div>
-		</div>
+	<?php
+	tebuto_ui_page_open(
+		array(
+			'title'        => __( 'Terminkategorien', 'tebuto-online-terminbuchung' ),
+			'page_class'   => 'tebuto-page-categories',
+			'fullheight'   => true,
+			'actions_html' => tebuto_ui_button(
+				array(
+					'label'   => __( 'Neue Kategorie', 'tebuto-online-terminbuchung' ),
+					'type'    => 'button',
+					'variant' => 'solid',
+					'color'   => 'primary',
+					'icon'    => 'dashicons-plus-alt2',
+					'attrs'   => array( 'id' => 'tebuto-add-category-btn' ),
+				)
+			) . tebuto_ui_button(
+				array(
+					'label'   => __( '← Dashboard', 'tebuto-online-terminbuchung' ),
+					'href'    => admin_url( 'admin.php?page=tebuto-main' ),
+					'variant' => 'outline',
+					'color'   => 'neutral',
+				)
+			),
+		)
+	);
+	?>
 
 		<!-- Categories Table -->
 		<div class="tebuto-card">
@@ -109,7 +122,7 @@ function tebuto_categories_page(): void {
 												<?php wp_nonce_field( 'tebuto_category_action', 'tebuto_category_nonce' ); ?>
 												<input type="hidden" name="tebuto_action" value="delete_category">
 												<input type="hidden" name="category_id" value="<?php echo esc_attr( $category['id'] ); ?>">
-												<button type="submit" class="button button-small tebuto-btn-danger">
+												<button type="submit" class="button button-small tebuto-btn tebuto-btn--solid tebuto-btn--danger tebuto-btn--sm">
 													<?php esc_html_e( 'Löschen', 'tebuto-online-terminbuchung' ); ?>
 												</button>
 											</form>
@@ -258,7 +271,9 @@ function tebuto_categories_page(): void {
 				</form>
 			</div>
 		</div>
-	</div>
+	<?php
+	tebuto_ui_page_close();
+	?>
 
 	<script>
 	jQuery(document).ready(function($) {
@@ -562,24 +577,4 @@ function tebuto_get_category_form_data( bool $is_update = false ) {
 	}
 
 	return $data;
-}
-
-/**
- * Add an admin notice to be displayed.
- *
- * @param string $message Notice message.
- * @param string $type    Notice type (success, error, warning, info).
- * @return void
- */
-function tebuto_admin_notice( string $message, string $type = 'info' ): void {
-	add_action(
-		'admin_notices',
-		function () use ( $message, $type ) {
-			?>
-		<div class="notice notice-<?php echo esc_attr( $type ); ?> is-dismissible">
-			<p><?php echo esc_html( $message ); ?></p>
-		</div>
-			<?php
-		}
-	);
 }

@@ -1,16 +1,3 @@
-// Tebuto Block Editor Styles
-
-.tebuto-divider {
-	margin: 16px 0;
-	border: none;
-	border-top: 1px solid #e0e0e0;
-}
-
-.tebuto-block-editor {
-	// Clean preview - no extra styling
-}
-
-// Preview container - clean, no borders
 .tebuto-block-preview {
 	min-height: 200px;
 
@@ -20,85 +7,12 @@
 	}
 }
 
-// Notice when not connected or session expired
-.tebuto-block-notice {
-	text-align: center;
-	padding: 40px 24px;
-	background: #fef3c7;
-	border: 1px solid #f59e0b;
-	border-radius: 8px;
-
-	p {
-		margin: 0 0 12px 0;
-		color: #92400e;
-
-		&:first-child {
-			font-size: 16px;
-		}
-
-		&:last-of-type {
-			margin-bottom: 16px;
-		}
-	}
-}
-
-.tebuto-block-notice-expired {
-	background: #fff7ed;
-	border-color: #fb923c;
-
-	p {
-		color: #9a3412;
-	}
-}
-
-// Inspector Controls Styles
-.tebuto-preset-buttons {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 8px;
-}
-
-.tebuto-preset-button {
-	display: inline-flex !important;
-	align-items: center;
-	gap: 8px;
-	padding: 8px 12px !important;
-	height: auto !important;
-}
-
-.tebuto-preset-color-dot {
-	width: 16px;
-	height: 16px;
-	border-radius: 50%;
-	flex-shrink: 0;
-	box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
-}
-
-.tebuto-color-control {
-	margin-bottom: 16px;
-}
-
-.tebuto-color-label {
-	display: block;
-	font-weight: 600;
-	font-size: 13px;
-	margin-bottom: 4px;
-}
-
-.tebuto-color-description {
-	font-size: 12px;
-	color: #757575;
-	margin: 0 0 8px 0;
-}
-
-// Panel description
 .tebuto-panel-description {
 	font-size: 12px;
 	color: #757575;
-	margin: 0 0 16px 0;
+	margin: 0 0 16px;
 }
 
-// Category list
 .tebuto-category-list {
 	max-height: 300px;
 	overflow-y: auto;
@@ -151,7 +65,6 @@
 	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
-// Loading state
 .tebuto-loading {
 	display: flex;
 	align-items: center;
@@ -160,7 +73,6 @@
 	color: #757575;
 }
 
-// Empty state
 .tebuto-empty {
 	padding: 16px;
 	color: #757575;
@@ -168,19 +80,36 @@
 	text-align: center;
 }
 
-// Error state
-.tebuto-error {
-	padding: 12px;
-	color: #dc2626;
-	background: #fef2f2;
-	border-radius: 4px;
-	margin: 0;
-	font-size: 13px;
-}
-
-// Custom CSS textarea
 .tebuto-css-textarea textarea {
-	font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace !important;
+	font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace !important;
 	font-size: 12px !important;
 	line-height: 1.5 !important;
+}
+
+.tebuto-widget-settings-layout {
+	display: grid;
+	grid-template-columns: minmax(280px, 420px) minmax(0, 1fr);
+	gap: 24px;
+	align-items: start;
+}
+
+.tebuto-widget-settings-controls {
+	.components-panel__body {
+		border: 1px solid #dcdcde;
+		margin-bottom: 12px;
+		background: #fff;
+	}
+}
+
+.tebuto-widget-settings-preview {
+	min-height: 320px;
+	border: 1px solid #dcdcde;
+	background: #fff;
+	padding: 16px;
+}
+
+@media (max-width: 960px) {
+	.tebuto-widget-settings-layout {
+		grid-template-columns: 1fr;
+	}
 }

@@ -52,13 +52,23 @@ function tebuto_bookings_page(): void {
 	$now = time();
 
 	?>
-	<div class="wrap tebuto-admin-wrap">
-		<div class="tebuto-header">
-			<h1><?php esc_html_e( 'Buchungen', 'tebuto-online-terminbuchung' ); ?></h1>
-			<a href="<?php echo esc_url( admin_url( 'admin.php?page=tebuto-main' ) ); ?>" class="button">
-				<?php esc_html_e( '← Dashboard', 'tebuto-online-terminbuchung' ); ?>
-			</a>
-		</div>
+	<?php
+	tebuto_ui_page_open(
+		array(
+			'title'        => __( 'Buchungen', 'tebuto-online-terminbuchung' ),
+			'page_class'   => 'tebuto-page-bookings',
+			'fullheight'   => true,
+			'actions_html' => tebuto_ui_button(
+				array(
+					'label'   => __( '← Dashboard', 'tebuto-online-terminbuchung' ),
+					'href'    => admin_url( 'admin.php?page=tebuto-main' ),
+					'variant' => 'outline',
+					'color'   => 'neutral',
+				)
+			),
+		)
+	);
+	?>
 
 		<!-- Filters -->
 		<div class="tebuto-filters-panel">
@@ -376,15 +386,36 @@ function tebuto_bookings_page(): void {
 					<button type="button" class="tebuto-modal-close">&times;</button>
 				</div>
 				<div class="tebuto-modal-body" id="tebuto-booking-modal-body">
-					<!-- Filled by JavaScript -->
 				</div>
 				<div class="tebuto-modal-footer">
 					<button type="button" class="button tebuto-modal-close-btn"><?php esc_html_e( 'Schließen', 'tebuto-online-terminbuchung' ); ?></button>
 				</div>
 			</div>
 		</div>
-	</div>
+	<template id="tebuto-booking-details-template">
+		<div class="tebuto-booking-details">
+			<div class="tebuto-detail-section" data-section="client">
+				<h4 data-label="clientInfo"></h4>
+				<p><strong data-label="name"></strong> <span data-field="clientName"></span></p>
+				<p><strong data-label="phone"></strong> <span data-field="clientPhone"></span></p>
+				<p data-field-row="email"><strong>E-Mail:</strong> <span data-field="clientEmail"></span></p>
+			</div>
+			<div class="tebuto-detail-section" data-section="appointment">
+				<h4 data-label="appointmentInfo"></h4>
+				<p><strong data-label="category"></strong> <span data-field="category"></span></p>
+				<p><strong data-label="date"></strong> <span data-field="date"></span></p>
+				<p><strong data-label="time"></strong> <span data-field="time"></span></p>
+				<p><strong data-label="location"></strong> <span data-field="location"></span></p>
+			</div>
+			<div class="tebuto-detail-section" data-section="booking">
+				<h4 data-label="bookingInfo"></h4>
+				<p><strong data-label="bookedOn"></strong> <span data-field="bookedOn"></span></p>
+				<p><strong data-label="price"></strong> <span data-field="price"></span></p>
+			</div>
+		</div>
+	</template>
 	<?php
+	tebuto_ui_page_close();
 }
 
 /**

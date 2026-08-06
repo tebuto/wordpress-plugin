@@ -33,7 +33,7 @@ get_header_version() {
 }
 
 get_constant_version() {
-	perl -ne "print \$1 if /define\\('TEBUTO_VERSION', '([0-9]+\\.[0-9]+\\.[0-9]+)'\\)/" "$PLUGIN_FILE"
+	perl -ne "print \$1 if /define\\(\\s*'TEBUTO_VERSION'\\s*,\\s*'([0-9]+\\.[0-9]+\\.[0-9]+)'\\s*\\)/" "$PLUGIN_FILE"
 }
 
 get_stable_tag() {
@@ -96,7 +96,7 @@ update_plugin_file() {
 	local new_version="$1"
 
 	perl -pi -e "s/(\* Version:\s*)[0-9]+\.[0-9]+\.[0-9]+/\${1}$new_version/" "$PLUGIN_FILE"
-	perl -pi -e "s/(define\\('TEBUTO_VERSION', ')[0-9]+\.[0-9]+\.[0-9]+(')/\${1}$new_version\${2}/" "$PLUGIN_FILE"
+	perl -pi -e "s/(define\\(\\s*'TEBUTO_VERSION'\\s*,\\s*')[0-9]+\.[0-9]+\.[0-9]+(')/\${1}$new_version\${2}/" "$PLUGIN_FILE"
 }
 
 update_readme_file() {

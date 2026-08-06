@@ -46,36 +46,21 @@ function tebuto_widget_shortcode( $atts = array() ): string {
 		return '<!-- Tebuto: Not connected -->';
 	}
 
-	// Defaults from saved user meta (or hardcoded fallbacks)
-	$defaults = array(
-		'primary_color'                 => tebuto_get_user_meta( $current_user_id, 'primary_color', '#00B4A9' ),
-		'background_color'              => tebuto_get_user_meta( $current_user_id, 'background_color', '#ffffff' ),
-		'text_primary'                  => tebuto_get_user_meta( $current_user_id, 'text_primary', '#374151' ),
-		'text_secondary'                => tebuto_get_user_meta( $current_user_id, 'text_secondary', '#6b7280' ),
-		'border_color'                  => tebuto_get_user_meta( $current_user_id, 'border_color', '#E9E9E9' ),
-		'border'                        => tebuto_get_user_meta( $current_user_id, 'border', 'true' ),
-		'inherit_font'                  => tebuto_get_user_meta( $current_user_id, 'inherit_font', 'false' ),
-		'categories'                    => tebuto_get_user_meta( $current_user_id, 'categories', '' ),
-		'show_quick_filters'            => tebuto_get_user_meta( $current_user_id, 'show_quick_filters', 'false' ),
-		'show_provider_filter'          => tebuto_get_user_meta( $current_user_id, 'show_provider_filter', 'false' ),
-		'show_location_quick_filter'    => tebuto_get_user_meta( $current_user_id, 'show_location_quick_filter', 'false' ),
-		'show_category_selection_first' => tebuto_get_user_meta( $current_user_id, 'show_category_selection_first', 'true' ),
-		'custom_css'                    => tebuto_get_user_meta( $current_user_id, 'custom_css', '' ),
-	);
+	$theme_defaults = tebuto_widget_defaults( 'booking' );
+	$defaults       = tebuto_widget_settings_for_user( $current_user_id, 'booking' );
 
 	$parsed = shortcode_atts( $defaults, $atts, 'tebuto_online_terminbuchung_widget' );
 
-	// Sanitize values
 	$primary_color                 = sanitize_hex_color( $parsed['primary_color'] );
-	$primary_color                 = $primary_color ? $primary_color : '#00B4A9';
+	$primary_color                 = $primary_color ? $primary_color : $theme_defaults['primary_color'];
 	$background_color              = sanitize_hex_color( $parsed['background_color'] );
-	$background_color              = $background_color ? $background_color : '#ffffff';
+	$background_color              = $background_color ? $background_color : $theme_defaults['background_color'];
 	$text_primary                  = sanitize_hex_color( $parsed['text_primary'] );
-	$text_primary                  = $text_primary ? $text_primary : '#374151';
+	$text_primary                  = $text_primary ? $text_primary : $theme_defaults['text_primary'];
 	$text_secondary                = sanitize_hex_color( $parsed['text_secondary'] );
-	$text_secondary                = $text_secondary ? $text_secondary : '#6b7280';
+	$text_secondary                = $text_secondary ? $text_secondary : $theme_defaults['text_secondary'];
 	$border_color                  = sanitize_hex_color( $parsed['border_color'] );
-	$border_color                  = $border_color ? $border_color : '#E9E9E9';
+	$border_color                  = $border_color ? $border_color : $theme_defaults['border_color'];
 	$border                        = $parsed['border'] === 'true' ? 'true' : 'false';
 	$inherit_font                  = $parsed['inherit_font'] === 'true' ? 'true' : 'false';
 	$show_quick_filters            = $parsed['show_quick_filters'] === 'true' ? 'true' : 'false';
@@ -97,24 +82,23 @@ function tebuto_widget_shortcode( $atts = array() ): string {
 		'data-container-id'   => esc_attr( $widget_id ),
 	);
 
-	// Color attributes (only add if different from defaults to keep script tag cleaner)
-	if ( $primary_color !== '#00B4A9' ) {
+	if ( strcasecmp( $primary_color, $theme_defaults['primary_color'] ) !== 0 ) {
 		$widget_attrs['data-primary-color'] = esc_attr( $primary_color );
 	}
 
-	if ( $background_color !== '#ffffff' ) {
+	if ( strcasecmp( $background_color, $theme_defaults['background_color'] ) !== 0 ) {
 		$widget_attrs['data-background-color'] = esc_attr( $background_color );
 	}
 
-	if ( $text_primary !== '#374151' ) {
+	if ( strcasecmp( $text_primary, $theme_defaults['text_primary'] ) !== 0 ) {
 		$widget_attrs['data-text-primary'] = esc_attr( $text_primary );
 	}
 
-	if ( $text_secondary !== '#6b7280' ) {
+	if ( strcasecmp( $text_secondary, $theme_defaults['text_secondary'] ) !== 0 ) {
 		$widget_attrs['data-text-secondary'] = esc_attr( $text_secondary );
 	}
 
-	if ( $border_color !== '#E9E9E9' ) {
+	if ( strcasecmp( $border_color, $theme_defaults['border_color'] ) !== 0 ) {
 		$widget_attrs['data-border-color'] = esc_attr( $border_color );
 	}
 

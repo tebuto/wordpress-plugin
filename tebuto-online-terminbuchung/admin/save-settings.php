@@ -63,19 +63,19 @@ function tebuto_save_settings(): void {
 			);
 		}
 
-		// Sanitize and save color settings
-		$background_color = isset( $_POST['background_color'] ) ? sanitize_hex_color( wp_unslash( $_POST['background_color'] ) ) : '#ffffff';
-		$primary_color    = isset( $_POST['primary_color'] ) ? sanitize_hex_color( wp_unslash( $_POST['primary_color'] ) ) : '#00B4A9';
-		$text_primary     = isset( $_POST['text_primary'] ) ? sanitize_hex_color( wp_unslash( $_POST['text_primary'] ) ) : '#374151';
-		$text_secondary   = isset( $_POST['text_secondary'] ) ? sanitize_hex_color( wp_unslash( $_POST['text_secondary'] ) ) : '#6b7280';
-		$border_color     = isset( $_POST['border_color'] ) ? sanitize_hex_color( wp_unslash( $_POST['border_color'] ) ) : '#E9E9E9';
+		$theme_defaults = tebuto_widget_defaults( 'booking' );
 
-		// Use defaults if sanitization returns empty
-		$background_color = ! empty( $background_color ) ? $background_color : '#ffffff';
-		$primary_color    = ! empty( $primary_color ) ? $primary_color : '#00B4A9';
-		$text_primary     = ! empty( $text_primary ) ? $text_primary : '#374151';
-		$text_secondary   = ! empty( $text_secondary ) ? $text_secondary : '#6b7280';
-		$border_color     = ! empty( $border_color ) ? $border_color : '#E9E9E9';
+		$background_color = isset( $_POST['background_color'] ) ? sanitize_hex_color( wp_unslash( $_POST['background_color'] ) ) : $theme_defaults['background_color'];
+		$primary_color    = isset( $_POST['primary_color'] ) ? sanitize_hex_color( wp_unslash( $_POST['primary_color'] ) ) : $theme_defaults['primary_color'];
+		$text_primary     = isset( $_POST['text_primary'] ) ? sanitize_hex_color( wp_unslash( $_POST['text_primary'] ) ) : $theme_defaults['text_primary'];
+		$text_secondary   = isset( $_POST['text_secondary'] ) ? sanitize_hex_color( wp_unslash( $_POST['text_secondary'] ) ) : $theme_defaults['text_secondary'];
+		$border_color     = isset( $_POST['border_color'] ) ? sanitize_hex_color( wp_unslash( $_POST['border_color'] ) ) : $theme_defaults['border_color'];
+
+		$background_color = ! empty( $background_color ) ? $background_color : $theme_defaults['background_color'];
+		$primary_color    = ! empty( $primary_color ) ? $primary_color : $theme_defaults['primary_color'];
+		$text_primary     = ! empty( $text_primary ) ? $text_primary : $theme_defaults['text_primary'];
+		$text_secondary   = ! empty( $text_secondary ) ? $text_secondary : $theme_defaults['text_secondary'];
+		$border_color     = ! empty( $border_color ) ? $border_color : $theme_defaults['border_color'];
 
 		// Boolean settings
 		$border                        = isset( $_POST['border'] ) && $_POST['border'] === 'true' ? 'true' : 'false';
