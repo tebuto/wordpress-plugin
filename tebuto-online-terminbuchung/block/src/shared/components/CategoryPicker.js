@@ -1,5 +1,6 @@
-import { CheckboxControl, Notice, Spinner, ToggleControl } from '@wordpress/components'
+import { Notice, Spinner, ToggleControl } from '@wordpress/components'
 import { __ } from '@wordpress/i18n'
+import SelectableRow from './SelectableRow'
 
 export default function CategoryPicker({
 	categories,
@@ -55,34 +56,28 @@ export default function CategoryPicker({
 							const isSelectable = Boolean(cat.widgetSelectable ?? cat.publicBookingEnabled)
 
 							return (
-								<div
+								<SelectableRow
 									key={cat.id}
-									className={
-										isSelectable ? 'tebuto-category-item' : 'tebuto-category-item tebuto-category-item--unavailable'
+									checked={isSelectable && selected.includes(cat.id)}
+									disabled={!isSelectable}
+									onChange={() => onToggle(cat.id)}
+									leading={
+										<span
+											className="tebuto-category-color"
+											style={{
+												backgroundColor: cat.color
+											}}
+											aria-hidden="true"
+										/>
 									}
 								>
-									<CheckboxControl
-										label={
-											<span className="tebuto-category-label">
-												<span
-													className="tebuto-category-color"
-													style={{
-														backgroundColor: cat.color
-													}}
-												/>
-												{cat.name}
-												{!isSelectable && (
-													<span className="tebuto-category-unavailable-hint">
-														{__('Nicht öffentlich', 'tebuto-online-terminbuchung')}
-													</span>
-												)}
-											</span>
-										}
-										checked={isSelectable && selected.includes(cat.id)}
-										disabled={!isSelectable}
-										onChange={() => onToggle(cat.id)}
-									/>
-								</div>
+									<span className="tebuto-category-label-text">{cat.name}</span>
+									{!isSelectable && (
+										<span className="tebuto-category-unavailable-hint">
+											{__('Nicht öffentlich', 'tebuto-online-terminbuchung')}
+										</span>
+									)}
+								</SelectableRow>
 							)
 						})
 					)}

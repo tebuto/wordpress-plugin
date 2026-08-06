@@ -46,6 +46,8 @@ function tebuto_save_settings(): void {
 		tebuto_delete_user_meta( $current_user_id, 'show_location_quick_filter' );
 		tebuto_delete_user_meta( $current_user_id, 'show_category_selection_first' );
 		tebuto_delete_user_meta( $current_user_id, 'custom_css' );
+		tebuto_delete_user_meta( $current_user_id, 'seminars' );
+		tebuto_delete_user_meta( $current_user_id, 'show_list_first' );
 		tebuto_clear_seminars_feature_cache( $current_user_id );
 
 		wp_safe_redirect( admin_url( 'admin.php?page=tebuto-main&disconnected=1' ) );
@@ -84,6 +86,7 @@ function tebuto_save_settings(): void {
 		$show_provider_filter          = isset( $_POST['show_provider_filter'] ) && $_POST['show_provider_filter'] === 'true' ? 'true' : 'false';
 		$show_location_quick_filter    = isset( $_POST['show_location_quick_filter'] ) && $_POST['show_location_quick_filter'] === 'true' ? 'true' : 'false';
 		$show_category_selection_first = isset( $_POST['show_category_selection_first'] ) && $_POST['show_category_selection_first'] === 'true' ? 'true' : 'false';
+		$show_list_first               = isset( $_POST['show_list_first'] ) && $_POST['show_list_first'] === 'false' ? 'false' : 'true';
 		// Quick filters are enabled together with the provider filter (HTML widget configurator behavior).
 		$show_quick_filters = $show_provider_filter;
 
@@ -120,6 +123,13 @@ function tebuto_save_settings(): void {
 			}
 		}
 
+		$seminars = '';
+		if ( isset( $_POST['seminars'] ) && ! empty( $_POST['seminars'] ) ) {
+			$raw_seminars = sanitize_text_field( wp_unslash( $_POST['seminars'] ) );
+			$seminars     = preg_replace( '/[^a-zA-Z0-9_\-,]/', '', $raw_seminars );
+			$seminars     = preg_replace( '/,+/', ',', trim( $seminars, ',' ) );
+		}
+
 		// Custom CSS
 		$custom_css = '';
 		if ( isset( $_POST['custom_css'] ) ) {
@@ -140,6 +150,8 @@ function tebuto_save_settings(): void {
 		tebuto_update_user_meta( $current_user_id, 'show_provider_filter', $show_provider_filter );
 		tebuto_update_user_meta( $current_user_id, 'show_location_quick_filter', $show_location_quick_filter );
 		tebuto_update_user_meta( $current_user_id, 'show_category_selection_first', $show_category_selection_first );
+		tebuto_update_user_meta( $current_user_id, 'seminars', $seminars );
+		tebuto_update_user_meta( $current_user_id, 'show_list_first', $show_list_first );
 		tebuto_update_user_meta( $current_user_id, 'custom_css', $custom_css );
 
 		wp_safe_redirect( admin_url( 'admin.php?page=tebuto-shortcode&saved=1' ) );

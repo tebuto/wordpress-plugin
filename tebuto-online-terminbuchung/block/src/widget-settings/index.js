@@ -1,6 +1,6 @@
 import { createRoot, render } from '@wordpress/element'
 import { useCallback, useEffect, useState } from 'react'
-import { buildShortcode, camelToSnake } from '../shared/attributeMap'
+import { camelToSnake } from '../shared/attributeMap'
 import { getDefaults, getTebutoData } from '../shared/theme'
 import WidgetConfigurator from '../shared/WidgetConfigurator'
 import '../block/editor.scss'
@@ -17,8 +17,13 @@ const BOOLEAN_FIELDS = new Set([
 
 function readInitialAttributes() {
 	const settings = window.tebutoWidgetSettings || getTebutoData().defaultSettings || {}
-	const defaults = getDefaults()
-	return { ...defaults, ...settings }
+	const bookingDefaults = getDefaults('booking')
+	const seminarsDefaults = getDefaults('seminars')
+	return {
+		...bookingDefaults,
+		...seminarsDefaults,
+		...settings
+	}
 }
 
 function syncHiddenInputs(attributes) {
@@ -76,14 +81,10 @@ function syncHiddenInputs(attributes) {
 
 		input.value = value ?? ''
 	}
-
-	const shortcodeEl = document.getElementById('tebuto-shortcode')
-	if (shortcodeEl) {
-		shortcodeEl.textContent = buildShortcode(attributes)
-	}
 }
 
 function WidgetSettingsApp() {
+	const [variant, setVariant] = useState('booking')
 	const [attributes, setAttributesState] = useState(readInitialAttributes)
 
 	const setAttributes = useCallback((next) => {
@@ -94,7 +95,15 @@ function WidgetSettingsApp() {
 		syncHiddenInputs(attributes)
 	}, [attributes])
 
-	return <WidgetConfigurator variant="booking" surface="admin" attributes={attributes} setAttributes={setAttributes} />
+	return (
+		<WidgetConfigurator
+			variant={variant}
+			surface="admin"
+			attributes={attributes}
+			setAttributes={setAttributes}
+			onVariantChange={setVariant}
+		/>
+	)
 }
 
 const rootEl = document.getElementById('tebuto-widget-settings-app')

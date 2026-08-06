@@ -271,23 +271,27 @@ function tebuto_enqueue_widget_settings_assets(): void {
 		tebuto_get_localized_tebuto_data( get_current_user_id() )
 	);
 
-	$saved = tebuto_widget_settings_for_user( get_current_user_id(), 'booking' );
+	$user_id        = get_current_user_id();
+	$saved_booking  = tebuto_widget_settings_for_user( $user_id, 'booking' );
+	$saved_seminars = tebuto_widget_settings_for_user( $user_id, 'seminars' );
 	wp_localize_script(
 		'tebuto-widget-settings',
 		'tebutoWidgetSettings',
 		array(
-			'primaryColor'               => $saved['primary_color'],
-			'backgroundColor'            => $saved['background_color'],
-			'textPrimary'                => $saved['text_primary'],
-			'textSecondary'              => $saved['text_secondary'],
-			'borderColor'                => $saved['border_color'],
-			'border'                     => $saved['border'] === 'true',
-			'inheritFont'                => $saved['inherit_font'] === 'true',
-			'showProviderFilter'         => $saved['show_provider_filter'] === 'true',
-			'showLocationQuickFilter'    => $saved['show_location_quick_filter'] === 'true',
-			'showCategorySelectionFirst' => $saved['show_category_selection_first'] !== 'false',
-			'categories'                 => $saved['categories'],
-			'customCss'                  => $saved['custom_css'],
+			'primaryColor'               => $saved_booking['primary_color'],
+			'backgroundColor'            => $saved_booking['background_color'],
+			'textPrimary'                => $saved_booking['text_primary'],
+			'textSecondary'              => $saved_booking['text_secondary'],
+			'borderColor'                => $saved_booking['border_color'],
+			'border'                     => $saved_booking['border'] === 'true',
+			'inheritFont'                => $saved_booking['inherit_font'] === 'true',
+			'showProviderFilter'         => $saved_booking['show_provider_filter'] === 'true',
+			'showLocationQuickFilter'    => $saved_booking['show_location_quick_filter'] === 'true',
+			'showCategorySelectionFirst' => $saved_booking['show_category_selection_first'] !== 'false',
+			'categories'                 => $saved_booking['categories'],
+			'seminars'                   => $saved_seminars['seminars'],
+			'showListFirst'              => $saved_seminars['show_list_first'] !== 'false',
+			'customCss'                  => $saved_booking['custom_css'],
 		)
 	);
 }

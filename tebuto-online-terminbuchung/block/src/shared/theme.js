@@ -6,8 +6,17 @@ export function getPresets() {
 	return getTebutoData().presets || []
 }
 
-export function getDefaults() {
-	return getTebutoData().defaults || {}
+/**
+ * @param {'booking'|'seminars'} [variant='booking']
+ * @returns {Record<string, unknown>}
+ */
+export function getDefaults(variant = 'booking') {
+	const data = getTebutoData()
+	const shared = data.defaults || {}
+	if (variant === 'seminars') {
+		return { ...shared, ...(data.seminarsDefaults || {}) }
+	}
+	return shared
 }
 
 export function getConnectUrl() {

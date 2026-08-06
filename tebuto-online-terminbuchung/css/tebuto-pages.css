@@ -212,20 +212,47 @@
         overflow: hidden;
     }
 
-    body.tebuto-fullheight .tebuto-page-shortcode .tebuto-widget-settings-app,
+    body.tebuto-fullheight .tebuto-page-shortcode .tebuto-widget-settings-app {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+    }
+
     body.tebuto-fullheight .tebuto-page-shortcode .tebuto-widget-settings-layout {
+        display: grid;
+        grid-template-columns: minmax(280px, 420px) minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr);
+        align-items: stretch;
         flex: 1;
         min-height: 0;
         overflow: hidden;
     }
 
     body.tebuto-fullheight .tebuto-page-shortcode .tebuto-widget-settings-controls {
+        display: flex;
+        flex-direction: column;
         min-height: 0;
+        min-width: 0;
+        overflow: hidden;
+        padding-right: 4px;
+    }
+
+    body.tebuto-fullheight .tebuto-page-shortcode .tebuto-widget-settings-controls-scroll {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-x: hidden;
         overflow-y: auto;
+    }
+
+    body.tebuto-fullheight .tebuto-page-shortcode .tebuto-widget-variant-tabs {
+        flex-shrink: 0;
     }
 
     body.tebuto-fullheight .tebuto-page-shortcode .tebuto-widget-settings-preview {
         min-height: 0;
+        min-width: 0;
         overflow: auto;
     }
 

@@ -79,4 +79,13 @@
 .tebuto-admin-wrap {
     --tebuto-font-montserrat: "Montserrat";
     font-family: var(--tebuto-font);
+
+    /* WordPress / Gutenberg component accents (toggles, primary buttons, focus) */
+    --wp-admin-theme-color: var(--tebuto-primary-brand);
+    --wp-admin-theme-color--rgb: 0, 144, 135;
+    --wp-admin-theme-color-darker-10: var(--tebuto-primary-hover);
+    --wp-admin-theme-color-darker-20: #004d4c;
+    --wp-components-color-accent: var(--tebuto-primary-brand);
+    --wp-components-color-accent-darker-10: var(--tebuto-primary-hover);
+    --wp-components-color-accent-darker-20: #004d4c;
 }

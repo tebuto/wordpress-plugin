@@ -1,9 +1,30 @@
-import { CheckboxControl, Notice, Spinner } from '@wordpress/components'
+import { Notice, Spinner, ToggleControl } from '@wordpress/components'
 import { __ } from '@wordpress/i18n'
+import SelectableRow from './SelectableRow'
 
-export default function SeminarPicker({ seminars, selected, onToggle, loading, error }) {
+export default function SeminarPicker({
+	seminars,
+	selected,
+	onToggle,
+	loading,
+	error,
+	showListFirst,
+	onShowListFirstChange
+}) {
 	return (
 		<>
+			{onShowListFirstChange && (
+				<ToggleControl
+					label={__('Seminarliste zuerst anzeigen', 'tebuto-online-terminbuchung')}
+					help={__(
+						'Wenn deaktiviert, öffnet das Widget direkt die Detailseite – nur sinnvoll bei genau einem Seminar.',
+						'tebuto-online-terminbuchung'
+					)}
+					checked={showListFirst !== false}
+					onChange={onShowListFirstChange}
+				/>
+			)}
+
 			<p className="tebuto-panel-description">
 				{__(
 					'Keine Auswahl = alle Seminare. Nur öffentliche Seminare können im Widget verwendet werden.',
@@ -34,28 +55,19 @@ export default function SeminarPicker({ seminars, selected, onToggle, loading, e
 							const slug = seminar.slug || ''
 
 							return (
-								<div
+								<SelectableRow
 									key={seminar.id || slug}
-									className={
-										isSelectable ? 'tebuto-category-item' : 'tebuto-category-item tebuto-category-item--unavailable'
-									}
+									checked={isSelectable && selected.includes(slug)}
+									disabled={!isSelectable || !slug}
+									onChange={() => onToggle(slug)}
 								>
-									<CheckboxControl
-										label={
-											<span className="tebuto-category-label">
-												{seminar.title}
-												{!isSelectable && (
-													<span className="tebuto-category-unavailable-hint">
-														{__('Nicht öffentlich', 'tebuto-online-terminbuchung')}
-													</span>
-												)}
-											</span>
-										}
-										checked={isSelectable && selected.includes(slug)}
-										disabled={!isSelectable || !slug}
-										onChange={() => onToggle(slug)}
-									/>
-								</div>
+									<span className="tebuto-category-label-text">{seminar.title}</span>
+									{!isSelectable && (
+										<span className="tebuto-category-unavailable-hint">
+											{__('Nicht öffentlich', 'tebuto-online-terminbuchung')}
+										</span>
+									)}
+								</SelectableRow>
 							)
 						})
 					)}

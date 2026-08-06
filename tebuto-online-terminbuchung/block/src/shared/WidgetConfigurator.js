@@ -159,7 +159,7 @@ function ConfiguratorPanels({
 	selectedSeminars,
 	toggleSeminar
 }) {
-	const { showCategorySelectionFirst, customCss } = attributes
+	const { showCategorySelectionFirst, showListFirst, customCss } = attributes
 
 	return (
 		<>
@@ -188,15 +188,11 @@ function ConfiguratorPanels({
 						onToggle={toggleSeminar}
 						loading={loadingSeminars}
 						error={seminarsError}
+						showListFirst={showListFirst}
+						onShowListFirstChange={(value) => setAttributes({ showListFirst: value })}
 					/>
 				</PanelBody>
 			)}
-
-			<PanelBody title={__('Farbvorlagen', 'tebuto-online-terminbuchung')} initialOpen={false}>
-				<ThemePresetPicker onSelect={(preset) => applyPreset(setAttributes, preset)} />
-			</PanelBody>
-
-			<ColorSettings attributes={attributes} setAttributes={setAttributes} />
 
 			<DisplayOptions
 				variant={variant}
@@ -204,6 +200,12 @@ function ConfiguratorPanels({
 				setAttributes={setAttributes}
 				hasSubaccountCategoriesSelected={hasSubaccountCategoriesSelected}
 			/>
+
+			<PanelBody title={__('Farbvorlagen', 'tebuto-online-terminbuchung')} initialOpen={false}>
+				<ThemePresetPicker onSelect={(preset) => applyPreset(setAttributes, preset)} />
+			</PanelBody>
+
+			<ColorSettings attributes={attributes} setAttributes={setAttributes} />
 
 			<CustomCssPanel variant={variant} value={customCss} onChange={(value) => setAttributes({ customCss: value })} />
 		</>
@@ -287,7 +289,48 @@ function InspectorConfigurator({ variant, attributes, setAttributes }) {
 	)
 }
 
-function AdminConfigurator({ variant, attributes, setAttributes }) {
+function VariantTabs({ variant, onVariantChange }) {
+	if (typeof onVariantChange !== 'function') {
+		return null
+	}
+
+	return (
+		<div
+			className="tebuto-widget-variant-tabs"
+			role="tablist"
+			aria-label={__('Widget-Typ', 'tebuto-online-terminbuchung')}
+		>
+			<button
+				type="button"
+				role="tab"
+				aria-selected={variant === 'booking'}
+				className={
+					variant === 'booking'
+						? 'tebuto-widget-variant-tab tebuto-widget-variant-tab--active'
+						: 'tebuto-widget-variant-tab'
+				}
+				onClick={() => onVariantChange('booking')}
+			>
+				{__('Termine', 'tebuto-online-terminbuchung')}
+			</button>
+			<button
+				type="button"
+				role="tab"
+				aria-selected={variant === 'seminars'}
+				className={
+					variant === 'seminars'
+						? 'tebuto-widget-variant-tab tebuto-widget-variant-tab--active'
+						: 'tebuto-widget-variant-tab'
+				}
+				onClick={() => onVariantChange('seminars')}
+			>
+				{__('Seminare', 'tebuto-online-terminbuchung')}
+			</button>
+		</div>
+	)
+}
+
+function AdminConfigurator({ variant, attributes, setAttributes, onVariantChange }) {
 	const previewContainerRef = useRef(null)
 	const [copyLabel, setCopyLabel] = useState(null)
 	const data = getTebutoData()
@@ -342,36 +385,40 @@ function AdminConfigurator({ variant, attributes, setAttributes }) {
 	return (
 		<div className="tebuto-widget-settings-layout">
 			<div className="tebuto-widget-settings-controls">
-				<ConfiguratorPanels
-					variant={variant}
-					attributes={attributes}
-					setAttributes={setAttributes}
-					availableCategories={availableCategories}
-					loadingCategories={loading}
-					categoriesError={error}
-					selectedCategories={bookingSync.selectedCategories}
-					selectedAvailableCategories={bookingSync.selectedAvailableCategories}
-					hasSubaccountCategoriesSelected={bookingSync.hasSubaccountCategoriesSelected}
-					toggleCategory={bookingSync.toggleCategory}
-					availableSeminars={availableSeminars}
-					loadingSeminars={loadingSeminars}
-					seminarsError={seminarsError}
-					selectedSeminars={seminarSync.selectedSeminars}
-					toggleSeminar={seminarSync.toggleSeminar}
-				/>
+				<VariantTabs variant={variant} onVariantChange={onVariantChange} />
 
-				<PanelBody title={__('Shortcode', 'tebuto-online-terminbuchung')} initialOpen={true}>
-					<TextareaControl
-						label={__('Shortcode kopieren', 'tebuto-online-terminbuchung')}
-						value={shortcode}
-						readOnly
-						rows={3}
-						className="tebuto-css-textarea"
+				<div className="tebuto-widget-settings-controls-scroll">
+					<ConfiguratorPanels
+						variant={variant}
+						attributes={attributes}
+						setAttributes={setAttributes}
+						availableCategories={availableCategories}
+						loadingCategories={loading}
+						categoriesError={error}
+						selectedCategories={bookingSync.selectedCategories}
+						selectedAvailableCategories={bookingSync.selectedAvailableCategories}
+						hasSubaccountCategoriesSelected={bookingSync.hasSubaccountCategoriesSelected}
+						toggleCategory={bookingSync.toggleCategory}
+						availableSeminars={availableSeminars}
+						loadingSeminars={loadingSeminars}
+						seminarsError={seminarsError}
+						selectedSeminars={seminarSync.selectedSeminars}
+						toggleSeminar={seminarSync.toggleSeminar}
 					/>
-					<Button variant="primary" onClick={copyShortcode}>
-						{copyLabel || __('Shortcode kopieren', 'tebuto-online-terminbuchung')}
-					</Button>
-				</PanelBody>
+
+					<PanelBody title={__('Shortcode', 'tebuto-online-terminbuchung')} initialOpen={true}>
+						<TextareaControl
+							label={__('Shortcode kopieren', 'tebuto-online-terminbuchung')}
+							value={shortcode}
+							readOnly
+							rows={3}
+							className="tebuto-css-textarea"
+						/>
+						<Button variant="primary" onClick={copyShortcode}>
+							{copyLabel || __('Shortcode kopieren', 'tebuto-online-terminbuchung')}
+						</Button>
+					</PanelBody>
+				</div>
 			</div>
 
 			<div className="tebuto-widget-settings-preview">
@@ -391,11 +438,19 @@ function AdminConfigurator({ variant, attributes, setAttributes }) {
  *   surface: 'inspector'|'admin',
  *   attributes: Record<string, unknown>,
  *   setAttributes: (attrs: Record<string, unknown>) => void,
+ *   onVariantChange?: (variant: 'booking'|'seminars') => void,
  * }} props
  */
-export default function WidgetConfigurator({ variant, surface, attributes, setAttributes }) {
+export default function WidgetConfigurator({ variant, surface, attributes, setAttributes, onVariantChange }) {
 	if (surface === 'admin') {
-		return <AdminConfigurator variant={variant} attributes={attributes} setAttributes={setAttributes} />
+		return (
+			<AdminConfigurator
+				variant={variant}
+				attributes={attributes}
+				setAttributes={setAttributes}
+				onVariantChange={onVariantChange}
+			/>
+		)
 	}
 
 	return <InspectorConfigurator variant={variant} attributes={attributes} setAttributes={setAttributes} />

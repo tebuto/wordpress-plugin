@@ -26,9 +26,7 @@ export default function DisplayOptions({
 			inheritFont: defaults.inheritFont ?? false
 		}
 
-		if (variant === 'seminars') {
-			next.showListFirst = defaults.showListFirst ?? true
-		} else {
+		if (variant !== 'seminars') {
 			next.showProviderFilter = defaults.showProviderFilter ?? false
 			next.showLocationQuickFilter = defaults.showLocationQuickFilter ?? false
 		}
@@ -65,25 +63,6 @@ export default function DisplayOptions({
 					onChange={(value) => setAttributes({ inheritFont: value })}
 				/>
 			</ToolsPanelItem>
-
-			{variant === 'seminars' && (
-				<ToolsPanelItem
-					hasValue={() => attributes.showListFirst !== (defaults.showListFirst ?? true)}
-					label={__('Seminarliste zuerst anzeigen', 'tebuto-online-terminbuchung')}
-					onDeselect={() => setAttributes({ showListFirst: defaults.showListFirst ?? true })}
-					isShownByDefault
-				>
-					<ToggleControl
-						label={__('Seminarliste zuerst anzeigen', 'tebuto-online-terminbuchung')}
-						help={__(
-							'Wenn deaktiviert, öffnet das Widget direkt die Detailseite – nur sinnvoll bei genau einem Seminar.',
-							'tebuto-online-terminbuchung'
-						)}
-						checked={attributes.showListFirst !== false}
-						onChange={(value) => setAttributes({ showListFirst: value })}
-					/>
-				</ToolsPanelItem>
-			)}
 
 			{variant === 'booking' && hasManagedUsers && (
 				<ToolsPanelItem

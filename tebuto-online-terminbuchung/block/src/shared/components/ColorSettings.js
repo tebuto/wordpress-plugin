@@ -1,47 +1,65 @@
-import { PanelColorSettings } from '@wordpress/block-editor'
+import { BaseControl, Button, ColorIndicator, ColorPicker, Dropdown, Flex, PanelBody } from '@wordpress/components'
 import { __ } from '@wordpress/i18n'
 
-export default function ColorSettings({ attributes, setAttributes }) {
-	const { primaryColor, backgroundColor, textPrimary, textSecondary, borderColor } = attributes
+const COLOR_FIELDS = [
+	{
+		key: 'primaryColor',
+		label: __('Primärfarbe', 'tebuto-online-terminbuchung')
+	},
+	{
+		key: 'backgroundColor',
+		label: __('Hintergrund', 'tebuto-online-terminbuchung')
+	},
+	{
+		key: 'textPrimary',
+		label: __('Textfarbe', 'tebuto-online-terminbuchung')
+	},
+	{
+		key: 'textSecondary',
+		label: __('Sekundärtext', 'tebuto-online-terminbuchung')
+	},
+	{
+		key: 'borderColor',
+		label: __('Rahmenfarbe', 'tebuto-online-terminbuchung')
+	}
+]
+
+function ColorRow({ label, value, onChange }) {
+	const colorValue = value || '#000000'
 
 	return (
-		<PanelColorSettings
-			title={__('Eigene Farben festlegen', 'tebuto-online-terminbuchung')}
-			initialOpen={false}
-			__experimentalIsRenderedInSidebar
-			enableAlpha={false}
-			colorSettings={[
-				{
-					value: primaryColor,
-					onChange: (color) => setAttributes({ primaryColor: color }),
-					label: __('Primärfarbe', 'tebuto-online-terminbuchung'),
-					description: __('Buttons und Akzente', 'tebuto-online-terminbuchung')
-				},
-				{
-					value: backgroundColor,
-					onChange: (color) => setAttributes({ backgroundColor: color }),
-					label: __('Hintergrund', 'tebuto-online-terminbuchung'),
-					description: __('Widget-Hintergrund', 'tebuto-online-terminbuchung')
-				},
-				{
-					value: textPrimary,
-					onChange: (color) => setAttributes({ textPrimary: color }),
-					label: __('Textfarbe', 'tebuto-online-terminbuchung'),
-					description: __('Haupttext', 'tebuto-online-terminbuchung')
-				},
-				{
-					value: textSecondary,
-					onChange: (color) => setAttributes({ textSecondary: color }),
-					label: __('Sekundärtext', 'tebuto-online-terminbuchung'),
-					description: __('Beschreibungen', 'tebuto-online-terminbuchung')
-				},
-				{
-					value: borderColor,
-					onChange: (color) => setAttributes({ borderColor: color }),
-					label: __('Rahmenfarbe', 'tebuto-online-terminbuchung'),
-					description: __('Rahmen und Trennlinien', 'tebuto-online-terminbuchung')
-				}
-			]}
-		/>
+		<BaseControl label={label} __nextHasNoMarginBottom className="tebuto-color-row">
+			<Dropdown
+				popoverProps={{ placement: 'left-start' }}
+				renderToggle={({ isOpen, onToggle }) => (
+					<Button variant="secondary" onClick={onToggle} aria-expanded={isOpen} className="tebuto-color-row__toggle">
+						<Flex align="center" gap={2}>
+							<ColorIndicator colorValue={colorValue} />
+							<span>{colorValue}</span>
+						</Flex>
+					</Button>
+				)}
+				renderContent={() => (
+					<div className="tebuto-color-row__picker">
+						<ColorPicker color={colorValue} onChange={onChange} enableAlpha={false} defaultValue={colorValue} />
+					</div>
+				)}
+			/>
+		</BaseControl>
+	)
+}
+
+export default function ColorSettings({ attributes, setAttributes }) {
+	return (
+		<PanelBody title={__('Eigene Farben festlegen', 'tebuto-online-terminbuchung')} initialOpen={false}>
+			{COLOR_FIELDS.map((field) => (
+				<ColorRow
+					key={field.key}
+					label={field.label}
+					value={attributes[field.key]}
+					onChange={(color) => setAttributes({ [field.key]: color })}
+				/>
+			))}
+		</PanelBody>
 	)
 }

@@ -47,6 +47,17 @@ const BOOLEAN_ATTRS = new Set([
 
 const SKIP_SHORTCODE = new Set(['configuredCategoriesJson'])
 
+const BOOKING_ONLY_ATTRS = new Set([
+	'categories',
+	'configuredCategoriesJson',
+	'showQuickFilters',
+	'showProviderFilter',
+	'showLocationQuickFilter',
+	'showCategorySelectionFirst'
+])
+
+const SEMINARS_ONLY_ATTRS = new Set(['seminars', 'showListFirst'])
+
 function valuesEqual(a, b) {
 	if (typeof a === 'boolean' || typeof b === 'boolean') {
 		return Boolean(a) === Boolean(b)
@@ -128,11 +139,20 @@ export function toDataAttributes(attrs, _variant) {
  * @returns {string}
  */
 export function buildShortcode(attrs, tag = 'tebuto_online_terminbuchung_widget') {
-	const defaults = getDefaults()
+	const isSeminars = tag === 'tebuto_seminare_widget'
+	const defaults = getDefaults(isSeminars ? 'seminars' : 'booking')
 	const params = []
 
 	for (const [camel, snake] of Object.entries(CAMEL_TO_SNAKE)) {
 		if (SKIP_SHORTCODE.has(camel) || !(camel in attrs)) {
+			continue
+		}
+
+		if (isSeminars && BOOKING_ONLY_ATTRS.has(camel)) {
+			continue
+		}
+
+		if (!isSeminars && SEMINARS_ONLY_ATTRS.has(camel)) {
 			continue
 		}
 

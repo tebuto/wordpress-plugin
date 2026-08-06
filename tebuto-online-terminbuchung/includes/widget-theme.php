@@ -47,7 +47,7 @@ function tebuto_widget_theme_presets(): array {
 			'primaryColor'    => '#8b5cf6',
 			'backgroundColor' => '#ffffff',
 			'textPrimary'     => '#1e1b4b',
-			'textSecondary'   => '#6b21a8',
+			'textSecondary'   => '#6b7280',
 			'borderColor'     => '#e9d5ff',
 		),
 		array(
