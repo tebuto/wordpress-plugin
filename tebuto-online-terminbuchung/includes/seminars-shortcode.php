@@ -21,7 +21,8 @@ $tebuto_seminars_widget_instance_count = 0;
  *
  * Verwendung:
  *   [tebuto_seminare_widget]
- *   [tebuto_seminare_widget seminars="slug-1,slug-2" show_past="true"]
+ *   [tebuto_seminare_widget seminars="slug-1,slug-2"]
+ *   [tebuto_seminare_widget seminars="einfuehrung" show_list_first="false"]
  *   [tebuto_seminare_widget primary_color="#3b82f6" border="false" inherit_font="true"]
  *
  * @param array<string, string>|string $atts Shortcode-Attribute.
@@ -50,7 +51,7 @@ function tebuto_seminars_widget_shortcode( $atts = [] ): string {
 		'border'           => tebuto_get_user_meta( $current_user_id, 'border', 'true' ),
 		'inherit_font'     => tebuto_get_user_meta( $current_user_id, 'inherit_font', 'false' ),
 		'seminars'         => '',
-		'show_past'        => 'false',
+		'show_list_first'  => 'true',
 		'custom_css'       => tebuto_get_user_meta( $current_user_id, 'custom_css', '' ),
 	];
 
@@ -63,7 +64,7 @@ function tebuto_seminars_widget_shortcode( $atts = [] ): string {
 	$border_color     = sanitize_hex_color( $parsed['border_color'] ) ?: '#E9E9E9';
 	$border           = $parsed['border'] === 'true' ? 'true' : 'false';
 	$inherit_font     = $parsed['inherit_font'] === 'true' ? 'true' : 'false';
-	$show_past        = $parsed['show_past'] === 'true' ? 'true' : 'false';
+	$show_list_first  = $parsed['show_list_first'] === 'false' ? 'false' : 'true';
 	$seminars         = preg_replace( '/[^a-zA-Z0-9_\-,]/', '', $parsed['seminars'] );
 	$custom_css       = wp_strip_all_tags( $parsed['custom_css'] );
 
@@ -104,8 +105,8 @@ function tebuto_seminars_widget_shortcode( $atts = [] ): string {
 		$widget_attrs['data-seminars'] = esc_attr( $seminars );
 	}
 
-	if ( $show_past === 'true' ) {
-		$widget_attrs['data-show-past'] = 'true';
+	if ( $show_list_first === 'false' ) {
+		$widget_attrs['data-show-list-first'] = 'false';
 	}
 
 	$attr_string = '';

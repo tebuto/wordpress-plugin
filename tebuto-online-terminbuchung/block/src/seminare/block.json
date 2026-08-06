@@ -40,9 +40,9 @@
 			"type": "string",
 			"default": ""
 		},
-		"showPast": {
+		"showListFirst": {
 			"type": "boolean",
-			"default": false
+			"default": true
 		},
 		"customCss": {
 			"type": "string",

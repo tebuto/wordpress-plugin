@@ -69,7 +69,7 @@ export default function Edit( { attributes, setAttributes } ) {
 		border,
 		inheritFont,
 		seminars,
-		showPast,
+		showListFirst,
 		customCss,
 	} = attributes;
 
@@ -129,8 +129,8 @@ export default function Edit( { attributes, setAttributes } ) {
 			script.dataset.seminars = seminars.trim();
 		}
 
-		if ( showPast ) {
-			script.dataset.showPast = 'true';
+		if ( showListFirst === false ) {
+			script.dataset.showListFirst = 'false';
 		}
 
 		script.async = true;
@@ -147,7 +147,7 @@ export default function Edit( { attributes, setAttributes } ) {
 		border,
 		inheritFont,
 		seminars,
-		showPast,
+		showListFirst,
 	] );
 
 	useEffect( () => {
@@ -240,16 +240,16 @@ export default function Edit( { attributes, setAttributes } ) {
 
 					<ToggleControl
 						label={ __(
-							'Vergangene Termine anzeigen',
+							'Seminarliste zuerst anzeigen',
 							'tebuto-online-terminbuchung'
 						) }
 						help={ __(
-							'Zeigt auch bereits stattgefundene Seminartermine an',
+							'Wenn deaktiviert, öffnet das Widget direkt die Detailseite – nur sinnvoll bei genau einem Seminar.',
 							'tebuto-online-terminbuchung'
 						) }
-						checked={ showPast }
+						checked={ showListFirst !== false }
 						onChange={ ( value ) =>
-							setAttributes( { showPast: value } )
+							setAttributes( { showListFirst: value } )
 						}
 					/>
 				</PanelBody>

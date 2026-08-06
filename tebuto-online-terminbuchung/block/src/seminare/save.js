@@ -8,7 +8,7 @@ export default function save( { attributes } ) {
 		border,
 		inheritFont,
 		seminars,
-		showPast,
+		showListFirst,
 		customCss,
 	} = attributes;
 
@@ -48,8 +48,8 @@ export default function save( { attributes } ) {
 		widgetAttributes[ 'data-seminars' ] = seminars.trim();
 	}
 
-	if ( showPast ) {
-		widgetAttributes[ 'data-show-past' ] = 'true';
+	if ( showListFirst === false ) {
+		widgetAttributes[ 'data-show-list-first' ] = 'false';
 	}
 
 	return (
