@@ -64,13 +64,13 @@ function tebuto_add_admin_menu(): void {
 		'tebuto_shortcode_page'
 	);
 
-	// Submenu: Connection
+	// Hidden OAuth callback landing (not shown in menu; Keycloak redirect URI).
 	add_submenu_page(
-		'tebuto-main',
-		__( 'Verbindung', 'tebuto-online-terminbuchung' ),
-		__( 'Verbindung', 'tebuto-online-terminbuchung' ),
+		null,
+		__( 'Tebuto Verbindung', 'tebuto-online-terminbuchung' ),
+		'',
 		'manage_options',
 		'tebuto-integration',
-		'tebuto_admin_page'
+		'tebuto_oauth_landing_page'
 	);
 }

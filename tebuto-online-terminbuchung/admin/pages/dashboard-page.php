@@ -47,12 +47,16 @@ function tebuto_dashboard_page(): void {
 	$stats = tebuto_calculate_dashboard_stats( $bookings_result, $upcoming_events );
 
 	?>
-	<div class="wrap tebuto-admin-wrap">
+	<div class="wrap tebuto-admin-wrap tebuto-page-dashboard">
 		<div class="tebuto-header">
 			<h1><?php esc_html_e( 'Dashboard', 'tebuto-online-terminbuchung' ); ?></h1>
-			<a href="<?php echo esc_url( admin_url( 'admin.php?page=tebuto-integration' ) ); ?>" class="button">
-				<?php esc_html_e( 'Einstellungen', 'tebuto-online-terminbuchung' ); ?>
-			</a>
+			<form method="post" class="tebuto-disconnect-form">
+				<?php wp_nonce_field( 'tebuto_disconnect', 'tebuto_nonce' ); ?>
+				<input type="hidden" name="tebuto_disconnect" value="1">
+				<button type="submit" class="button tebuto-btn-danger-outline" onclick="return confirm('<?php echo esc_js( __( 'Möchtest du die Verbindung wirklich trennen?', 'tebuto-online-terminbuchung' ) ); ?>');">
+					<?php esc_html_e( 'Verbindung trennen', 'tebuto-online-terminbuchung' ); ?>
+				</button>
+			</form>
 		</div>
 
 		<!-- Statistics Cards -->

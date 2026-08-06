@@ -36,11 +36,12 @@ function tebuto_enqueue_admin_assets( string $hook_suffix ): void {
 	}
 
 	// Enqueue admin styles
+	$style_path = TEBUTO_PLUGIN_PATH . 'css/admin-style.css';
 	wp_enqueue_style(
 		'tebuto-admin-style',
 		TEBUTO_PLUGIN_URL . 'css/admin-style.css',
 		array(),
-		TEBUTO_VERSION
+		file_exists( $style_path ) ? (string) filemtime( $style_path ) : TEBUTO_VERSION
 	);
 
 	// Enqueue WordPress color picker

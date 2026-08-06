@@ -31,7 +31,7 @@ Mit diesem Plugin bindest du die **Online-Terminbuchung** deines Tebuto-Kontos i
 
 1. Installiere und aktiviere das Plugin
 2. Registriere dich bei [tebuto.de](https://tebuto.de) oder melde dich mit deinem bestehenden Tebuto-Konto an
-3. Gehe zu **Tebuto → Verbindung** im WordPress-Admin und verbinde dein Konto
+3. Gehe zu **Tebuto → Dashboard** im WordPress-Admin und verbinde dein Konto
 4. Konfiguriere das Widget unter **Tebuto → Shortcode**
 5. Füge den Shortcode oder Gutenberg-Block auf deiner gewünschten Seite ein
 
@@ -78,7 +78,7 @@ Tebuto erfüllt alle Anforderungen der DSGVO. Daten werden ausschließlich inner
 = Nach der Installation =
 
 1. Erstelle ein Tebuto-Konto auf [tebuto.de](https://tebuto.de) oder melde dich an
-2. Gehe zu **Tebuto → Verbindung** und verbinde dein Tebuto-Konto
+2. Gehe zu **Tebuto → Dashboard** und verbinde dein Tebuto-Konto
 3. Richte in Tebuto deine Terminkategorien und Verfügbarkeiten ein
 4. Konfiguriere das Widget unter **Tebuto → Shortcode**
 5. Füge den Shortcode oder Block auf deiner Seite ein
@@ -113,7 +113,7 @@ Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter
 
 == Screenshots ==
 
-1. Einstellungsseite - Verbindung mit Tebuto herstellen
+1. Dashboard - Verbindung mit Tebuto herstellen / trennen
 2. Shortcode-Einstellungen - Widget konfigurieren
 3. Frontend - Buchungswidget auf der Website
 

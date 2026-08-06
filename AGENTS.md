@@ -7,7 +7,7 @@ WordPress plugin (**Tebuto - Online-Terminbuchung**) that connects a WordPress s
 ```
 tebuto-online-terminbuchung/   # Plugin source — edit here
 ├── tebuto-plugin.php          # Bootstrap, constants, hooks
-├── admin/                     # wp-admin pages (dashboard, bookings, categories, shortcode, connection)
+├── admin/                     # wp-admin pages (dashboard, bookings, categories, shortcode, hidden OAuth landing)
 ├── includes/                  # API client, OAuth, shortcode, AJAX, helpers
 ├── block/
 │   ├── src/block/             # Gutenberg block source (edit.js, save.js, block.json)
@@ -32,7 +32,7 @@ Human docs: [README.md](README.md) (user-facing), [CONTRIBUTING.md](CONTRIBUTING
 
 **Data flow**
 
-1. Admin connects via **Tebuto → Verbindung** (`tebuto-integration`) — full-page OAuth redirect (not in block editor iframe; Keycloak blocks embedded auth).
+1. Admin connects via the connect CTA on the Tebuto Dashboard (or Gutenberg block notice) — full-page OAuth redirect to Keycloak (not in block editor iframe; Keycloak blocks embedded auth). Callback lands on hidden slug `tebuto-integration`, then redirects to the Dashboard.
 2. Tokens and settings live in **WordPress user meta** under prefix `tebuto_online_terminbuchung_` — use `tebuto_get_user_meta()` / `tebuto_update_user_meta()`.
 3. Frontend widget resolves the connected admin via `tebuto_get_connected_user_id()` (visitors are not logged in).
 4. Admin pages call `Tebuto_API` (token refresh, REST). Block editor and shortcode page use `wp_ajax_*` handlers in `includes/ajax-handlers.php` (nonce `tebuto_admin`).
@@ -167,6 +167,6 @@ pnpm version:check
 | `tebuto-bookings` | Buchungen |
 | `tebuto-categories` | Kategorien |
 | `tebuto-shortcode` | Shortcode / widget settings |
-| `tebuto-integration` | Verbindung (OAuth) |
+| `tebuto-integration` | Hidden OAuth callback landing (not in menu) |
 
 Shortcode tag: `[tebuto_online_terminbuchung_widget]`. Block name: `tebuto/terminbuchung`.

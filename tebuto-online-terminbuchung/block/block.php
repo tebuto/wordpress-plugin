@@ -50,7 +50,7 @@ function tebuto_enqueue_block_editor_assets(): void {
 		'reconnectUrl'      => tebuto_get_authorize_url(),
 		'widgetUrl'         => TEBUTO_WIDGET_URL,
 		'seminarsWidgetUrl' => TEBUTO_SEMINARS_WIDGET_URL,
-		'settingsUrl'       => admin_url( 'admin.php?page=tebuto-integration' ),
+		'settingsUrl'       => tebuto_get_authorize_url(),
 		'shortcodeUrl'      => admin_url( 'admin.php?page=tebuto-shortcode' ),
 		'defaultSettings'   => $default_settings,
 		'nonce'             => wp_create_nonce( 'tebuto_admin' ),

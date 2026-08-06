@@ -81,7 +81,7 @@ When developing against a self-hosted Tebuto instance (for example the `*.tebuto
 6. Advanced: PKCE code challenge method **S256**
 7. Login theme: **tebuto** (when that theme is installed on your Keycloak instance)
 
-Connect via **Tebuto → Verbindung** in wp-admin (full-page OAuth redirect). The block editor iframe cannot complete login because Keycloak blocks embedded auth with `frame-ancestors`.
+Connect via the connect CTA on the **Tebuto Dashboard** (or Gutenberg block notice) — full-page OAuth redirect. The block editor iframe cannot complete login because Keycloak blocks embedded auth with `frame-ancestors`. Disconnect from the Dashboard header (**Verbindung trennen**).
 
 ## Development Workflow
 

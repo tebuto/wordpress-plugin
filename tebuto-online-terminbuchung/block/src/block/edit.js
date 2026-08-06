@@ -101,7 +101,7 @@ export default function Edit({ attributes, setAttributes }) {
 	const therapistUUID = window.tebutoData?.uuid || ''
 	const authState = window.tebutoData?.authState || 'disconnected'
 	const reconnectUrl =
-		window.tebutoData?.reconnectUrl || window.tebutoData?.settingsUrl || '/wp-admin/admin.php?page=tebuto-integration'
+		window.tebutoData?.reconnectUrl || window.tebutoData?.settingsUrl || '/wp-admin/admin.php?page=tebuto-main'
 	const widgetUrl = window.tebutoData?.widgetUrl || ''
 	const ajaxUrl = window.ajaxurl || '/wp-admin/admin-ajax.php'
 

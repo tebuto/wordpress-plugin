@@ -52,6 +52,99 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
+/* Desktop: fill remaining viewport; scroll inside widgets / tables */
+@media (min-width: 783px) {
+    body.toplevel_page_tebuto-main #wpfooter,
+    body.tebuto-main_page_tebuto-categories #wpfooter {
+        display: none;
+    }
+
+    body.toplevel_page_tebuto-main #wpbody-content,
+    body.tebuto-main_page_tebuto-categories #wpbody-content {
+        display: flex;
+        flex-direction: column;
+        float: none;
+        width: auto;
+        box-sizing: border-box;
+        height: calc(100vh - 32px);
+        padding-bottom: 16px;
+    }
+
+    body.toplevel_page_tebuto-main #wpbody-content > .notice,
+    body.toplevel_page_tebuto-main #wpbody-content > .updated,
+    body.toplevel_page_tebuto-main #wpbody-content > .error,
+    body.tebuto-main_page_tebuto-categories #wpbody-content > .notice,
+    body.tebuto-main_page_tebuto-categories #wpbody-content > .updated,
+    body.tebuto-main_page_tebuto-categories #wpbody-content > .error {
+        flex-shrink: 0;
+    }
+
+    .tebuto-admin-wrap.tebuto-page-dashboard,
+    .tebuto-admin-wrap.tebuto-page-categories {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+        height: auto;
+        margin-top: 16px;
+        margin-bottom: 0;
+        overflow: hidden;
+        box-sizing: border-box;
+    }
+
+    .tebuto-page-dashboard .tebuto-header,
+    .tebuto-page-categories .tebuto-header,
+    .tebuto-page-dashboard .tebuto-stats-grid {
+        flex-shrink: 0;
+    }
+
+    .tebuto-page-dashboard .tebuto-dashboard-grid {
+        flex: 1;
+        min-height: 0;
+        align-items: stretch;
+    }
+
+    .tebuto-page-dashboard .tebuto-dashboard-grid > .tebuto-card {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .tebuto-page-dashboard .tebuto-dashboard-grid .tebuto-card-header {
+        flex-shrink: 0;
+    }
+
+    .tebuto-page-dashboard .tebuto-dashboard-grid .tebuto-card-body {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+    }
+
+    .tebuto-page-categories > .tebuto-card {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .tebuto-page-categories .tebuto-table-responsive {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        margin: 0;
+        padding: 0;
+    }
+
+    .tebuto-page-categories .tebuto-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+}
+
 .tebuto-header {
     display: flex;
     align-items: center;
@@ -181,6 +274,12 @@
 @media (max-width: 1200px) {
     .tebuto-dashboard-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 783px) and (max-width: 1200px) {
+    .tebuto-page-dashboard .tebuto-dashboard-grid {
+        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
     }
 }
 
@@ -2003,6 +2102,21 @@
 .tebuto-btn-danger:hover {
     background: #dc2626 !important;
     border-color: #dc2626 !important;
+}
+
+.wp-core-ui .button.tebuto-btn-danger-outline {
+    background: #fff !important;
+    border-color: var(--tebuto-danger) !important;
+    color: var(--tebuto-danger) !important;
+    box-shadow: none !important;
+}
+
+.wp-core-ui .button.tebuto-btn-danger-outline:hover,
+.wp-core-ui .button.tebuto-btn-danger-outline:focus {
+    background: var(--tebuto-danger-light) !important;
+    border-color: #dc2626 !important;
+    color: #dc2626 !important;
+    box-shadow: none !important;
 }
 
 .button.button-primary {

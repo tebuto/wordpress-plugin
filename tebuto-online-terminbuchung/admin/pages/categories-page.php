@@ -27,7 +27,7 @@ function tebuto_categories_page(): void {
 	}
 
 	?>
-	<div class="wrap tebuto-admin-wrap">
+	<div class="wrap tebuto-admin-wrap tebuto-page-categories">
 		<div class="tebuto-header">
 			<h1><?php esc_html_e( 'Terminkategorien', 'tebuto-online-terminbuchung' ); ?></h1>
 			<div class="tebuto-header-actions">

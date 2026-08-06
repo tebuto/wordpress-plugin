@@ -1,6 +1,6 @@
 <?php
 /**
- * Tebuto settings page.
+ * Hidden OAuth landing page for Tebuto (callback slug tebuto-integration).
  *
  * @package Tebuto
  */
@@ -8,78 +8,12 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Render the Tebuto admin settings page.
+ * Redirect accidental visits to the dashboard.
+ * OAuth success is handled on admin_init before this renders.
  *
  * @return void
  */
-function tebuto_admin_page(): void {
-	$is_connected = tebuto_is_connected();
-
-	?>
-	<div class="wrap tebuto-admin-wrap">
-		<div class="tebuto-header">
-			<h1><?php esc_html_e( 'Verbindung', 'tebuto-online-terminbuchung' ); ?></h1>
-			<a href="<?php echo esc_url( admin_url( 'admin.php?page=tebuto-main' ) ); ?>" class="button">
-				<?php esc_html_e( '← Dashboard', 'tebuto-online-terminbuchung' ); ?>
-			</a>
-		</div>
-
-		<?php if ( ! $is_connected ) : ?>
-			<?php if ( tebuto_is_session_expired() ) : ?>
-				<div class="tebuto-card tebuto-card-warning tebuto-auth-notice tebuto-auth-notice-expired">
-					<div class="tebuto-card-icon">
-						<span class="dashicons dashicons-update"></span>
-					</div>
-					<div class="tebuto-card-content">
-						<h2><?php esc_html_e( 'Sitzung abgelaufen', 'tebuto-online-terminbuchung' ); ?></h2>
-						<p><?php esc_html_e( 'Deine Verbindung zu Tebuto ist abgelaufen. Melde dich erneut an, um das Plugin weiter zu nutzen. Deine Widget-Einstellungen bleiben erhalten.', 'tebuto-online-terminbuchung' ); ?></p>
-						<a href="<?php echo esc_url( tebuto_get_authorize_url() ); ?>" class="button button-primary button-hero">
-							<?php esc_html_e( 'Erneut bei Tebuto anmelden', 'tebuto-online-terminbuchung' ); ?>
-						</a>
-					</div>
-				</div>
-			<?php else : ?>
-				<div class="tebuto-card tebuto-card-connect">
-					<div class="tebuto-card-icon">
-						<span class="dashicons dashicons-calendar-alt"></span>
-					</div>
-					<div class="tebuto-card-content">
-						<h2><?php esc_html_e( 'Mit Tebuto verbinden', 'tebuto-online-terminbuchung' ); ?></h2>
-						<p><?php esc_html_e( 'Du bist derzeit nicht mit Tebuto verbunden. Verbinde dein Konto, um öffentliche Termine auf deiner Website anzubieten.', 'tebuto-online-terminbuchung' ); ?></p>
-						<a href="<?php echo esc_url( tebuto_get_authorize_url() ); ?>" class="button button-primary button-hero">
-							<?php esc_html_e( 'Mit Tebuto verbinden', 'tebuto-online-terminbuchung' ); ?>
-						</a>
-					</div>
-				</div>
-			<?php endif; ?>
-		<?php else : ?>
-			<div class="tebuto-card tebuto-card-success">
-				<div class="tebuto-card-icon">
-					<span class="dashicons dashicons-yes-alt"></span>
-				</div>
-				<div class="tebuto-card-content">
-					<h2><?php esc_html_e( 'Mit Tebuto verbunden', 'tebuto-online-terminbuchung' ); ?></h2>
-					<p><?php esc_html_e( 'Dein Tebuto-Konto ist verbunden. Du kannst jetzt Termine verwalten und das Buchungs-Widget auf deiner Website einbinden.', 'tebuto-online-terminbuchung' ); ?></p>
-				</div>
-			</div>
-
-			<div class="tebuto-card" style="max-width: 500px;">
-				<div class="tebuto-card-body">
-					<p style="margin: 0 0 16px; color: var(--tebuto-text-secondary);">
-						<?php esc_html_e( 'Um die Verbindung zu trennen, klicke auf den Button unten. Du kannst dich jederzeit wieder verbinden.', 'tebuto-online-terminbuchung' ); ?>
-					</p>
-					<form method="post" class="tebuto-disconnect-form">
-						<?php wp_nonce_field( 'tebuto_disconnect', 'tebuto_nonce' ); ?>
-						<input type="hidden" name="tebuto_disconnect" value="1">
-						<button type="submit" class="button tebuto-btn-danger" onclick="return confirm('<?php echo esc_js( __( 'Möchtest du die Verbindung wirklich trennen?', 'tebuto-online-terminbuchung' ) ); ?>');">
-							<?php esc_html_e( 'Verbindung trennen', 'tebuto-online-terminbuchung' ); ?>
-						</button>
-					</form>
-				</div>
-			</div>
-		<?php endif; ?>
-	</div>
-	<?php
+function tebuto_oauth_landing_page(): void {
+	wp_safe_redirect( admin_url( 'admin.php?page=tebuto-main' ) );
+	exit;
 }
-
-
