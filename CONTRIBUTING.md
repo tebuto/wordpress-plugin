@@ -6,7 +6,7 @@ Thank you for your interest in contributing to the Tebuto WordPress plugin!
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 20 or higher
+- [Node.js](https://nodejs.org/) 22.13 or higher
 - [pnpm](https://pnpm.io/) 11 or higher
 - [PHP](https://www.php.net/) 7.4+ and [Composer](https://getcomposer.org/) (for PHPCS)
 - [Docker](https://www.docker.com/) (optional, for local WordPress)

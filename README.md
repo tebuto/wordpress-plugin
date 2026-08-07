@@ -134,7 +134,7 @@ Once connected, the **Tebuto** menu provides:
 
 The repository includes a Docker Compose setup that runs WordPress and MariaDB locally. Plugin changes are synced into `wordpress/wp-content/plugins/` automatically via pnpm scripts.
 
-**Requirements:** [Docker](https://www.docker.com/), [Node.js](https://nodejs.org/) 20+
+**Requirements:** [Docker](https://www.docker.com/), [Node.js](https://nodejs.org/) 22.13+
 
 ### First-Time Setup
 

@@ -49,7 +49,7 @@ Human docs: [README.md](README.md) (user-facing), [CONTRIBUTING.md](CONTRIBUTING
 
 ## Commands
 
-Prerequisites: Node.js **20+**, pnpm **11+**, PHP **7.4+** with Composer (for PHP lint), Docker (optional, for local WordPress).
+Prerequisites: Node.js **22.13+**, pnpm **11+**, PHP **7.4+** with Composer (for PHP lint), Docker (optional, for local WordPress).
 
 ```bash
 pnpm install                  # Root + block workspace deps
