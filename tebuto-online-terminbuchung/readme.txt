@@ -4,7 +4,7 @@ Tags: Praxissoftware, Terminbuchung, Therapie, Buchungswidget, Kalender
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.5.0
+Stable tag: 2.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -120,16 +120,14 @@ Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter
 
 == Changelog ==
 
-= 2.5.0 =
-* **Seminare im Admin** – Neue Seite „Seminare“ mit Akkordeon-Liste, Veranstaltungs-Detailseite, CRUD für Seminare (inkl. Banner und Beschreibung) sowie bearbeitbaren Veranstaltungs-Einstellungen und Terminen
-* **Seminar-Auswahl im Block** – Der Seminarblick zeigt jetzt die verfügbaren Seminare per Checkbox statt freier Slug-Eingabe
-* Teilnehmer einer Veranstaltung werden schreibgeschützt angezeigt
-
 = 2.4.0 =
 * **NEU: Seminare-Widget** – Seminare per Gutenberg-Block „Tebuto Seminare“ oder Shortcode `[tebuto_seminare_widget]` auf der Website einbinden
 * **NEU: Shortcode-Attribute** – u. a. `seminars`, `show_list_first` sowie Farben, Rahmen, Schrift und eigenes CSS wie beim Buchungswidget
+* **NEU: Seminare im Admin** – Neue Seite „Seminare“ mit Akkordeon-Liste, Veranstaltungs-Detailseite, CRUD für Seminare (inkl. Banner und Beschreibung) sowie bearbeitbaren Veranstaltungs-Einstellungen und Terminen
+* **NEU: Seminar-Auswahl im Block** – Verfügbare Seminare per Checkbox statt freier Slug-Eingabe auswählen
 * **Verbesserung: Admin-Oberfläche** – Überarbeitetes Design für Dashboard, Buchungen, Kategorien und Shortcode-Einstellungen
 * **Verbesserung: Verbindung** – Menüpunkt „Verbindung“ in „Dashboard“ umbenannt; Einstellungen und Verbindung klarer getrennt
+* Teilnehmer einer Veranstaltung werden schreibgeschützt angezeigt
 
 = 2.3.2 =
 * **Wartung** – Abhängigkeiten und Build-Tooling aktualisiert (`@wordpress/scripts`, GitHub Actions)
@@ -197,14 +195,11 @@ Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter
 
 == Upgrade Notice ==
 
-= 2.5.0 =
-Seminarverwaltung im WordPress-Admin und Seminar-Auswahl im Gutenberg-Block/Shortcode-Konfigurator.
-
 = 2.4.0 =
-TODO: Add upgrade notice
+Seminare einbinden (Block & Shortcode), Seminarverwaltung im WordPress-Admin und überarbeitete Admin-Oberfläche.
 
 = 2.3.2 =
-TODO: Add upgrade notice
+Wartungs-Update: Abhängigkeiten und Build-Tooling aktualisiert.
 
 = 2.3.1 =
 Die Block-Editor-Vorschau respektiert „Termine von verwalteten Konten anzeigen“ jetzt wie die veröffentlichte Seite.
