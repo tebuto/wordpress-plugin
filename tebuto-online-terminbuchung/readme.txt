@@ -126,10 +126,13 @@ Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter
 * Teilnehmer einer Veranstaltung werden schreibgeschützt angezeigt
 
 = 2.4.0 =
-* TODO: Add changelog entries
+* **NEU: Seminare-Widget** – Seminare per Gutenberg-Block „Tebuto Seminare“ oder Shortcode `[tebuto_seminare_widget]` auf der Website einbinden
+* **NEU: Shortcode-Attribute** – u. a. `seminars`, `show_list_first` sowie Farben, Rahmen, Schrift und eigenes CSS wie beim Buchungswidget
+* **Verbesserung: Admin-Oberfläche** – Überarbeitetes Design für Dashboard, Buchungen, Kategorien und Shortcode-Einstellungen
+* **Verbesserung: Verbindung** – Menüpunkt „Verbindung“ in „Dashboard“ umbenannt; Einstellungen und Verbindung klarer getrennt
 
 = 2.3.2 =
-* TODO: Add changelog entries
+* **Wartung** – Abhängigkeiten und Build-Tooling aktualisiert (`@wordpress/scripts`, GitHub Actions)
 
 = 2.3.1 =
 * **Fix: Gutenberg-Vorschau** – Die Live-Vorschau im Block-Editor berücksichtigt „Termine von verwalteten Konten anzeigen“ jetzt wie die veröffentlichte Seite; Termine von Unterkonten erscheinen nicht mehr, wenn die Option deaktiviert ist
