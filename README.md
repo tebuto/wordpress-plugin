@@ -8,6 +8,7 @@
   <a href="https://wordpress.org/plugins/tebuto-online-terminbuchung/"><img alt="WordPress Plugin" src="https://img.shields.io/wordpress/plugin/v/tebuto-online-terminbuchung?label=wordpress.org"></a>
   <a href="https://github.com/tebuto/wordpress-plugin/blob/main/LICENSE"><img alt="GPLv2 License" src="https://img.shields.io/github/license/tebuto/wordpress-plugin"></a>
   <a href="https://github.com/tebuto/wordpress-plugin/actions/workflows/branch.yaml"><img alt="CI Status" src="https://img.shields.io/github/actions/workflow/status/tebuto/wordpress-plugin/.github%2Fworkflows%2Fbranch.yaml?label=CI&logo=GitHub"></a>
+  <a href="https://sonar.artus-engineering.de/dashboard?id=tebuto_wordpress-plugin_d85838b5-fae9-48e3-9636-0ec145a330f3"><img alt="Quality Gate Status" src="https://sonar.artus-engineering.de/api/project_badges/measure?project=tebuto_wordpress-plugin_d85838b5-fae9-48e3-9636-0ec145a330f3&metric=alert_status&token=sqb_d19c45be2051785f85a16b0d50ee03c3bad2a894"></a>
 </div>
 
 <hr />
