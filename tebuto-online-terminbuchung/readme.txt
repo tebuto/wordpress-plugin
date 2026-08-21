@@ -4,7 +4,7 @@ Tags: Praxissoftware, Terminbuchung, Therapie, Buchungswidget, Kalender
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.4.0
+Stable tag: 2.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -120,6 +120,10 @@ Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter
 
 == Changelog ==
 
+= 2.4.1 =
+* **Verbesserung: Barrierefreiheit** – Formularfelder und Schalter im Admin (u. a. Kategorien, Seminar-Termine) sowie Überschriften in der Buchungsdetailansicht sind für Screenreader korrekt beschriftet und verknüpft
+* **Wartung** – Code-Qualität und Wartbarkeit verbessert; Abhängigkeiten aktualisiert
+
 = 2.4.0 =
 * **NEU: Seminare-Widget** – Seminare per Gutenberg-Block „Tebuto Seminare“ oder Shortcode `[tebuto_seminare_widget]` auf der Website einbinden
 * **NEU: Shortcode-Attribute** – u. a. `seminars`, `show_list_first` sowie Farben, Rahmen, Schrift und eigenes CSS wie beim Buchungswidget
@@ -194,6 +198,9 @@ Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter
 * Professionelles Admin-Interface
 
 == Upgrade Notice ==
+
+= 2.4.1 =
+Wartungs-Update: bessere Barrierefreiheit im Admin und interne Code-Qualität.
 
 = 2.4.0 =
 Seminare einbinden (Block & Shortcode), Seminarverwaltung im WordPress-Admin und überarbeitete Admin-Oberfläche.
