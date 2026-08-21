@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n'
 import { useEffect, useState } from 'react'
+import { applyAjaxNetworkError, applyAjaxResult } from './ajaxResult'
 import { getTebutoData } from './theme'
 
 export default function useCategories() {
@@ -38,27 +39,18 @@ export default function useCategories() {
 					return
 				}
 
-				if (payload.success) {
-					setCategories(payload.data)
-					setError(null)
-				} else {
-					const errorPayload = payload.data
-					const errorCode = typeof errorPayload === 'object' && errorPayload !== null ? errorPayload.code : null
-
-					if (errorCode === 'session_expired') {
-						setSessionExpired(true)
-						setError(null)
-					} else {
-						const errorMessage =
-							typeof errorPayload === 'object' && errorPayload !== null && errorPayload.message
-								? errorPayload.message
-								: errorPayload
-						setError(errorMessage || __('Kategorien konnten nicht geladen werden.', 'tebuto-online-terminbuchung'))
-					}
-				}
+				applyAjaxResult(payload, {
+					setData: setCategories,
+					setError,
+					setSessionExpired,
+					fallbackError: __('Kategorien konnten nicht geladen werden.', 'tebuto-online-terminbuchung')
+				})
 			} catch {
 				if (!cancelled) {
-					setError(__('Verbindungsfehler beim Laden der Kategorien.', 'tebuto-online-terminbuchung'))
+					applyAjaxNetworkError({
+						setError,
+						networkError: __('Verbindungsfehler beim Laden der Kategorien.', 'tebuto-online-terminbuchung')
+					})
 				}
 			} finally {
 				if (!cancelled) {

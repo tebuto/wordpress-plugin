@@ -8,29 +8,21 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Render the bookings management page.
+ * Read bookings page filters from the query string.
  *
- * @return void
+ * @return array{current_status: string, current_page: int, date_from: string, date_to: string, filters: array}
  */
-function tebuto_bookings_page(): void {
-	$api = tebuto_require_tebuto_connection();
-	if ( $api === null ) {
-		return;
-	}
-
-	// Get filter values from query string
-    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+function tebuto_get_bookings_page_filters(): array {
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$current_status = isset( $_GET['status'] ) ? sanitize_text_field( wp_unslash( $_GET['status'] ) ) : '';
-    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$current_page = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
 
-	// Date range filter - default to today to +30 days
-    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$date_from = isset( $_GET['date_from'] ) ? sanitize_text_field( wp_unslash( $_GET['date_from'] ) ) : wp_date( 'Y-m-d' );
-    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$date_to = isset( $_GET['date_to'] ) ? sanitize_text_field( wp_unslash( $_GET['date_to'] ) ) : wp_date( 'Y-m-d', strtotime( '+30 days' ) );
 
-	// Build filters
 	$filters = array(
 		'page'      => $current_page,
 		'page_size' => 20,
@@ -42,13 +34,37 @@ function tebuto_bookings_page(): void {
 		$filters['status'] = $current_status;
 	}
 
-	// Fetch bookings
-	$bookings_result = $api->get_bookings( $filters );
+	return array(
+		'current_status' => $current_status,
+		'current_page'   => $current_page,
+		'date_from'      => $date_from,
+		'date_to'        => $date_to,
+		'filters'        => $filters,
+	);
+}
+
+/**
+ * Render the bookings management page.
+ *
+ * @return void
+ */
+function tebuto_bookings_page(): void {
+	$api = tebuto_require_tebuto_connection();
+	if ( $api === null ) {
+		return;
+	}
+
+	$page_filters   = tebuto_get_bookings_page_filters();
+	$current_status = $page_filters['current_status'];
+	$current_page   = $page_filters['current_page'];
+	$date_from      = $page_filters['date_from'];
+	$date_to        = $page_filters['date_to'];
+
+	$bookings_result = $api->get_bookings( $page_filters['filters'] );
 	if ( is_wp_error( $bookings_result ) && tebuto_maybe_render_session_expired_from_error( $bookings_result ) ) {
 		return;
 	}
 
-	// Current time for past appointment check
 	$now = time();
 
 	?>
@@ -70,6 +86,25 @@ function tebuto_bookings_page(): void {
 	);
 	?>
 
+		<?php tebuto_render_bookings_filters( $date_from, $date_to, $current_status ); ?>
+
+		<?php tebuto_render_bookings_table( $bookings_result, $api, $now, $date_from, $date_to, $current_status, $current_page ); ?>
+
+		<?php tebuto_render_booking_details_modal(); ?>
+	<?php
+	tebuto_ui_page_close();
+}
+
+/**
+ * Render bookings filter panel.
+ *
+ * @param string $date_from      Selected start date (Y-m-d).
+ * @param string $date_to        Selected end date (Y-m-d).
+ * @param string $current_status Selected status filter.
+ * @return void
+ */
+function tebuto_render_bookings_filters( string $date_from, string $date_to, string $current_status ): void {
+	?>
 		<!-- Filters -->
 		<div class="tebuto-filters-panel">
 			<form method="get" class="tebuto-filters-form" id="tebuto-bookings-filter-form">
@@ -219,7 +254,23 @@ function tebuto_bookings_page(): void {
 				</div>
 			</form>
 		</div>
+	<?php
+}
 
+/**
+ * Render bookings table card (error / empty / table + pagination).
+ *
+ * @param array|WP_Error $bookings_result Bookings API response.
+ * @param Tebuto_API     $api             API instance.
+ * @param int            $now             Current unix timestamp.
+ * @param string         $date_from       Selected start date.
+ * @param string         $date_to         Selected end date.
+ * @param string         $current_status  Selected status.
+ * @param int            $current_page    Current page number.
+ * @return void
+ */
+function tebuto_render_bookings_table( $bookings_result, Tebuto_API $api, int $now, string $date_from, string $date_to, string $current_status, int $current_page ): void {
+	?>
 		<!-- Bookings Table -->
 		<div class="tebuto-card">
 			<?php if ( is_wp_error( $bookings_result ) ) : ?>
@@ -251,9 +302,30 @@ function tebuto_bookings_page(): void {
 						<tbody>
 							<?php
 							foreach ( $bookings_result['bookings'] as $booking ) :
-								$event_start = strtotime( $booking['event']['start'] );
-								$is_past     = $event_start < $now;
-								?>
+								tebuto_render_booking_row( $booking, $now );
+							endforeach;
+							?>
+						</tbody>
+					</table>
+				</div>
+
+				<?php tebuto_render_bookings_pagination( $bookings_result, $date_from, $date_to, $current_status, $current_page ); ?>
+			<?php endif; ?>
+		</div>
+	<?php
+}
+
+/**
+ * Render a single booking table row.
+ *
+ * @param array $booking Booking data.
+ * @param int   $now     Current unix timestamp.
+ * @return void
+ */
+function tebuto_render_booking_row( array $booking, int $now ): void {
+	$event_start = strtotime( $booking['event']['start'] );
+	$is_past     = $event_start < $now;
+	?>
 								<tr class="tebuto-booking-row <?php echo $is_past ? 'tebuto-booking-past' : ''; ?>" data-booking-id="<?php echo esc_attr( $booking['id'] ); ?>">
 									<td>
 										<div class="tebuto-client-info">
@@ -321,13 +393,25 @@ function tebuto_bookings_page(): void {
 										</div>
 									</td>
 								</tr>
-							<?php endforeach; ?>
-						</tbody>
-					</table>
-				</div>
+	<?php
+}
 
+/**
+ * Render bookings pagination controls.
+ *
+ * @param array  $bookings_result Bookings API response (success).
+ * @param string $date_from       Selected start date.
+ * @param string $date_to         Selected end date.
+ * @param string $current_status  Selected status.
+ * @param int    $current_page    Current page number.
+ * @return void
+ */
+function tebuto_render_bookings_pagination( array $bookings_result, string $date_from, string $date_to, string $current_status, int $current_page ): void {
+	if ( $bookings_result['totalPages'] <= 1 ) {
+		return;
+	}
+	?>
 				<!-- Pagination -->
-				<?php if ( $bookings_result['totalPages'] > 1 ) : ?>
 					<div class="tebuto-pagination">
 						<?php
 						$base_url = admin_url( 'admin.php?page=tebuto-bookings' );
@@ -337,7 +421,6 @@ function tebuto_bookings_page(): void {
 							$base_url = add_query_arg( 'status', $current_status, $base_url );
 						}
 
-						// Previous
 						if ( $current_page > 1 ) :
 							?>
 							<a href="<?php echo esc_url( add_query_arg( 'paged', $current_page - 1, $base_url ) ); ?>" class="button tebuto-btn tebuto-btn--outline tebuto-btn--neutral">
@@ -368,7 +451,6 @@ function tebuto_bookings_page(): void {
 						</span>
 
 						<?php
-						// Next
 						if ( $current_page < $bookings_result['totalPages'] ) :
 							?>
 							<a href="<?php echo esc_url( add_query_arg( 'paged', $current_page + 1, $base_url ) ); ?>" class="button tebuto-btn tebuto-btn--outline tebuto-btn--neutral">
@@ -376,10 +458,16 @@ function tebuto_bookings_page(): void {
 							</a>
 						<?php endif; ?>
 					</div>
-				<?php endif; ?>
-			<?php endif; ?>
-		</div>
+	<?php
+}
 
+/**
+ * Render booking details modal and template.
+ *
+ * @return void
+ */
+function tebuto_render_booking_details_modal(): void {
+	?>
 		<!-- Booking Details Modal -->
 		<div id="tebuto-booking-modal" class="tebuto-modal" style="display: none;">
 			<div class="tebuto-modal-content">
@@ -417,7 +505,6 @@ function tebuto_bookings_page(): void {
 		</div>
 	</template>
 	<?php
-	tebuto_ui_page_close();
 }
 
 /**

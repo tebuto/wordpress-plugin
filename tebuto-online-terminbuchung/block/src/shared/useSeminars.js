@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n'
 import { useEffect, useState } from 'react'
+import { applyAjaxNetworkError, applyAjaxResult } from './ajaxResult'
 import { getTebutoData } from './theme'
 
 export default function useSeminars() {
@@ -39,27 +40,18 @@ export default function useSeminars() {
 					return
 				}
 
-				if (payload.success) {
-					setSeminars(payload.data)
-					setError(null)
-				} else {
-					const errorPayload = payload.data
-					const errorCode = typeof errorPayload === 'object' && errorPayload !== null ? errorPayload.code : null
-
-					if (errorCode === 'session_expired') {
-						setSessionExpired(true)
-						setError(null)
-					} else {
-						const errorMessage =
-							typeof errorPayload === 'object' && errorPayload !== null && errorPayload.message
-								? errorPayload.message
-								: errorPayload
-						setError(errorMessage || __('Seminare konnten nicht geladen werden.', 'tebuto-online-terminbuchung'))
-					}
-				}
+				applyAjaxResult(payload, {
+					setData: setSeminars,
+					setError,
+					setSessionExpired,
+					fallbackError: __('Seminare konnten nicht geladen werden.', 'tebuto-online-terminbuchung')
+				})
 			} catch {
 				if (!cancelled) {
-					setError(__('Verbindungsfehler beim Laden der Seminare.', 'tebuto-online-terminbuchung'))
+					applyAjaxNetworkError({
+						setError,
+						networkError: __('Verbindungsfehler beim Laden der Seminare.', 'tebuto-online-terminbuchung')
+					})
 				}
 			} finally {
 				if (!cancelled) {

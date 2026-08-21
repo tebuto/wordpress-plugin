@@ -1,80 +1,35 @@
-export default function save({ attributes }) {
-	const {
-		primaryColor,
-		backgroundColor,
-		textPrimary,
-		textSecondary,
-		borderColor,
-		border,
-		inheritFont,
-		showProviderFilter,
-		showLocationQuickFilter,
-		showCategorySelectionFirst,
-		categories,
-		configuredCategoriesJson,
-		customCss
-	} = attributes
+const COLOR_DEFAULTS = {
+	primaryColor: '#00B4A9',
+	backgroundColor: '#ffffff',
+	textPrimary: '#374151',
+	textSecondary: '#6b7280',
+	borderColor: '#E9E9E9'
+}
 
-	const uuid = window.tebutoData?.uuid || ''
-	const widgetUrl = 'https://tebuto.de/widget/booking.js'
+const COLOR_DATA_KEYS = {
+	primaryColor: 'data-primary-color',
+	backgroundColor: 'data-background-color',
+	textPrimary: 'data-text-primary',
+	textSecondary: 'data-text-secondary',
+	borderColor: 'data-border-color'
+}
 
-	// Build widget attributes
-	const widgetAttributes = {
-		'data-therapist-uuid': uuid,
-		'data-border': border ? 'true' : 'false'
+function hasSubaccountCategories(configuredCategoriesJson) {
+	if (!configuredCategoriesJson) {
+		return false
 	}
 
-	// Color attributes (only add if different from defaults)
-	if (primaryColor && primaryColor !== '#00B4A9') {
-		widgetAttributes['data-primary-color'] = primaryColor
+	try {
+		const configuredCategories = JSON.parse(configuredCategoriesJson)
+		return Array.isArray(configuredCategories)
+			? configuredCategories.some((category) => category.isFromSubaccount === true)
+			: false
+	} catch {
+		return false
 	}
+}
 
-	if (backgroundColor && backgroundColor !== '#ffffff') {
-		widgetAttributes['data-background-color'] = backgroundColor
-	}
-
-	if (textPrimary && textPrimary !== '#374151') {
-		widgetAttributes['data-text-primary'] = textPrimary
-	}
-
-	if (textSecondary && textSecondary !== '#6b7280') {
-		widgetAttributes['data-text-secondary'] = textSecondary
-	}
-
-	if (borderColor && borderColor !== '#E9E9E9') {
-		widgetAttributes['data-border-color'] = borderColor
-	}
-
-	// Boolean attributes
-	if (inheritFont) {
-		widgetAttributes['data-inherit-font'] = 'true'
-	}
-
-	let hasSubaccountCategories = false
-	if (configuredCategoriesJson) {
-		try {
-			const configuredCategories = JSON.parse(configuredCategoriesJson)
-			hasSubaccountCategories = Array.isArray(configuredCategories)
-				? configuredCategories.some((category) => category.isFromSubaccount === true)
-				: false
-		} catch {
-			hasSubaccountCategories = false
-		}
-	}
-
-	if (showProviderFilter || hasSubaccountCategories) {
-		widgetAttributes['data-include-subusers'] = 'true'
-		widgetAttributes['data-show-quick-filters'] = 'true'
-	}
-
-	if (showLocationQuickFilter) {
-		widgetAttributes['data-show-location-quick-filter'] = 'true'
-	}
-
-	if ((showProviderFilter || hasSubaccountCategories) && configuredCategoriesJson) {
-		widgetAttributes['data-configured-categories'] = configuredCategoriesJson
-	}
-
+function resolveCategoriesForEmbed(categories, configuredCategoriesJson) {
 	let categoriesForEmbed = categories
 	if (!categoriesForEmbed?.trim() && configuredCategoriesJson) {
 		try {
@@ -91,6 +46,65 @@ export default function save({ attributes }) {
 			categoriesForEmbed = categories
 		}
 	}
+	return categoriesForEmbed
+}
+
+export function buildBookingWidgetDataAttributes(attributes, uuid) {
+	const {
+		primaryColor,
+		backgroundColor,
+		textPrimary,
+		textSecondary,
+		borderColor,
+		border,
+		inheritFont,
+		showProviderFilter,
+		showLocationQuickFilter,
+		showCategorySelectionFirst,
+		categories,
+		configuredCategoriesJson
+	} = attributes
+
+	const widgetAttributes = {
+		'data-therapist-uuid': uuid,
+		'data-border': border ? 'true' : 'false'
+	}
+
+	const colorValues = {
+		primaryColor,
+		backgroundColor,
+		textPrimary,
+		textSecondary,
+		borderColor
+	}
+
+	for (const [key, dataKey] of Object.entries(COLOR_DATA_KEYS)) {
+		const value = colorValues[key]
+		if (value && value !== COLOR_DEFAULTS[key]) {
+			widgetAttributes[dataKey] = value
+		}
+	}
+
+	if (inheritFont) {
+		widgetAttributes['data-inherit-font'] = 'true'
+	}
+
+	const includeSubusers = showProviderFilter || hasSubaccountCategories(configuredCategoriesJson)
+
+	if (includeSubusers) {
+		widgetAttributes['data-include-subusers'] = 'true'
+		widgetAttributes['data-show-quick-filters'] = 'true'
+	}
+
+	if (showLocationQuickFilter) {
+		widgetAttributes['data-show-location-quick-filter'] = 'true'
+	}
+
+	if (includeSubusers && configuredCategoriesJson) {
+		widgetAttributes['data-configured-categories'] = configuredCategoriesJson
+	}
+
+	const categoriesForEmbed = resolveCategoriesForEmbed(categories, configuredCategoriesJson)
 
 	if (categoriesForEmbed?.trim()) {
 		widgetAttributes['data-categories'] = categoriesForEmbed
@@ -99,6 +113,16 @@ export default function save({ attributes }) {
 	if (showCategorySelectionFirst === false) {
 		widgetAttributes['data-show-category-selection-first'] = 'false'
 	}
+
+	return widgetAttributes
+}
+
+export default function save({ attributes }) {
+	const { customCss } = attributes
+
+	const uuid = window.tebutoData?.uuid || ''
+	const widgetUrl = 'https://tebuto.de/widget/booking.js'
+	const widgetAttributes = buildBookingWidgetDataAttributes(attributes, uuid)
 
 	return (
 		<>

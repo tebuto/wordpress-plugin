@@ -144,12 +144,26 @@ class Tebuto_API {
 
 		$response_body = json_decode( $body, true );
 
+		if ( ! is_array( $response_body ) ) {
+			$this->last_error = __( 'Therapeuten-Daten nicht in API-Antwort gefunden.', 'tebuto-online-terminbuchung' );
+			return false;
+		}
+
+		return $this->persist_therapist_identity_from_whoami( $response_body );
+	}
+
+	/**
+	 * Persist therapist / user identity from a who-am-i response body.
+	 *
+	 * @param array $response_body Decoded who-am-i payload.
+	 * @return bool True if therapist ID was stored.
+	 */
+	private function persist_therapist_identity_from_whoami( array $response_body ): bool {
 		if ( ! isset( $response_body['therapists'][0]['therapist']['id'] ) ) {
 			$this->last_error = __( 'Therapeuten-Daten nicht in API-Antwort gefunden.', 'tebuto-online-terminbuchung' );
 			return false;
 		}
 
-		// Store Tebuto user ID (needed for managed users endpoint)
 		if ( isset( $response_body['id'] ) ) {
 			$this->tebuto_user_id = absint( $response_body['id'] );
 			tebuto_update_user_meta( $this->user_id, 'tebuto_user_id', $this->tebuto_user_id );
@@ -157,13 +171,11 @@ class Tebuto_API {
 
 		$therapist = $response_body['therapists'][0]['therapist'];
 
-		// Store ID
 		if ( isset( $therapist['id'] ) ) {
 			$this->therapist_id = absint( $therapist['id'] );
 			tebuto_update_user_meta( $this->user_id, 'therapist_id', $this->therapist_id );
 		}
 
-		// Store UUID if not present
 		if ( isset( $therapist['uuid'] ) ) {
 			$uuid = tebuto_get_user_meta( $this->user_id, 'therapist_uuid' );
 			if ( empty( $uuid ) ) {
@@ -171,7 +183,6 @@ class Tebuto_API {
 			}
 		}
 
-		// Store name if not present
 		if ( isset( $therapist['name'] ) ) {
 			$name = tebuto_get_user_meta( $this->user_id, 'therapist_name' );
 			if ( empty( $name ) ) {
@@ -203,12 +214,77 @@ class Tebuto_API {
 	}
 
 	/**
-	 * Get therapist ID.
+	 * Ensure credentials and token are ready for an authenticated API call.
 	 *
-	 * @return int|null
+	 * @return true|WP_Error
 	 */
-	public function get_therapist_id(): ?int {
-		return $this->therapist_id;
+	private function ensure_ready_for_authenticated_request() {
+		if ( ! $this->access_token ) {
+			$this->last_error = __( 'Nicht mit Tebuto verbunden.', 'tebuto-online-terminbuchung' );
+			return new WP_Error( 'not_connected', $this->last_error );
+		}
+
+		if ( ! $this->therapist_id ) {
+			$this->fetch_and_store_therapist_id();
+		}
+
+		if ( ! $this->therapist_id ) {
+			if ( empty( $this->last_error ) ) {
+				$this->last_error = __( 'Therapeuten-ID nicht gefunden. Bitte verbinde dich erneut mit Tebuto.', 'tebuto-online-terminbuchung' );
+			}
+			return new WP_Error( 'no_therapist_id', $this->last_error );
+		}
+
+		if ( ! $this->ensure_valid_token() ) {
+			$this->last_error = __( 'Token konnte nicht erneuert werden.', 'tebuto-online-terminbuchung' );
+			return new WP_Error( 'token_refresh_failed', $this->last_error );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Decode an HTTP response, refresh once on 401, and map API errors.
+	 *
+	 * @param array|WP_Error $response       HTTP response from wp_remote_*.
+	 * @param bool           $is_retry       Whether this is already a retry.
+	 * @param callable       $retry_callback Zero-arg callback to re-issue the request.
+	 * @return array|WP_Error
+	 */
+	private function decode_authenticated_http_response( $response, bool $is_retry, callable $retry_callback ) {
+		if ( is_wp_error( $response ) ) {
+			$this->last_error = $response->get_error_message();
+			return $response;
+		}
+
+		$status_code = wp_remote_retrieve_response_code( $response );
+		$body        = wp_remote_retrieve_body( $response );
+		$decoded     = json_decode( $body, true );
+
+		if ( $status_code === 401 && ! $is_retry ) {
+			if ( $this->refresh_access_token() ) {
+				return $retry_callback();
+			}
+
+			return $this->session_expired_error();
+		}
+
+		if ( $status_code >= 400 ) {
+			$error_message    = is_array( $decoded ) && isset( $decoded['message'] )
+				? $decoded['message']
+				: __( 'API-Fehler', 'tebuto-online-terminbuchung' );
+			$this->last_error = $error_message;
+			return new WP_Error(
+				'api_error',
+				$error_message,
+				array(
+					'status'   => $status_code,
+					'response' => $decoded,
+				)
+			);
+		}
+
+		return is_array( $decoded ) ? $decoded : array();
 	}
 
 	/**
@@ -222,28 +298,9 @@ class Tebuto_API {
 	 * @return array|WP_Error Response data or error.
 	 */
 	private function request( string $method, string $endpoint, array $data = array(), array $query = array(), bool $is_retry = false ) {
-		if ( ! $this->access_token ) {
-			$this->last_error = __( 'Nicht mit Tebuto verbunden.', 'tebuto-online-terminbuchung' );
-			return new WP_Error( 'not_connected', $this->last_error );
-		}
-
-		// Try to fetch therapist_id if missing
-		if ( ! $this->therapist_id ) {
-			$this->fetch_and_store_therapist_id();
-		}
-
-		if ( ! $this->therapist_id ) {
-			// Return the error from fetch attempt, or a generic one
-			if ( empty( $this->last_error ) ) {
-				$this->last_error = __( 'Therapeuten-ID nicht gefunden. Bitte verbinde dich erneut mit Tebuto.', 'tebuto-online-terminbuchung' );
-			}
-			return new WP_Error( 'no_therapist_id', $this->last_error );
-		}
-
-		// Refresh token if needed
-		if ( ! $this->ensure_valid_token() ) {
-			$this->last_error = __( 'Token konnte nicht erneuert werden.', 'tebuto-online-terminbuchung' );
-			return new WP_Error( 'token_refresh_failed', $this->last_error );
+		$ready = $this->ensure_ready_for_authenticated_request();
+		if ( is_wp_error( $ready ) ) {
+			return $ready;
 		}
 
 		$url = TEBUTO_API_URL . '/' . $endpoint;
@@ -268,37 +325,13 @@ class Tebuto_API {
 
 		$response = wp_remote_request( $url, $args );
 
-		if ( is_wp_error( $response ) ) {
-			$this->last_error = $response->get_error_message();
-			return $response;
-		}
-
-		$status_code = wp_remote_retrieve_response_code( $response );
-		$body        = wp_remote_retrieve_body( $response );
-		$decoded     = json_decode( $body, true );
-
-		if ( $status_code === 401 && ! $is_retry ) {
-			if ( $this->refresh_access_token() ) {
+		return $this->decode_authenticated_http_response(
+			$response,
+			$is_retry,
+			function () use ( $method, $endpoint, $data, $query ) {
 				return $this->request( $method, $endpoint, $data, $query, true );
 			}
-
-			return $this->session_expired_error();
-		}
-
-		if ( $status_code >= 400 ) {
-			$error_message    = $decoded['message'] ?? __( 'API-Fehler', 'tebuto-online-terminbuchung' );
-			$this->last_error = $error_message;
-			return new WP_Error(
-				'api_error',
-				$error_message,
-				array(
-					'status'   => $status_code,
-					'response' => $decoded,
-				)
-			);
-		}
-
-		return $decoded ?? array();
+		);
 	}
 
 	/**
@@ -537,19 +570,12 @@ class Tebuto_API {
 	}
 
 	/**
-	 * Aggregate all event categories for the manager account and subaccounts.
+	 * Aggregate event categories owned by the main therapist.
 	 *
-	 * Includes every category for display in the plugin. Non-public rows stay visible
-	 * but are marked with widgetSelectable=false. Subaccount inherited mirrors are omitted.
-	 *
+	 * @param string $main_name Main therapist display name.
 	 * @return array|WP_Error
 	 */
-	public function get_aggregated_event_categories() {
-		if ( empty( $this->therapist_id ) ) {
-			return new WP_Error( 'no_therapist_id', __( 'Therapeuten-ID nicht gefunden.', 'tebuto-online-terminbuchung' ) );
-		}
-
-		$main_name       = $this->get_therapist_name() ?? '';
+	private function aggregate_main_therapist_categories( string $main_name ) {
 		$main_categories = $this->get_event_categories_for_therapist( $this->therapist_id );
 		if ( is_wp_error( $main_categories ) ) {
 			return $main_categories;
@@ -567,9 +593,19 @@ class Tebuto_API {
 			}
 		}
 
+		return $result;
+	}
+
+	/**
+	 * Append non-inherited event categories from managed subaccounts.
+	 *
+	 * @param array $result Aggregated categories so far.
+	 * @return array
+	 */
+	private function append_subaccount_event_categories( array $result ): array {
 		$capabilities = tebuto_get_widget_account_capabilities( $this->user_id );
 		if ( empty( $capabilities['has_managed_users'] ) ) {
-			return $this->sort_aggregated_event_categories( $result );
+			return $result;
 		}
 
 		$configured_therapists = $this->get_configured_therapists();
@@ -598,6 +634,30 @@ class Tebuto_API {
 				);
 			}
 		}
+
+		return $result;
+	}
+
+	/**
+	 * Aggregate all event categories for the manager account and subaccounts.
+	 *
+	 * Includes every category for display in the plugin. Non-public rows stay visible
+	 * but are marked with widgetSelectable=false. Subaccount inherited mirrors are omitted.
+	 *
+	 * @return array|WP_Error
+	 */
+	public function get_aggregated_event_categories() {
+		if ( empty( $this->therapist_id ) ) {
+			return new WP_Error( 'no_therapist_id', __( 'Therapeuten-ID nicht gefunden.', 'tebuto-online-terminbuchung' ) );
+		}
+
+		$main_name = $this->get_therapist_name() ?? '';
+		$result    = $this->aggregate_main_therapist_categories( $main_name );
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		$result = $this->append_subaccount_event_categories( $result );
 
 		return $this->sort_aggregated_event_categories( $result );
 	}
@@ -679,26 +739,6 @@ class Tebuto_API {
 		);
 	}
 
-	/**
-	 * Skip an event.
-	 *
-	 * @param array $data Skip event data.
-	 * @return array|WP_Error
-	 */
-	public function skip_event( array $data ) {
-		return $this->request( 'POST', self::PATH_THERAPISTS . $this->therapist_id . '/events/skip', $data );
-	}
-
-	/**
-	 * Release a skipped event.
-	 *
-	 * @param int $event_id Event ID.
-	 * @return array|WP_Error
-	 */
-	public function release_event( int $event_id ) {
-		return $this->request( 'POST', self::PATH_THERAPISTS . $this->therapist_id . '/events/' . $event_id . '/release' );
-	}
-
 	// =========================================================================
 	// BOOKINGS
 	// =========================================================================
@@ -778,38 +818,6 @@ class Tebuto_API {
 	// =========================================================================
 	// EVENT RULES
 	// =========================================================================
-
-	/**
-	 * Get event rules for a category.
-	 *
-	 * @param int $category_id Category ID.
-	 * @return array|WP_Error
-	 */
-	public function get_event_rules( int $category_id ) {
-		return $this->request( 'GET', self::PATH_THERAPISTS . $this->therapist_id . self::PATH_EVENT_CATEGORIES . $category_id . '/event-rules' );
-	}
-
-	/**
-	 * Create an event rule.
-	 *
-	 * @param int   $category_id Category ID.
-	 * @param array $data        Rule data.
-	 * @return array|WP_Error
-	 */
-	public function create_event_rule( int $category_id, array $data ) {
-		return $this->request( 'POST', self::PATH_THERAPISTS . $this->therapist_id . self::PATH_EVENT_CATEGORIES . $category_id . '/event-rules', $data );
-	}
-
-	/**
-	 * Delete an event rule.
-	 *
-	 * @param int $category_id Category ID.
-	 * @param int $rule_id     Rule ID.
-	 * @return array|WP_Error
-	 */
-	public function delete_event_rule( int $category_id, int $rule_id ) {
-		return $this->request( 'DELETE', self::PATH_THERAPISTS . $this->therapist_id . self::PATH_EVENT_CATEGORIES . $category_id . '/event-rules/' . $rule_id );
-	}
 
 	// =========================================================================
 	// SEMINARS
@@ -1033,36 +1041,12 @@ class Tebuto_API {
 	}
 
 	/**
-	 * Make a multipart/form-data API request (for file uploads).
+	 * Build a multipart/form-data body for a single file field named "file".
 	 *
-	 * @param string $method   HTTP method.
-	 * @param string $endpoint Relative endpoint.
-	 * @param array  $file     $_FILES entry.
-	 * @param bool   $is_retry Whether this is a retry after token refresh.
-	 * @return array|WP_Error
+	 * @param array $file $_FILES entry.
+	 * @return array{body: string, boundary: string}|WP_Error
 	 */
-	private function request_multipart( string $method, string $endpoint, array $file, bool $is_retry = false ) {
-		if ( ! $this->access_token ) {
-			$this->last_error = __( 'Nicht mit Tebuto verbunden.', 'tebuto-online-terminbuchung' );
-			return new WP_Error( 'not_connected', $this->last_error );
-		}
-
-		if ( ! $this->therapist_id ) {
-			$this->fetch_and_store_therapist_id();
-		}
-
-		if ( ! $this->therapist_id ) {
-			if ( empty( $this->last_error ) ) {
-				$this->last_error = __( 'Therapeuten-ID nicht gefunden. Bitte verbinde dich erneut mit Tebuto.', 'tebuto-online-terminbuchung' );
-			}
-			return new WP_Error( 'no_therapist_id', $this->last_error );
-		}
-
-		if ( ! $this->ensure_valid_token() ) {
-			$this->last_error = __( 'Token konnte nicht erneuert werden.', 'tebuto-online-terminbuchung' );
-			return new WP_Error( 'token_refresh_failed', $this->last_error );
-		}
-
+	private function build_multipart_file_body( array $file ) {
 		$boundary  = wp_generate_password( 24, false );
 		$filename  = isset( $file['name'] ) ? (string) $file['name'] : 'banner';
 		$file_type = isset( $file['type'] ) ? (string) $file['type'] : 'application/octet-stream';
@@ -1079,74 +1063,53 @@ class Tebuto_API {
 		$body .= $contents . "\r\n";
 		$body .= '--' . $boundary . "--\r\n";
 
+		return array(
+			'body'     => $body,
+			'boundary' => $boundary,
+		);
+	}
+
+	/**
+	 * Make a multipart/form-data API request (for file uploads).
+	 *
+	 * @param string $method   HTTP method.
+	 * @param string $endpoint Relative endpoint.
+	 * @param array  $file     $_FILES entry.
+	 * @param bool   $is_retry Whether this is a retry after token refresh.
+	 * @return array|WP_Error
+	 */
+	private function request_multipart( string $method, string $endpoint, array $file, bool $is_retry = false ) {
+		$ready = $this->ensure_ready_for_authenticated_request();
+		if ( is_wp_error( $ready ) ) {
+			return $ready;
+		}
+
+		$multipart = $this->build_multipart_file_body( $file );
+		if ( is_wp_error( $multipart ) ) {
+			return $multipart;
+		}
+
 		$url  = TEBUTO_API_URL . '/' . $endpoint;
 		$args = array(
 			'method'    => $method,
 			'headers'   => array(
 				'Authorization' => self::HEADER_AUTH_PREFIX . $this->access_token,
-				'Content-Type'  => 'multipart/form-data; boundary=' . $boundary,
+				'Content-Type'  => 'multipart/form-data; boundary=' . $multipart['boundary'],
 			),
-			'body'      => $body,
+			'body'      => $multipart['body'],
 			'timeout'   => 60,
 			'sslverify' => TEBUTO_SSL_VERIFY,
 		);
 
 		$response = wp_remote_request( $url, $args );
 
-		if ( is_wp_error( $response ) ) {
-			$this->last_error = $response->get_error_message();
-			return $response;
-		}
-
-		$status_code = wp_remote_retrieve_response_code( $response );
-		$body_raw    = wp_remote_retrieve_body( $response );
-		$decoded     = json_decode( $body_raw, true );
-
-		if ( $status_code === 401 && ! $is_retry ) {
-			if ( $this->refresh_access_token() ) {
+		return $this->decode_authenticated_http_response(
+			$response,
+			$is_retry,
+			function () use ( $method, $endpoint, $file ) {
 				return $this->request_multipart( $method, $endpoint, $file, true );
 			}
-
-			return $this->session_expired_error();
-		}
-
-		if ( $status_code >= 400 ) {
-			$error_message    = is_array( $decoded ) && isset( $decoded['message'] ) ? $decoded['message'] : __( 'API-Fehler', 'tebuto-online-terminbuchung' );
-			$this->last_error = $error_message;
-			return new WP_Error(
-				'api_error',
-				$error_message,
-				array(
-					'status'   => $status_code,
-					'response' => $decoded,
-				)
-			);
-		}
-
-		return is_array( $decoded ) ? $decoded : array();
-	}
-
-	// =========================================================================
-	// CLIENTS
-	// =========================================================================
-
-	/**
-	 * Get all clients.
-	 *
-	 * @return array|WP_Error
-	 */
-	public function get_clients() {
-		return $this->request( 'GET', self::PATH_THERAPISTS . $this->therapist_id . '/clients' );
-	}
-
-	/**
-	 * Get a single client.
-	 *
-	 * @param int $client_id Client ID.
-	 * @return array|WP_Error
-	 */
-	public function get_client( int $client_id ) {
-		return $this->request( 'GET', self::PATH_THERAPISTS . $this->therapist_id . '/clients/' . $client_id );
+		);
 	}
 
 	// =========================================================================
@@ -1160,15 +1123,6 @@ class Tebuto_API {
 	 */
 	public function get_therapist() {
 		return $this->request( 'GET', self::PATH_THERAPISTS . $this->therapist_id );
-	}
-
-	/**
-	 * Get global therapist branding (widget theme colors).
-	 *
-	 * @return array|WP_Error
-	 */
-	public function get_branding() {
-		return $this->request( 'GET', self::PATH_THERAPISTS . $this->therapist_id . '/branding' );
 	}
 
 	/**
@@ -1213,6 +1167,68 @@ class Tebuto_API {
 	}
 
 	/**
+	 * Build the main therapist entry for configured-therapist lists.
+	 *
+	 * @return array{id: int, name: string}|null
+	 */
+	private function build_main_therapist_entry(): ?array {
+		if ( ! $this->therapist_id ) {
+			return null;
+		}
+
+		$main_name = $this->get_therapist_name();
+		if ( $main_name ) {
+			return array(
+				'id'   => $this->therapist_id,
+				'name' => $main_name,
+			);
+		}
+
+		$info = $this->get_therapist();
+		if ( ! is_wp_error( $info ) && isset( $info['name'] ) ) {
+			tebuto_update_user_meta( $this->user_id, 'therapist_name', sanitize_text_field( $info['name'] ) );
+			return array(
+				'id'   => $this->therapist_id,
+				'name' => $info['name'],
+			);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Append managed users' therapists that are not already in the list.
+	 *
+	 * @param array $therapists Existing therapist entries.
+	 * @return array
+	 */
+	private function append_managed_therapists( array $therapists ): array {
+		$managed = $this->get_managed_users();
+		if ( is_wp_error( $managed ) || ! isset( $managed['users'] ) || ! is_array( $managed['users'] ) ) {
+			return $therapists;
+		}
+
+		$seen_ids = array_column( $therapists, 'id' );
+		foreach ( $managed['users'] as $user ) {
+			if ( ! isset( $user['therapists'] ) || ! is_array( $user['therapists'] ) ) {
+				continue;
+			}
+			foreach ( $user['therapists'] as $t ) {
+				$tid = $t['id'] ?? 0;
+				if ( $tid && ! in_array( $tid, $seen_ids, true ) ) {
+					$therapists[] = array(
+						'id'   => $tid,
+						'name' => $t['name'] ?? '',
+					);
+					$seen_ids[]   = $tid;
+				}
+			}
+		}
+
+		return $therapists;
+	}
+
+	/**
 	 * Get all configured therapists (main therapist + managed users' therapists).
 	 *
 	 * Used internally when aggregating subaccount categories for the widget
@@ -1223,46 +1239,11 @@ class Tebuto_API {
 	public function get_configured_therapists(): array {
 		$therapists = array();
 
-		// Add main therapist
-		$main_name = $this->get_therapist_name();
-		if ( $this->therapist_id && $main_name ) {
-			$therapists[] = array(
-				'id'   => $this->therapist_id,
-				'name' => $main_name,
-			);
-		} elseif ( $this->therapist_id ) {
-			// Fallback: fetch therapist info from API
-			$info = $this->get_therapist();
-			if ( ! is_wp_error( $info ) && isset( $info['name'] ) ) {
-				$therapists[] = array(
-					'id'   => $this->therapist_id,
-					'name' => $info['name'],
-				);
-				tebuto_update_user_meta( $this->user_id, 'therapist_name', sanitize_text_field( $info['name'] ) );
-			}
+		$main = $this->build_main_therapist_entry();
+		if ( null !== $main ) {
+			$therapists[] = $main;
 		}
 
-		// Add managed users' therapists
-		$managed = $this->get_managed_users();
-		if ( ! is_wp_error( $managed ) && isset( $managed['users'] ) && is_array( $managed['users'] ) ) {
-			$seen_ids = array_column( $therapists, 'id' );
-			foreach ( $managed['users'] as $user ) {
-				if ( ! isset( $user['therapists'] ) || ! is_array( $user['therapists'] ) ) {
-					continue;
-				}
-				foreach ( $user['therapists'] as $t ) {
-					$tid = $t['id'] ?? 0;
-					if ( $tid && ! in_array( $tid, $seen_ids, true ) ) {
-						$therapists[] = array(
-							'id'   => $tid,
-							'name' => $t['name'] ?? '',
-						);
-						$seen_ids[]   = $tid;
-					}
-				}
-			}
-		}
-
-		return $therapists;
+		return $this->append_managed_therapists( $therapists );
 	}
 }

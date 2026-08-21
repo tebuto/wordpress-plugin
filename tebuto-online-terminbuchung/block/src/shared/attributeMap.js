@@ -19,22 +19,6 @@ const CAMEL_TO_SNAKE = {
 	showListFirst: 'show_list_first'
 }
 
-const CAMEL_TO_DATA = {
-	primaryColor: 'primary-color',
-	backgroundColor: 'background-color',
-	textPrimary: 'text-primary',
-	textSecondary: 'text-secondary',
-	borderColor: 'border-color',
-	border: 'border',
-	inheritFont: 'inherit-font',
-	showQuickFilters: 'show-quick-filters',
-	showLocationQuickFilter: 'show-location-quick-filter',
-	showCategorySelectionFirst: 'show-category-selection-first',
-	categories: 'categories',
-	seminars: 'seminars',
-	showListFirst: 'show-list-first'
-}
-
 const BOOLEAN_ATTRS = new Set([
 	'border',
 	'inheritFont',
@@ -57,6 +41,8 @@ const BOOKING_ONLY_ATTRS = new Set([
 ])
 
 const SEMINARS_ONLY_ATTRS = new Set(['seminars', 'showListFirst'])
+
+const CONTENT_ATTRS = new Set(['categories', 'seminars', 'customCss'])
 
 function valuesEqual(a, b) {
 	if (typeof a === 'boolean' || typeof b === 'boolean') {
@@ -88,57 +74,34 @@ function formatShortcodeValue(key, value) {
 	return toStringValue(value)
 }
 
-/**
- * Map camelCase block attributes to data-* keys for the widget script.
- *
- * @param {Record<string, unknown>} attrs
- * @param {'booking'|'seminars'} _variant
- * @returns {Record<string, string>}
- */
-export function toDataAttributes(attrs, _variant) {
-	const data = {}
-
-	for (const [camel, dataKey] of Object.entries(CAMEL_TO_DATA)) {
-		if (!(camel in attrs) || attrs[camel] === undefined || attrs[camel] === null) {
-			continue
-		}
-
-		const value = attrs[camel]
-
-		if (BOOLEAN_ATTRS.has(camel)) {
-			if (camel === 'showCategorySelectionFirst' || camel === 'showListFirst') {
-				if (value === false) {
-					data[`data-${dataKey}`] = 'false'
-				}
-				continue
-			}
-			if (camel === 'border') {
-				data[`data-${dataKey}`] = value ? 'true' : 'false'
-				continue
-			}
-			if (value) {
-				data[`data-${dataKey}`] = 'true'
-			}
-			continue
-		}
-
-		if (typeof value === 'string' && value.trim() === '') {
-			continue
-		}
-
-		data[`data-${dataKey}`] = toStringValue(value)
+function isAttrAllowedForTag(camel, isSeminars) {
+	if (SKIP_SHORTCODE.has(camel)) {
+		return false
 	}
-
-	if (attrs.showProviderFilter) {
-		data['data-include-subusers'] = 'true'
-		data['data-show-quick-filters'] = 'true'
+	if (isSeminars && BOOKING_ONLY_ATTRS.has(camel)) {
+		return false
 	}
-
-	if (attrs.configuredCategoriesJson) {
-		data['data-configured-categories'] = toStringValue(attrs.configuredCategoriesJson)
+	if (!isSeminars && SEMINARS_ONLY_ATTRS.has(camel)) {
+		return false
 	}
+	return true
+}
 
-	return data
+function isEmptyContentAttr(camel, value) {
+	if (!CONTENT_ATTRS.has(camel)) {
+		return false
+	}
+	return !value || toStringValue(value).trim() === ''
+}
+
+function shouldOmitAsDefault(value, defaultValue) {
+	if (defaultValue !== undefined && valuesEqual(value, defaultValue)) {
+		return true
+	}
+	if (defaultValue === undefined && (value === '' || value === false || value == null)) {
+		return true
+	}
+	return false
 }
 
 /**
@@ -154,34 +117,22 @@ export function buildShortcode(attrs, tag = 'tebuto_online_terminbuchung_widget'
 	const params = []
 
 	for (const [camel, snake] of Object.entries(CAMEL_TO_SNAKE)) {
-		if (SKIP_SHORTCODE.has(camel) || !(camel in attrs)) {
-			continue
-		}
-
-		if (isSeminars && BOOKING_ONLY_ATTRS.has(camel)) {
-			continue
-		}
-
-		if (!isSeminars && SEMINARS_ONLY_ATTRS.has(camel)) {
+		if (!(camel in attrs) || !isAttrAllowedForTag(camel, isSeminars)) {
 			continue
 		}
 
 		const value = attrs[camel]
-		const defaultValue = defaults[camel]
 
-		if (camel === 'categories' || camel === 'seminars' || camel === 'customCss') {
-			if (!value || toStringValue(value).trim() === '') {
-				continue
-			}
+		if (isEmptyContentAttr(camel, value)) {
+			continue
+		}
+
+		if (CONTENT_ATTRS.has(camel)) {
 			params.push(`${snake}="${formatShortcodeValue(camel, value)}"`)
 			continue
 		}
 
-		if (defaultValue !== undefined && valuesEqual(value, defaultValue)) {
-			continue
-		}
-
-		if (defaultValue === undefined && (value === '' || value === false || value == null)) {
+		if (shouldOmitAsDefault(value, defaults[camel])) {
 			continue
 		}
 

@@ -26,6 +26,46 @@ function readInitialAttributes() {
 	}
 }
 
+function ensureHiddenInput(form, name) {
+	let input = form.querySelector(`[name="${name}"]`)
+	if (!input) {
+		input = document.createElement('input')
+		input.type = 'hidden'
+		input.name = name
+		form.appendChild(input)
+	}
+	return input
+}
+
+function syncCategoriesInputs(form, value) {
+	const categoriesInput = form.querySelector('[name="categories_json"]')
+	if (categoriesInput) {
+		const ids = value
+			? String(value)
+					.split(',')
+					.map((id) => Number.parseInt(id.trim(), 10))
+					.filter((id) => Number.isFinite(id))
+			: []
+		categoriesInput.value = JSON.stringify(ids)
+	}
+
+	const categoriesField = ensureHiddenInput(form, 'categories')
+	categoriesField.value = value || ''
+}
+
+function setInputValue(input, camel, value) {
+	if (BOOLEAN_FIELDS.has(camel)) {
+		if (input.type === 'checkbox') {
+			input.checked = Boolean(value)
+		} else {
+			input.value = value ? 'true' : 'false'
+		}
+		return
+	}
+
+	input.value = value ?? ''
+}
+
 function syncHiddenInputs(attributes) {
 	const form = document.getElementById('tebuto-widget-settings-form')
 	if (!form) {
@@ -37,49 +77,14 @@ function syncHiddenInputs(attributes) {
 			continue
 		}
 
-		const snake = camelToSnake(camel)
-
 		if (camel === 'categories') {
-			const categoriesInput = form.querySelector('[name="categories_json"]')
-			if (categoriesInput) {
-				const ids = value
-					? String(value)
-							.split(',')
-							.map((id) => Number.parseInt(id.trim(), 10))
-							.filter((id) => Number.isFinite(id))
-					: []
-				categoriesInput.value = JSON.stringify(ids)
-			}
-
-			let categoriesField = form.querySelector('[name="categories"]')
-			if (!categoriesField) {
-				categoriesField = document.createElement('input')
-				categoriesField.type = 'hidden'
-				categoriesField.name = 'categories'
-				form.appendChild(categoriesField)
-			}
-			categoriesField.value = value || ''
+			syncCategoriesInputs(form, value)
 			continue
 		}
 
-		let input = form.querySelector(`[name="${snake}"]`)
-		if (!input) {
-			input = document.createElement('input')
-			input.type = 'hidden'
-			input.name = snake
-			form.appendChild(input)
-		}
-
-		if (BOOLEAN_FIELDS.has(camel)) {
-			if (input.type === 'checkbox') {
-				input.checked = Boolean(value)
-			} else {
-				input.value = value ? 'true' : 'false'
-			}
-			continue
-		}
-
-		input.value = value ?? ''
+		const snake = camelToSnake(camel)
+		const input = ensureHiddenInput(form, snake)
+		setInputValue(input, camel, value)
 	}
 }
 

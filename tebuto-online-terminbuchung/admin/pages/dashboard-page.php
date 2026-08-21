@@ -8,6 +8,47 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Load dashboard API data.
+ *
+ * Returns null if a session-expired screen was already rendered.
+ *
+ * @param Tebuto_API $api API instance.
+ * @return array{upcoming_events: array|WP_Error, bookings_result: array|WP_Error, categories: array|WP_Error, stats: array}|null
+ */
+function tebuto_load_dashboard_data( Tebuto_API $api ): ?array {
+	$today       = wp_date( 'Y-m-d\T00:00:00' );
+	$today_end   = wp_date( 'Y-m-d\T23:59:59' );
+	$month_start = wp_date( 'Y-m-01\T00:00:00' );
+
+	$upcoming_events = $api->get_events( $today, $today_end );
+	if ( is_wp_error( $upcoming_events ) && tebuto_maybe_render_session_expired_from_error( $upcoming_events ) ) {
+		return null;
+	}
+
+	$bookings_result = $api->get_bookings(
+		array(
+			'start'     => $month_start,
+			'page_size' => 100,
+		)
+	);
+	if ( is_wp_error( $bookings_result ) && tebuto_maybe_render_session_expired_from_error( $bookings_result ) ) {
+		return null;
+	}
+
+	$categories = $api->get_aggregated_event_categories();
+	if ( is_wp_error( $categories ) && tebuto_maybe_render_session_expired_from_error( $categories ) ) {
+		return null;
+	}
+
+	return array(
+		'upcoming_events' => $upcoming_events,
+		'bookings_result' => $bookings_result,
+		'categories'      => $categories,
+		'stats'           => tebuto_calculate_dashboard_stats( $bookings_result, $upcoming_events ),
+	);
+}
+
+/**
  * Render the Tebuto dashboard page.
  *
  * @return void
@@ -18,33 +59,14 @@ function tebuto_dashboard_page(): void {
 		return;
 	}
 
-	// Get data for dashboard
-	$today       = wp_date( 'Y-m-d\T00:00:00' );
-	$today_end   = wp_date( 'Y-m-d\T23:59:59' );
-	$month_start = wp_date( 'Y-m-01\T00:00:00' );
-
-	$upcoming_events = $api->get_events( $today, $today_end );
-	if ( is_wp_error( $upcoming_events ) && tebuto_maybe_render_session_expired_from_error( $upcoming_events ) ) {
+	$data = tebuto_load_dashboard_data( $api );
+	if ( $data === null ) {
 		return;
 	}
 
-	$bookings_result = $api->get_bookings(
-		array(
-			'start'     => $month_start,
-			'page_size' => 100,
-		)
-	);
-	if ( is_wp_error( $bookings_result ) && tebuto_maybe_render_session_expired_from_error( $bookings_result ) ) {
-		return;
-	}
-
-	$categories = $api->get_aggregated_event_categories();
-	if ( is_wp_error( $categories ) && tebuto_maybe_render_session_expired_from_error( $categories ) ) {
-		return;
-	}
-
-	// Calculate statistics
-	$stats = tebuto_calculate_dashboard_stats( $bookings_result, $upcoming_events );
+	$upcoming_events = $data['upcoming_events'];
+	$categories      = $data['categories'];
+	$stats           = $data['stats'];
 
 	$disconnect_form  = '<form method="post" class="tebuto-disconnect-form"';
 	$disconnect_form .= ' data-tebuto-confirm="' . esc_attr( __( 'Möchtest du die Verbindung wirklich trennen?', 'tebuto-online-terminbuchung' ) ) . '"';
@@ -73,6 +95,25 @@ function tebuto_dashboard_page(): void {
 	);
 	?>
 
+		<?php tebuto_render_dashboard_stats( $stats, $categories ); ?>
+
+		<div class="tebuto-dashboard-grid">
+			<?php tebuto_render_dashboard_today_events( $upcoming_events ); ?>
+			<?php tebuto_render_dashboard_categories( $categories, $api ); ?>
+		</div>
+	<?php
+	tebuto_ui_page_close();
+}
+
+/**
+ * Render dashboard statistics cards.
+ *
+ * @param array          $stats      Dashboard stats.
+ * @param array|WP_Error $categories Categories response.
+ * @return void
+ */
+function tebuto_render_dashboard_stats( array $stats, $categories ): void {
+	?>
 		<div class="tebuto-stats-grid">
 			<?php
 			echo tebuto_ui_stat_card( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -101,115 +142,127 @@ function tebuto_dashboard_page(): void {
 			);
 			?>
 		</div>
-
-		<div class="tebuto-dashboard-grid">
-			<?php
-			tebuto_ui_card_open(
-				array(
-					'title'               => __( 'Termine heute', 'tebuto-online-terminbuchung' ),
-					'header_actions_html' => tebuto_ui_button(
-						array(
-							'label'   => __( 'Alle Buchungen', 'tebuto-online-terminbuchung' ),
-							'href'    => admin_url( 'admin.php?page=tebuto-bookings' ),
-							'variant' => 'outline',
-							'color'   => 'neutral',
-							'size'    => 'sm',
-							'class'   => 'button-small',
-						)
-					),
-				)
-			);
-			$all_events = array();
-			if ( ! is_wp_error( $upcoming_events ) && is_array( $upcoming_events ) ) {
-				$all_events = tebuto_merge_events( $upcoming_events );
-			}
-			if ( empty( $all_events ) ) {
-				echo tebuto_ui_empty_state( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-					array(
-						'icon'  => 'dashicons-calendar-alt',
-						'title' => __( 'Keine Termine für heute.', 'tebuto-online-terminbuchung' ),
-					)
-				);
-			} else {
-				echo '<ul class="tebuto-event-list">';
-				$displayed = 0;
-				foreach ( $all_events as $event ) {
-					if ( $displayed >= 10 ) {
-						break;
-					}
-					++$displayed;
-					$is_booked = isset( $event['details'] ) && ! empty( $event['details']['booking'] );
-					echo '<li class="tebuto-event-item ' . ( $is_booked ? 'tebuto-event-booked' : '' ) . '">';
-					echo '<div class="tebuto-event-color" style="background-color: ' . esc_attr( $event['color'] ?? TEBUTO_COLOR_FALLBACK ) . '"></div>';
-					echo '<div class="tebuto-event-info">';
-					echo '<span class="tebuto-event-title">' . esc_html( $event['title'] ) . '</span>';
-					echo '<span class="tebuto-event-time">' . esc_html( tebuto_format_event_datetime( $event['start'], $event['end'] ) ) . '</span>';
-					echo '</div>';
-					$badge = $is_booked
-						? tebuto_ui_badge( __( 'Gebucht', 'tebuto-online-terminbuchung' ), 'success' )
-						: tebuto_ui_badge( __( 'Frei', 'tebuto-online-terminbuchung' ), 'default' );
-					echo $badge; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper escapes.
-					echo '</li>';
-				}
-				echo '</ul>';
-			}
-			tebuto_ui_card_close();
-
-			tebuto_ui_card_open(
-				array(
-					'title'               => __( 'Terminkategorien', 'tebuto-online-terminbuchung' ),
-					'header_actions_html' => tebuto_ui_button(
-						array(
-							'label'   => __( 'Verwalten', 'tebuto-online-terminbuchung' ),
-							'href'    => admin_url( 'admin.php?page=tebuto-categories' ),
-							'variant' => 'outline',
-							'color'   => 'neutral',
-							'size'    => 'sm',
-							'class'   => 'button-small',
-						)
-					),
-				)
-			);
-			if ( is_wp_error( $categories ) ) {
-				echo '<p class="tebuto-error">' . esc_html( $api->get_last_error() ) . '</p>';
-			} elseif ( empty( $categories ) ) {
-				echo tebuto_ui_empty_state( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-					array(
-						'icon'  => 'dashicons-category',
-						'title' => __( 'Noch keine Kategorien erstellt.', 'tebuto-online-terminbuchung' ),
-					)
-				);
-			} else {
-				echo '<ul class="tebuto-category-list">';
-				foreach ( $categories as $category ) {
-					$is_widget_selectable = ! empty( $category['widgetSelectable'] );
-					echo '<li class="tebuto-category-item' . ( $is_widget_selectable ? '' : ' tebuto-category-item--unavailable' ) . '"';
-					if ( ! $is_widget_selectable ) {
-						echo ' title="' . esc_attr__( 'Nur öffentliche Kategorien können im WordPress-Widget verwendet werden.', 'tebuto-online-terminbuchung' ) . '"';
-					}
-					echo '>';
-					echo '<div class="tebuto-category-color" style="background-color: ' . esc_attr( $category['color'] ) . '"></div>';
-					echo '<div class="tebuto-category-info">';
-					echo '<span class="tebuto-category-name">' . esc_html( $category['displayName'] ?? $category['name'] ) . '</span>';
-					echo '<span class="tebuto-category-meta">' . esc_html( $category['duration'] ) . ' ' . esc_html__( 'Min.', 'tebuto-online-terminbuchung' );
-					echo ' · ' . esc_html( number_format( (float) $category['price'], 2, ',', '.' ) ) . ' €</span>';
-					echo '</div><div class="tebuto-category-badges">';
-					$badge = $is_widget_selectable
-						? tebuto_ui_badge( __( 'Öffentlich', 'tebuto-online-terminbuchung' ), 'success' )
-						: tebuto_ui_badge( __( 'Nicht öffentlich', 'tebuto-online-terminbuchung' ), 'warning' );
-					echo $badge; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper escapes.
-					if ( ! empty( $category['privateBookingEnabled'] ) ) {
-						echo tebuto_ui_badge( __( 'Privat', 'tebuto-online-terminbuchung' ), 'info' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper escapes.
-					}
-					echo '</div></li>';
-				}
-				echo '</ul>';
-			}
-			tebuto_ui_card_close();
-			?>
-		</div>
 	<?php
-	tebuto_ui_page_close();
+}
+
+/**
+ * Render today's events card.
+ *
+ * @param array|WP_Error $upcoming_events Events API response.
+ * @return void
+ */
+function tebuto_render_dashboard_today_events( $upcoming_events ): void {
+	tebuto_ui_card_open(
+		array(
+			'title'               => __( 'Termine heute', 'tebuto-online-terminbuchung' ),
+			'header_actions_html' => tebuto_ui_button(
+				array(
+					'label'   => __( 'Alle Buchungen', 'tebuto-online-terminbuchung' ),
+					'href'    => admin_url( 'admin.php?page=tebuto-bookings' ),
+					'variant' => 'outline',
+					'color'   => 'neutral',
+					'size'    => 'sm',
+					'class'   => 'button-small',
+				)
+			),
+		)
+	);
+	$all_events = array();
+	if ( ! is_wp_error( $upcoming_events ) && is_array( $upcoming_events ) ) {
+		$all_events = tebuto_merge_events( $upcoming_events );
+	}
+	if ( empty( $all_events ) ) {
+		echo tebuto_ui_empty_state( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			array(
+				'icon'  => 'dashicons-calendar-alt',
+				'title' => __( 'Keine Termine für heute.', 'tebuto-online-terminbuchung' ),
+			)
+		);
+	} else {
+		echo '<ul class="tebuto-event-list">';
+		$displayed = 0;
+		foreach ( $all_events as $event ) {
+			if ( $displayed >= 10 ) {
+				break;
+			}
+			++$displayed;
+			$is_booked = isset( $event['details'] ) && ! empty( $event['details']['booking'] );
+			echo '<li class="tebuto-event-item ' . ( $is_booked ? 'tebuto-event-booked' : '' ) . '">';
+			echo '<div class="tebuto-event-color" style="background-color: ' . esc_attr( $event['color'] ?? TEBUTO_COLOR_FALLBACK ) . '"></div>';
+			echo '<div class="tebuto-event-info">';
+			echo '<span class="tebuto-event-title">' . esc_html( $event['title'] ) . '</span>';
+			echo '<span class="tebuto-event-time">' . esc_html( tebuto_format_event_datetime( $event['start'], $event['end'] ) ) . '</span>';
+			echo '</div>';
+			$badge = $is_booked
+				? tebuto_ui_badge( __( 'Gebucht', 'tebuto-online-terminbuchung' ), 'success' )
+				: tebuto_ui_badge( __( 'Frei', 'tebuto-online-terminbuchung' ), 'default' );
+			echo $badge; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper escapes.
+			echo '</li>';
+		}
+		echo '</ul>';
+	}
+	tebuto_ui_card_close();
+}
+
+/**
+ * Render categories card on the dashboard.
+ *
+ * @param array|WP_Error $categories Categories response.
+ * @param Tebuto_API     $api        API instance.
+ * @return void
+ */
+function tebuto_render_dashboard_categories( $categories, Tebuto_API $api ): void {
+	tebuto_ui_card_open(
+		array(
+			'title'               => __( 'Terminkategorien', 'tebuto-online-terminbuchung' ),
+			'header_actions_html' => tebuto_ui_button(
+				array(
+					'label'   => __( 'Verwalten', 'tebuto-online-terminbuchung' ),
+					'href'    => admin_url( 'admin.php?page=tebuto-categories' ),
+					'variant' => 'outline',
+					'color'   => 'neutral',
+					'size'    => 'sm',
+					'class'   => 'button-small',
+				)
+			),
+		)
+	);
+	if ( is_wp_error( $categories ) ) {
+		echo '<p class="tebuto-error">' . esc_html( $api->get_last_error() ) . '</p>';
+	} elseif ( empty( $categories ) ) {
+		echo tebuto_ui_empty_state( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			array(
+				'icon'  => 'dashicons-category',
+				'title' => __( 'Noch keine Kategorien erstellt.', 'tebuto-online-terminbuchung' ),
+			)
+		);
+	} else {
+		echo '<ul class="tebuto-category-list">';
+		foreach ( $categories as $category ) {
+			$is_widget_selectable = ! empty( $category['widgetSelectable'] );
+			echo '<li class="tebuto-category-item' . ( $is_widget_selectable ? '' : ' tebuto-category-item--unavailable' ) . '"';
+			if ( ! $is_widget_selectable ) {
+				echo ' title="' . esc_attr__( 'Nur öffentliche Kategorien können im WordPress-Widget verwendet werden.', 'tebuto-online-terminbuchung' ) . '"';
+			}
+			echo '>';
+			echo '<div class="tebuto-category-color" style="background-color: ' . esc_attr( $category['color'] ) . '"></div>';
+			echo '<div class="tebuto-category-info">';
+			echo '<span class="tebuto-category-name">' . esc_html( $category['displayName'] ?? $category['name'] ) . '</span>';
+			echo '<span class="tebuto-category-meta">' . esc_html( $category['duration'] ) . ' ' . esc_html__( 'Min.', 'tebuto-online-terminbuchung' );
+			echo ' · ' . esc_html( number_format( (float) $category['price'], 2, ',', '.' ) ) . ' €</span>';
+			echo '</div><div class="tebuto-category-badges">';
+			$badge = $is_widget_selectable
+				? tebuto_ui_badge( __( 'Öffentlich', 'tebuto-online-terminbuchung' ), 'success' )
+				: tebuto_ui_badge( __( 'Nicht öffentlich', 'tebuto-online-terminbuchung' ), 'warning' );
+			echo $badge; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper escapes.
+			if ( ! empty( $category['privateBookingEnabled'] ) ) {
+				echo tebuto_ui_badge( __( 'Privat', 'tebuto-online-terminbuchung' ), 'info' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper escapes.
+			}
+			echo '</div></li>';
+		}
+		echo '</ul>';
+	}
+	tebuto_ui_card_close();
 }
 
 /**
@@ -293,4 +346,3 @@ function tebuto_format_event_datetime( string $start, string $end ): string {
 
 	return sprintf( '%s, %s - %s', $date, $time_start, $time_end );
 }
-

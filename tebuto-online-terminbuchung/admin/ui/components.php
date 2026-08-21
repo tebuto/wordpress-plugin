@@ -96,6 +96,71 @@ function tebuto_ui_page_close(): void {
 }
 
 /**
+ * Build CSS class list for a Tebuto UI button.
+ *
+ * @param string $variant Button variant.
+ * @param string $color   Button color.
+ * @param string $size    Optional size.
+ * @param string $extra   Extra class string.
+ * @return array<int, string>
+ */
+function tebuto_ui_button_class_list( string $variant, string $color, string $size, string $extra ): array {
+	$classes = array(
+		'button',
+		'tebuto-btn',
+		'tebuto-btn--' . sanitize_html_class( $variant ),
+		'tebuto-btn--' . sanitize_html_class( $color ),
+	);
+	if ( $size !== '' ) {
+		$classes[] = 'tebuto-btn--' . sanitize_html_class( $size );
+	}
+	if ( $variant === 'solid' && $color === 'primary' ) {
+		$classes[] = 'button-primary';
+	}
+	if ( $extra !== '' ) {
+		$classes[] = $extra;
+	}
+
+	return $classes;
+}
+
+/**
+ * Build HTML attribute string for a Tebuto UI button.
+ *
+ * @param array<string, string> $attrs   Extra attributes.
+ * @param string                $onclick Legacy onclick handler.
+ * @return string
+ */
+function tebuto_ui_button_attrs_html( array $attrs, string $onclick ): string {
+	$attr_html = '';
+	foreach ( $attrs as $key => $value ) {
+		$attr_html .= ' ' . esc_attr( $key ) . '="' . esc_attr( $value ) . '"';
+	}
+	if ( $onclick !== '' ) {
+		$attr_html .= ' onclick="' . esc_attr( $onclick ) . '"';
+	}
+
+	return $attr_html;
+}
+
+/**
+ * Build inner HTML (icon + label) for a Tebuto UI button.
+ *
+ * @param string $icon  Optional dashicon class.
+ * @param string $label Button label.
+ * @return string
+ */
+function tebuto_ui_button_inner_html( string $icon, string $label ): string {
+	$inner = '';
+	if ( $icon !== '' ) {
+		$inner .= '<span class="dashicons ' . esc_attr( $icon ) . '"></span> ';
+	}
+	$inner .= esc_html( $label );
+
+	return $inner;
+}
+
+/**
  * Render a button (or link styled as button).
  *
  * @param array{label: string, href?: string, type?: string, variant?: string, color?: string, size?: string, class?: string, attrs?: array<string, string>, icon?: string, onclick?: string} $args Button args.
@@ -113,36 +178,9 @@ function tebuto_ui_button( array $args ): string {
 	$onclick = isset( $args['onclick'] ) ? (string) $args['onclick'] : '';
 	$attrs   = isset( $args['attrs'] ) && is_array( $args['attrs'] ) ? $args['attrs'] : array();
 
-	$classes = array(
-		'button',
-		'tebuto-btn',
-		'tebuto-btn--' . sanitize_html_class( $variant ),
-		'tebuto-btn--' . sanitize_html_class( $color ),
-	);
-	if ( $size !== '' ) {
-		$classes[] = 'tebuto-btn--' . sanitize_html_class( $size );
-	}
-	if ( $variant === 'solid' && $color === 'primary' ) {
-		$classes[] = 'button-primary';
-	}
-	if ( $extra !== '' ) {
-		$classes[] = $extra;
-	}
-
-	$attr_html = '';
-	foreach ( $attrs as $key => $value ) {
-		$attr_html .= ' ' . esc_attr( $key ) . '="' . esc_attr( $value ) . '"';
-	}
-	if ( $onclick !== '' ) {
-		$attr_html .= ' onclick="' . esc_attr( $onclick ) . '"';
-	}
-
-	$inner = '';
-	if ( $icon !== '' ) {
-		$inner .= '<span class="dashicons ' . esc_attr( $icon ) . '"></span> ';
-	}
-	$inner .= esc_html( $label );
-
+	$classes    = tebuto_ui_button_class_list( $variant, $color, $size, $extra );
+	$attr_html  = tebuto_ui_button_attrs_html( $attrs, $onclick );
+	$inner      = tebuto_ui_button_inner_html( $icon, $label );
 	$class_attr = esc_attr( implode( ' ', $classes ) );
 
 	if ( $href !== '' ) {

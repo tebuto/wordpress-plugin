@@ -10,89 +10,33 @@ defined( 'ABSPATH' ) || exit;
 const TEBUTO_SEMINAR_TIMEZONE = 'Europe/Berlin';
 
 /**
- * Render the occurrence detail page.
+ * Find an occurrence by ID within a seminar payload.
  *
- * @param int $seminar_id    Seminar ID.
- * @param int $occurrence_id Occurrence ID.
- * @return void
+ * @param array $seminar       Seminar data.
+ * @param int   $occurrence_id Occurrence ID.
+ * @return array|null
  */
-function tebuto_seminar_occurrence_page( int $seminar_id, int $occurrence_id ): void {
-	$api = tebuto_require_tebuto_connection();
-	if ( $api === null ) {
-		return;
-	}
-
-	tebuto_handle_seminar_actions( $api );
-
-	$seminar = $api->get_seminar( $seminar_id );
-	if ( is_wp_error( $seminar ) && tebuto_maybe_render_session_expired_from_error( $seminar ) ) {
-		return;
-	}
-
-	if ( is_wp_error( $seminar ) || ! is_array( $seminar ) ) {
-		tebuto_ui_page_open(
-			array(
-				'title'      => __( 'Veranstaltung', 'tebuto-online-terminbuchung' ),
-				'page_class' => 'tebuto-page-seminars',
-				'fullheight' => true,
-			)
-		);
-		echo tebuto_ui_admonition( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			array(
-				'title' => __( 'Fehler', 'tebuto-online-terminbuchung' ),
-				'body'  => $api->get_last_error() ? $api->get_last_error() : __( 'Seminar konnte nicht geladen werden.', 'tebuto-online-terminbuchung' ),
-				'tone'  => 'warning',
-				'icon'  => 'dashicons-warning',
-			)
-		);
-		tebuto_ui_page_close();
-		return;
-	}
-
-	$occurrence  = null;
+function tebuto_find_seminar_occurrence( array $seminar, int $occurrence_id ): ?array {
 	$occurrences = isset( $seminar['occurrences'] ) && is_array( $seminar['occurrences'] ) ? $seminar['occurrences'] : array();
 	foreach ( $occurrences as $item ) {
 		if ( absint( $item['id'] ?? 0 ) === $occurrence_id ) {
-			$occurrence = $item;
-			break;
+			return $item;
 		}
 	}
 
-	if ( $occurrence === null ) {
-		tebuto_ui_page_open(
-			array(
-				'title'      => __( 'Veranstaltung', 'tebuto-online-terminbuchung' ),
-				'page_class' => 'tebuto-page-seminars',
-				'fullheight' => true,
-			)
-		);
-		echo tebuto_ui_admonition( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			array(
-				'title' => __( 'Nicht gefunden', 'tebuto-online-terminbuchung' ),
-				'body'  => __( 'Die Veranstaltung wurde nicht gefunden.', 'tebuto-online-terminbuchung' ),
-				'tone'  => 'warning',
-				'icon'  => 'dashicons-warning',
-			)
-		);
-		tebuto_ui_page_close();
-		return;
-	}
+	return null;
+}
 
-	$registrations = $api->get_seminar_registrations( $occurrence_id );
-	if ( is_wp_error( $registrations ) && tebuto_maybe_render_session_expired_from_error( $registrations ) ) {
-		return;
-	}
-	if ( is_wp_error( $registrations ) ) {
-		$registrations = array();
-	}
-
-	$is_inherited = ! empty( $seminar['isInherited'] );
-	$status       = (string) ( $occurrence['status'] ?? 'draft' );
-	$lifecycle    = (string) ( $occurrence['lifecycleStatus'] ?? $status );
-	$title        = tebuto_occurrence_display_title( $occurrence );
-	$subtitle     = tebuto_occurrence_display_subtitle( $occurrence );
-	$back_url     = admin_url( 'admin.php?page=tebuto-seminars' );
-
+/**
+ * Build header action buttons HTML for the occurrence page.
+ *
+ * @param int    $occurrence_id Occurrence ID.
+ * @param string $status        Occurrence status.
+ * @param bool   $is_inherited  Whether the seminar is inherited.
+ * @param string $back_url      Back link URL.
+ * @return string
+ */
+function tebuto_build_occurrence_page_actions( int $occurrence_id, string $status, bool $is_inherited, string $back_url ): string {
 	$actions = '';
 	if ( ! $is_inherited ) {
 		$actions .= tebuto_ui_button(
@@ -160,6 +104,18 @@ function tebuto_seminar_occurrence_page( int $seminar_id, int $occurrence_id ): 
 		)
 	);
 
+	return $actions;
+}
+
+/**
+ * Build title meta HTML (lifecycle badge, subtitle, seminar name).
+ *
+ * @param string $lifecycle Lifecycle status.
+ * @param string $subtitle  Optional subtitle.
+ * @param array  $seminar   Seminar data.
+ * @return string
+ */
+function tebuto_build_occurrence_title_meta_html( string $lifecycle, string $subtitle, array $seminar ): string {
 	ob_start();
 	?>
 	<div class="tebuto-occurrence-meta">
@@ -172,7 +128,88 @@ function tebuto_seminar_occurrence_page( int $seminar_id, int $occurrence_id ): 
 		<?php endif; ?>
 	</div>
 	<?php
-	$title_meta = (string) ob_get_clean();
+	return (string) ob_get_clean();
+}
+
+/**
+ * Render the occurrence detail page.
+ *
+ * @param int $seminar_id    Seminar ID.
+ * @param int $occurrence_id Occurrence ID.
+ * @return void
+ */
+function tebuto_seminar_occurrence_page( int $seminar_id, int $occurrence_id ): void {
+	$api = tebuto_require_tebuto_connection();
+	if ( $api === null ) {
+		return;
+	}
+
+	tebuto_handle_seminar_actions( $api );
+
+	$seminar = $api->get_seminar( $seminar_id );
+	if ( is_wp_error( $seminar ) && tebuto_maybe_render_session_expired_from_error( $seminar ) ) {
+		return;
+	}
+
+	if ( is_wp_error( $seminar ) || ! is_array( $seminar ) ) {
+		tebuto_ui_page_open(
+			array(
+				'title'      => __( 'Veranstaltung', 'tebuto-online-terminbuchung' ),
+				'page_class' => 'tebuto-page-seminars',
+				'fullheight' => true,
+			)
+		);
+		echo tebuto_ui_admonition( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			array(
+				'title' => __( 'Fehler', 'tebuto-online-terminbuchung' ),
+				'body'  => $api->get_last_error() ? $api->get_last_error() : __( 'Seminar konnte nicht geladen werden.', 'tebuto-online-terminbuchung' ),
+				'tone'  => 'warning',
+				'icon'  => 'dashicons-warning',
+			)
+		);
+		tebuto_ui_page_close();
+		return;
+	}
+
+	$occurrence = tebuto_find_seminar_occurrence( $seminar, $occurrence_id );
+
+	if ( $occurrence === null ) {
+		tebuto_ui_page_open(
+			array(
+				'title'      => __( 'Veranstaltung', 'tebuto-online-terminbuchung' ),
+				'page_class' => 'tebuto-page-seminars',
+				'fullheight' => true,
+			)
+		);
+		echo tebuto_ui_admonition( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			array(
+				'title' => __( 'Nicht gefunden', 'tebuto-online-terminbuchung' ),
+				'body'  => __( 'Die Veranstaltung wurde nicht gefunden.', 'tebuto-online-terminbuchung' ),
+				'tone'  => 'warning',
+				'icon'  => 'dashicons-warning',
+			)
+		);
+		tebuto_ui_page_close();
+		return;
+	}
+
+	$registrations = $api->get_seminar_registrations( $occurrence_id );
+	if ( is_wp_error( $registrations ) && tebuto_maybe_render_session_expired_from_error( $registrations ) ) {
+		return;
+	}
+	if ( is_wp_error( $registrations ) ) {
+		$registrations = array();
+	}
+
+	$is_inherited = ! empty( $seminar['isInherited'] );
+	$status       = (string) ( $occurrence['status'] ?? 'draft' );
+	$lifecycle    = (string) ( $occurrence['lifecycleStatus'] ?? $status );
+	$title        = tebuto_occurrence_display_title( $occurrence );
+	$subtitle     = tebuto_occurrence_display_subtitle( $occurrence );
+	$back_url     = admin_url( 'admin.php?page=tebuto-seminars' );
+
+	$actions    = tebuto_build_occurrence_page_actions( $occurrence_id, $status, $is_inherited, $back_url );
+	$title_meta = tebuto_build_occurrence_title_meta_html( $lifecycle, $subtitle, $seminar );
 
 	tebuto_ui_page_open(
 		array(
@@ -546,6 +583,46 @@ function tebuto_render_occurrence_settings_summary( array $occurrence, array $se
 }
 
 /**
+ * Render a single session editor row.
+ *
+ * @param array $session      Session data.
+ * @param int   $index        Row index.
+ * @param bool  $is_inherited Whether inherited (read-only).
+ * @return void
+ */
+function tebuto_render_occurrence_session_row( array $session, int $index, bool $is_inherited ): void {
+	$row_id = 'tebuto-session-' . $index;
+	?>
+					<div class="tebuto-session-row">
+						<input type="hidden" name="session_ids[]" value="<?php echo esc_attr( (string) absint( $session['id'] ?? 0 ) ); ?>">
+						<div class="tebuto-modal-field">
+							<label for="<?php echo esc_attr( $row_id . '-start' ); ?>"><?php esc_html_e( 'Beginn', 'tebuto-online-terminbuchung' ); ?></label>
+							<input type="datetime-local" id="<?php echo esc_attr( $row_id . '-start' ); ?>" name="session_starts[]"
+								value="<?php echo esc_attr( tebuto_iso_to_datetime_local( isset( $session['start'] ) ? (string) $session['start'] : null ) ); ?>"
+								<?php disabled( $is_inherited ); ?> required>
+						</div>
+						<div class="tebuto-modal-field">
+							<label for="<?php echo esc_attr( $row_id . '-end' ); ?>"><?php esc_html_e( 'Ende', 'tebuto-online-terminbuchung' ); ?></label>
+							<input type="datetime-local" id="<?php echo esc_attr( $row_id . '-end' ); ?>" name="session_ends[]"
+								value="<?php echo esc_attr( tebuto_iso_to_datetime_local( isset( $session['end'] ) ? (string) $session['end'] : null ) ); ?>"
+								<?php disabled( $is_inherited ); ?> required>
+						</div>
+						<div class="tebuto-modal-field">
+							<label for="<?php echo esc_attr( $row_id . '-label' ); ?>"><?php esc_html_e( 'Bezeichnung', 'tebuto-online-terminbuchung' ); ?></label>
+							<input type="text" id="<?php echo esc_attr( $row_id . '-label' ); ?>" name="session_labels[]" maxlength="120"
+								value="<?php echo esc_attr( (string) ( $session['label'] ?? '' ) ); ?>"
+								<?php disabled( $is_inherited ); ?>>
+						</div>
+						<?php if ( ! $is_inherited ) : ?>
+							<button type="button" class="button tebuto-btn tebuto-btn--outline tebuto-btn--danger tebuto-btn--sm tebuto-remove-session" title="<?php esc_attr_e( 'Entfernen', 'tebuto-online-terminbuchung' ); ?>">
+								<span class="dashicons dashicons-trash"></span>
+							</button>
+						<?php endif; ?>
+					</div>
+	<?php
+}
+
+/**
  * Render the sessions editor card.
  *
  * @param array $occurrence   Occurrence data.
@@ -575,33 +652,7 @@ function tebuto_render_occurrence_sessions_card( array $occurrence, int $seminar
 				<p class="tebuto-empty"><?php esc_html_e( 'Noch keine Termine hinterlegt.', 'tebuto-online-terminbuchung' ); ?></p>
 			<?php else : ?>
 				<?php foreach ( $sessions as $index => $session ) : ?>
-					<?php $row_id = 'tebuto-session-' . (int) $index; ?>
-					<div class="tebuto-session-row">
-						<input type="hidden" name="session_ids[]" value="<?php echo esc_attr( (string) absint( $session['id'] ?? 0 ) ); ?>">
-						<div class="tebuto-modal-field">
-							<label for="<?php echo esc_attr( $row_id . '-start' ); ?>"><?php esc_html_e( 'Beginn', 'tebuto-online-terminbuchung' ); ?></label>
-							<input type="datetime-local" id="<?php echo esc_attr( $row_id . '-start' ); ?>" name="session_starts[]"
-								value="<?php echo esc_attr( tebuto_iso_to_datetime_local( isset( $session['start'] ) ? (string) $session['start'] : null ) ); ?>"
-								<?php disabled( $is_inherited ); ?> required>
-						</div>
-						<div class="tebuto-modal-field">
-							<label for="<?php echo esc_attr( $row_id . '-end' ); ?>"><?php esc_html_e( 'Ende', 'tebuto-online-terminbuchung' ); ?></label>
-							<input type="datetime-local" id="<?php echo esc_attr( $row_id . '-end' ); ?>" name="session_ends[]"
-								value="<?php echo esc_attr( tebuto_iso_to_datetime_local( isset( $session['end'] ) ? (string) $session['end'] : null ) ); ?>"
-								<?php disabled( $is_inherited ); ?> required>
-						</div>
-						<div class="tebuto-modal-field">
-							<label for="<?php echo esc_attr( $row_id . '-label' ); ?>"><?php esc_html_e( 'Bezeichnung', 'tebuto-online-terminbuchung' ); ?></label>
-							<input type="text" id="<?php echo esc_attr( $row_id . '-label' ); ?>" name="session_labels[]" maxlength="120"
-								value="<?php echo esc_attr( (string) ( $session['label'] ?? '' ) ); ?>"
-								<?php disabled( $is_inherited ); ?>>
-						</div>
-						<?php if ( ! $is_inherited ) : ?>
-							<button type="button" class="button tebuto-btn tebuto-btn--outline tebuto-btn--danger tebuto-btn--sm tebuto-remove-session" title="<?php esc_attr_e( 'Entfernen', 'tebuto-online-terminbuchung' ); ?>">
-								<span class="dashicons dashicons-trash"></span>
-							</button>
-						<?php endif; ?>
-					</div>
+					<?php tebuto_render_occurrence_session_row( $session, (int) $index, $is_inherited ); ?>
 				<?php endforeach; ?>
 			<?php endif; ?>
 		</div>
@@ -639,6 +690,36 @@ function tebuto_render_occurrence_sessions_card( array $occurrence, int $seminar
 	</template>
 	<?php
 	tebuto_ui_card_close();
+}
+
+/**
+ * Render a single registration table row.
+ *
+ * @param array $registration  Registration data.
+ * @param array $status_labels Status label map.
+ * @param array $status_tones  Status tone map.
+ * @param array $source_labels Source label map.
+ * @return void
+ */
+function tebuto_render_registration_row( array $registration, array $status_labels, array $status_tones, array $source_labels ): void {
+	$client         = isset( $registration['client'] ) && is_array( $registration['client'] ) ? $registration['client'] : array();
+	$name           = trim( ( $client['firstName'] ?? '' ) . ' ' . ( $client['lastName'] ?? '' ) );
+	$email          = (string) ( $client['email'] ?? '' );
+	$status         = (string) ( $registration['status'] ?? '' );
+	$source         = (string) ( $registration['source'] ?? '' );
+	$payment        = isset( $registration['payment'] ) && is_array( $registration['payment'] ) ? $registration['payment'] : null;
+	$payment_status = is_array( $payment ) ? (string) ( $payment['status'] ?? '' ) : '';
+	?>
+					<tr>
+						<td><?php echo esc_html( $name !== '' ? $name : '–' ); ?></td>
+						<td><?php echo esc_html( $email !== '' ? $email : '–' ); ?></td>
+						<td><?php echo esc_html( (string) absint( $registration['seats'] ?? 1 ) ); ?></td>
+						<td><?php echo tebuto_ui_badge( $status_labels[ $status ] ?? $status, $status_tones[ $status ] ?? 'default' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
+						<td><?php echo esc_html( $source_labels[ $source ] ?? $source ); ?></td>
+						<td><?php echo esc_html( tebuto_format_iso_datetime( isset( $registration['registeredAt'] ) ? (string) $registration['registeredAt'] : null ) ); ?></td>
+						<td><?php echo esc_html( $payment_status !== '' ? $payment_status : '–' ); ?></td>
+					</tr>
+	<?php
 }
 
 /**
@@ -705,24 +786,7 @@ function tebuto_render_occurrence_participants_card( array $registrations ): voi
 			</thead>
 			<tbody>
 				<?php foreach ( $registrations as $registration ) : ?>
-					<?php
-					$client         = isset( $registration['client'] ) && is_array( $registration['client'] ) ? $registration['client'] : array();
-					$name           = trim( ( $client['firstName'] ?? '' ) . ' ' . ( $client['lastName'] ?? '' ) );
-					$email          = (string) ( $client['email'] ?? '' );
-					$status         = (string) ( $registration['status'] ?? '' );
-					$source         = (string) ( $registration['source'] ?? '' );
-					$payment        = isset( $registration['payment'] ) && is_array( $registration['payment'] ) ? $registration['payment'] : null;
-					$payment_status = is_array( $payment ) ? (string) ( $payment['status'] ?? '' ) : '';
-					?>
-					<tr>
-						<td><?php echo esc_html( $name !== '' ? $name : '–' ); ?></td>
-						<td><?php echo esc_html( $email !== '' ? $email : '–' ); ?></td>
-						<td><?php echo esc_html( (string) absint( $registration['seats'] ?? 1 ) ); ?></td>
-						<td><?php echo tebuto_ui_badge( $status_labels[ $status ] ?? $status, $status_tones[ $status ] ?? 'default' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
-						<td><?php echo esc_html( $source_labels[ $source ] ?? $source ); ?></td>
-						<td><?php echo esc_html( tebuto_format_iso_datetime( isset( $registration['registeredAt'] ) ? (string) $registration['registeredAt'] : null ) ); ?></td>
-						<td><?php echo esc_html( $payment_status !== '' ? $payment_status : '–' ); ?></td>
-					</tr>
+					<?php tebuto_render_registration_row( $registration, $status_labels, $status_tones, $source_labels ); ?>
 				<?php endforeach; ?>
 			</tbody>
 		</table>

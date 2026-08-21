@@ -77,6 +77,22 @@ function tebuto_seminars_list_page(): void {
 	);
 	?>
 
+	<?php tebuto_render_seminars_list_card( $seminars, $api ); ?>
+
+	<?php tebuto_render_seminar_modal(); ?>
+	<?php tebuto_ui_page_close(); ?>
+	<?php
+}
+
+/**
+ * Render the seminars list card (error / empty / accordion).
+ *
+ * @param array|WP_Error $seminars Seminars API response.
+ * @param Tebuto_API     $api      API instance.
+ * @return void
+ */
+function tebuto_render_seminars_list_card( $seminars, Tebuto_API $api ): void {
+	?>
 	<div class="tebuto-card tebuto-seminars-card">
 		<?php if ( is_wp_error( $seminars ) ) : ?>
 			<div class="tebuto-card-body">
@@ -106,13 +122,27 @@ function tebuto_seminars_list_page(): void {
 		<?php else : ?>
 			<div class="tebuto-accordion" id="tebuto-seminars-accordion">
 				<?php foreach ( $seminars as $seminar ) : ?>
-					<?php
-					$sid          = absint( $seminar['id'] ?? 0 );
-					$title        = (string) ( $seminar['title'] ?? '' );
-					$topic        = (string) ( $seminar['topic'] ?? '' );
-					$price        = (string) ( $seminar['price'] ?? '0' );
-					$is_inherited = ! empty( $seminar['isInherited'] );
-					?>
+					<?php tebuto_render_seminar_accordion_item( $seminar ); ?>
+				<?php endforeach; ?>
+			</div>
+		<?php endif; ?>
+	</div>
+	<?php
+}
+
+/**
+ * Render a single seminar accordion item.
+ *
+ * @param array $seminar Seminar data.
+ * @return void
+ */
+function tebuto_render_seminar_accordion_item( array $seminar ): void {
+	$sid          = absint( $seminar['id'] ?? 0 );
+	$title        = (string) ( $seminar['title'] ?? '' );
+	$topic        = (string) ( $seminar['topic'] ?? '' );
+	$price        = (string) ( $seminar['price'] ?? '0' );
+	$is_inherited = ! empty( $seminar['isInherited'] );
+	?>
 					<div class="tebuto-accordion-item" data-seminar-id="<?php echo esc_attr( (string) $sid ); ?>" data-inherited="<?php echo $is_inherited ? '1' : '0'; ?>">
 						<div class="tebuto-accordion-header">
 							<button type="button" class="tebuto-accordion-toggle" aria-expanded="false">
@@ -163,13 +193,6 @@ function tebuto_seminars_list_page(): void {
 							<div class="tebuto-accordion-content"></div>
 						</div>
 					</div>
-				<?php endforeach; ?>
-			</div>
-		<?php endif; ?>
-	</div>
-
-	<?php tebuto_render_seminar_modal(); ?>
-	<?php tebuto_ui_page_close(); ?>
 	<?php
 }
 
@@ -552,27 +575,20 @@ function tebuto_get_seminar_form_data() {
 function tebuto_get_occurrence_form_data( bool $require_sessions = false ) {
 	unset( $require_sessions );
 
-	// phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified by caller.
-	$label         = isset( $_POST['occurrence_label'] ) ? sanitize_text_field( wp_unslash( $_POST['occurrence_label'] ) ) : '';
-	$location_type = isset( $_POST['occurrence_location_type'] ) ? sanitize_text_field( wp_unslash( $_POST['occurrence_location_type'] ) ) : 'virtual';
-	$capacity      = isset( $_POST['occurrence_capacity'] ) ? absint( $_POST['occurrence_capacity'] ) : 0;
-	$location_name = isset( $_POST['occurrence_location_name'] ) ? sanitize_text_field( wp_unslash( $_POST['occurrence_location_name'] ) ) : '';
-	$street        = isset( $_POST['occurrence_street'] ) ? sanitize_text_field( wp_unslash( $_POST['occurrence_street'] ) ) : '';
-	$city_zip      = isset( $_POST['occurrence_city_zip'] ) ? sanitize_text_field( wp_unslash( $_POST['occurrence_city_zip'] ) ) : '';
-	$reg_opens     = isset( $_POST['registration_opens_at'] ) ? sanitize_text_field( wp_unslash( $_POST['registration_opens_at'] ) ) : '';
-	$reg_closes    = isset( $_POST['registration_closes_at'] ) ? sanitize_text_field( wp_unslash( $_POST['registration_closes_at'] ) ) : '';
-	// phpcs:enable WordPress.Security.NonceVerification.Missing
+	$location = tebuto_sanitize_occurrence_location_fields();
+	$window   = tebuto_sanitize_occurrence_registration_window();
 
-	if ( ! in_array( $location_type, array( 'virtual', 'onsite', 'not-fixed' ), true ) ) {
-		$location_type = 'virtual';
-	}
+	// phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified by caller.
+	$label    = isset( $_POST['occurrence_label'] ) ? sanitize_text_field( wp_unslash( $_POST['occurrence_label'] ) ) : '';
+	$capacity = isset( $_POST['occurrence_capacity'] ) ? absint( $_POST['occurrence_capacity'] ) : 0;
+	// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 	if ( $capacity < 1 ) {
 		return new WP_Error( 'invalid_capacity', __( 'Die Kapazität muss mindestens 1 betragen.', 'tebuto-online-terminbuchung' ) );
 	}
 
 	$data = array(
-		'locationType'    => $location_type,
+		'locationType'    => $location['location_type'],
 		'capacity'        => $capacity,
 		'waitlistEnabled' => false,
 		'status'          => 'draft',
@@ -583,23 +599,63 @@ function tebuto_get_occurrence_form_data( bool $require_sessions = false ) {
 		$data['label'] = $label;
 	}
 
-	if ( $location_type === 'onsite' ) {
-		$data['locationName']          = $location_name !== '' ? $location_name : null;
-		$data['streetAndNumber']       = $street !== '' ? $street : null;
-		$data['cityZip']               = $city_zip !== '' ? $city_zip : null;
+	if ( $location['location_type'] === 'onsite' ) {
+		$data['locationName']          = $location['location_name'] !== '' ? $location['location_name'] : null;
+		$data['streetAndNumber']       = $location['street'] !== '' ? $location['street'] : null;
+		$data['cityZip']               = $location['city_zip'] !== '' ? $location['city_zip'] : null;
 		$data['additionalInformation'] = null;
 	}
 
-	$opens_iso  = tebuto_date_to_iso_start_of_day( $reg_opens );
-	$closes_iso = tebuto_date_to_iso_end_of_day( $reg_closes );
-	if ( $opens_iso ) {
-		$data['registrationOpensAt'] = $opens_iso;
+	if ( $window['opens_iso'] ) {
+		$data['registrationOpensAt'] = $window['opens_iso'];
 	}
-	if ( $closes_iso ) {
-		$data['registrationClosesAt'] = $closes_iso;
+	if ( $window['closes_iso'] ) {
+		$data['registrationClosesAt'] = $window['closes_iso'];
 	}
 
 	return $data;
+}
+
+/**
+ * Sanitize occurrence location fields from POST.
+ *
+ * @return array{location_type: string, location_name: string, street: string, city_zip: string}
+ */
+function tebuto_sanitize_occurrence_location_fields(): array {
+	// phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified by caller.
+	$location_type = isset( $_POST['occurrence_location_type'] ) ? sanitize_text_field( wp_unslash( $_POST['occurrence_location_type'] ) ) : 'virtual';
+	$location_name = isset( $_POST['occurrence_location_name'] ) ? sanitize_text_field( wp_unslash( $_POST['occurrence_location_name'] ) ) : '';
+	$street        = isset( $_POST['occurrence_street'] ) ? sanitize_text_field( wp_unslash( $_POST['occurrence_street'] ) ) : '';
+	$city_zip      = isset( $_POST['occurrence_city_zip'] ) ? sanitize_text_field( wp_unslash( $_POST['occurrence_city_zip'] ) ) : '';
+	// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+	if ( ! in_array( $location_type, array( 'virtual', 'onsite', 'not-fixed' ), true ) ) {
+		$location_type = 'virtual';
+	}
+
+	return array(
+		'location_type' => $location_type,
+		'location_name' => $location_name,
+		'street'        => $street,
+		'city_zip'      => $city_zip,
+	);
+}
+
+/**
+ * Sanitize occurrence registration window from POST.
+ *
+ * @return array{opens_iso: string|null, closes_iso: string|null}
+ */
+function tebuto_sanitize_occurrence_registration_window(): array {
+	// phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified by caller.
+	$reg_opens  = isset( $_POST['registration_opens_at'] ) ? sanitize_text_field( wp_unslash( $_POST['registration_opens_at'] ) ) : '';
+	$reg_closes = isset( $_POST['registration_closes_at'] ) ? sanitize_text_field( wp_unslash( $_POST['registration_closes_at'] ) ) : '';
+	// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+	return array(
+		'opens_iso'  => tebuto_date_to_iso_start_of_day( $reg_opens ),
+		'closes_iso' => tebuto_date_to_iso_end_of_day( $reg_closes ),
+	);
 }
 
 /**
@@ -778,23 +834,18 @@ function tebuto_handle_create_occurrence( Tebuto_API $api ): void {
 }
 
 /**
- * Handle update occurrence settings.
+ * Collect occurrence fields from POST for update flows.
  *
- * @param Tebuto_API $api API instance.
- * @return void
+ * @return array|WP_Error
  */
-function tebuto_handle_update_occurrence( Tebuto_API $api ): void {
+function tebuto_get_occurrence_update_form_data() {
+	$location = tebuto_sanitize_occurrence_location_fields();
+	$window   = tebuto_sanitize_occurrence_registration_window();
+
 	// phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified by caller.
-	$occurrence_id  = isset( $_POST['occurrence_id'] ) ? absint( $_POST['occurrence_id'] ) : 0;
 	$label          = isset( $_POST['occurrence_label'] ) ? sanitize_text_field( wp_unslash( $_POST['occurrence_label'] ) ) : '';
-	$location_type  = isset( $_POST['occurrence_location_type'] ) ? sanitize_text_field( wp_unslash( $_POST['occurrence_location_type'] ) ) : 'virtual';
 	$capacity       = isset( $_POST['occurrence_capacity'] ) ? absint( $_POST['occurrence_capacity'] ) : 0;
-	$location_name  = isset( $_POST['occurrence_location_name'] ) ? sanitize_text_field( wp_unslash( $_POST['occurrence_location_name'] ) ) : '';
-	$street         = isset( $_POST['occurrence_street'] ) ? sanitize_text_field( wp_unslash( $_POST['occurrence_street'] ) ) : '';
-	$city_zip       = isset( $_POST['occurrence_city_zip'] ) ? sanitize_text_field( wp_unslash( $_POST['occurrence_city_zip'] ) ) : '';
 	$additional     = isset( $_POST['occurrence_additional'] ) ? sanitize_textarea_field( wp_unslash( $_POST['occurrence_additional'] ) ) : '';
-	$reg_opens      = isset( $_POST['registration_opens_at'] ) ? sanitize_text_field( wp_unslash( $_POST['registration_opens_at'] ) ) : '';
-	$reg_closes     = isset( $_POST['registration_closes_at'] ) ? sanitize_text_field( wp_unslash( $_POST['registration_closes_at'] ) ) : '';
 	$price_override = isset( $_POST['price_override'] ) ? sanitize_text_field( wp_unslash( $_POST['price_override'] ) ) : '';
 	$tax_override   = isset( $_POST['tax_rate_override'] ) ? sanitize_text_field( wp_unslash( $_POST['tax_rate_override'] ) ) : '';
 	$outage_enabled = isset( $_POST['outage_fee_enabled'] );
@@ -802,46 +853,59 @@ function tebuto_handle_update_occurrence( Tebuto_API $api ): void {
 	$outage_price   = isset( $_POST['outage_fee_price'] ) ? sanitize_text_field( wp_unslash( $_POST['outage_fee_price'] ) ) : '';
 	// phpcs:enable WordPress.Security.NonceVerification.Missing
 
+	if ( $capacity < 1 ) {
+		return new WP_Error( 'invalid_capacity', __( 'Die Kapazität muss mindestens 1 betragen.', 'tebuto-online-terminbuchung' ) );
+	}
+
+	$data = array(
+		'label'                 => $label !== '' ? $label : null,
+		'locationType'          => $location['location_type'],
+		'capacity'              => $capacity,
+		'waitlistEnabled'       => false,
+		'outageFeeEnabled'      => $outage_enabled,
+		'registrationOpensAt'   => $window['opens_iso'],
+		'registrationClosesAt'  => $window['closes_iso'],
+		'priceOverride'         => $price_override !== '' ? tebuto_normalize_decimal( $price_override ) : null,
+		'taxRateOverride'       => $tax_override !== '' ? tebuto_normalize_decimal( $tax_override ) : null,
+		'outageFeeDays'         => $outage_enabled && $outage_days > 0 ? $outage_days : null,
+		'outageFeePrice'        => $outage_enabled && $outage_price !== '' ? tebuto_normalize_decimal( $outage_price ) : null,
+		'locationName'          => null,
+		'streetAndNumber'       => null,
+		'cityZip'               => null,
+		'additionalInformation' => null,
+	);
+
+	if ( $location['location_type'] === 'onsite' ) {
+		$data['locationName']          = $location['location_name'] !== '' ? $location['location_name'] : null;
+		$data['streetAndNumber']       = $location['street'] !== '' ? $location['street'] : null;
+		$data['cityZip']               = $location['city_zip'] !== '' ? $location['city_zip'] : null;
+		$data['additionalInformation'] = $additional !== '' ? $additional : null;
+	}
+
+	return $data;
+}
+
+/**
+ * Handle update occurrence settings.
+ *
+ * @param Tebuto_API $api API instance.
+ * @return void
+ */
+function tebuto_handle_update_occurrence( Tebuto_API $api ): void {
+	// phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified by caller.
+	$occurrence_id = isset( $_POST['occurrence_id'] ) ? absint( $_POST['occurrence_id'] ) : 0;
+	// phpcs:enable WordPress.Security.NonceVerification.Missing
+
 	if ( $occurrence_id < 1 ) {
 		tebuto_admin_notice( __( 'Ungültige Veranstaltungs-ID.', 'tebuto-online-terminbuchung' ), 'error' );
 		return;
 	}
 
-	if ( $capacity < 1 ) {
-		tebuto_admin_notice( __( 'Die Kapazität muss mindestens 1 betragen.', 'tebuto-online-terminbuchung' ), 'error' );
+	$data = tebuto_get_occurrence_update_form_data();
+	if ( is_wp_error( $data ) ) {
+		tebuto_admin_notice( $data->get_error_message(), 'error' );
 		return;
 	}
-
-	if ( ! in_array( $location_type, array( 'virtual', 'onsite', 'not-fixed' ), true ) ) {
-		$location_type = 'virtual';
-	}
-
-	$data = array(
-		'label'            => $label !== '' ? $label : null,
-		'locationType'     => $location_type,
-		'capacity'         => $capacity,
-		'waitlistEnabled'  => false,
-		'outageFeeEnabled' => $outage_enabled,
-	);
-
-	if ( $location_type === 'onsite' ) {
-		$data['locationName']          = $location_name !== '' ? $location_name : null;
-		$data['streetAndNumber']       = $street !== '' ? $street : null;
-		$data['cityZip']               = $city_zip !== '' ? $city_zip : null;
-		$data['additionalInformation'] = $additional !== '' ? $additional : null;
-	} else {
-		$data['locationName']          = null;
-		$data['streetAndNumber']       = null;
-		$data['cityZip']               = null;
-		$data['additionalInformation'] = null;
-	}
-
-	$data['registrationOpensAt']  = tebuto_date_to_iso_start_of_day( $reg_opens );
-	$data['registrationClosesAt'] = tebuto_date_to_iso_end_of_day( $reg_closes );
-	$data['priceOverride']        = $price_override !== '' ? tebuto_normalize_decimal( $price_override ) : null;
-	$data['taxRateOverride']      = $tax_override !== '' ? tebuto_normalize_decimal( $tax_override ) : null;
-	$data['outageFeeDays']        = $outage_enabled && $outage_days > 0 ? $outage_days : null;
-	$data['outageFeePrice']       = $outage_enabled && $outage_price !== '' ? tebuto_normalize_decimal( $outage_price ) : null;
 
 	$result = $api->update_seminar_occurrence( $occurrence_id, $data );
 	if ( is_wp_error( $result ) ) {
@@ -860,24 +924,17 @@ function tebuto_handle_update_occurrence( Tebuto_API $api ): void {
 }
 
 /**
- * Handle update occurrence sessions.
+ * Parse occurrence sessions arrays from POST.
  *
- * @param Tebuto_API $api API instance.
- * @return void
+ * @return array|WP_Error
  */
-function tebuto_handle_update_occurrence_sessions( Tebuto_API $api ): void {
+function tebuto_parse_occurrence_sessions_from_post() {
 	// phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified by caller.
-	$occurrence_id = isset( $_POST['occurrence_id'] ) ? absint( $_POST['occurrence_id'] ) : 0;
-	$starts        = isset( $_POST['session_starts'] ) && is_array( $_POST['session_starts'] ) ? wp_unslash( $_POST['session_starts'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-	$ends          = isset( $_POST['session_ends'] ) && is_array( $_POST['session_ends'] ) ? wp_unslash( $_POST['session_ends'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-	$labels        = isset( $_POST['session_labels'] ) && is_array( $_POST['session_labels'] ) ? wp_unslash( $_POST['session_labels'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-	$ids           = isset( $_POST['session_ids'] ) && is_array( $_POST['session_ids'] ) ? wp_unslash( $_POST['session_ids'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+	$starts = isset( $_POST['session_starts'] ) && is_array( $_POST['session_starts'] ) ? wp_unslash( $_POST['session_starts'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+	$ends   = isset( $_POST['session_ends'] ) && is_array( $_POST['session_ends'] ) ? wp_unslash( $_POST['session_ends'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+	$labels = isset( $_POST['session_labels'] ) && is_array( $_POST['session_labels'] ) ? wp_unslash( $_POST['session_labels'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+	$ids    = isset( $_POST['session_ids'] ) && is_array( $_POST['session_ids'] ) ? wp_unslash( $_POST['session_ids'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 	// phpcs:enable WordPress.Security.NonceVerification.Missing
-
-	if ( $occurrence_id < 1 ) {
-		tebuto_admin_notice( __( 'Ungültige Veranstaltungs-ID.', 'tebuto-online-terminbuchung' ), 'error' );
-		return;
-	}
 
 	$sessions = array();
 	$count    = max( count( $starts ), count( $ends ) );
@@ -896,13 +953,11 @@ function tebuto_handle_update_occurrence_sessions( Tebuto_API $api ): void {
 		$end_iso   = tebuto_datetime_local_to_iso( $end_raw );
 
 		if ( ! $start_iso || ! $end_iso ) {
-			tebuto_admin_notice( __( 'Bitte gib für jede Sitzung Beginn und Ende an.', 'tebuto-online-terminbuchung' ), 'error' );
-			return;
+			return new WP_Error( 'invalid_session_times', __( 'Bitte gib für jede Sitzung Beginn und Ende an.', 'tebuto-online-terminbuchung' ) );
 		}
 
 		if ( strtotime( $end_iso ) <= strtotime( $start_iso ) ) {
-			tebuto_admin_notice( __( 'Das Ende jeder Sitzung muss nach dem Beginn liegen.', 'tebuto-online-terminbuchung' ), 'error' );
-			return;
+			return new WP_Error( 'invalid_session_order', __( 'Das Ende jeder Sitzung muss nach dem Beginn liegen.', 'tebuto-online-terminbuchung' ) );
 		}
 
 		$session = array(
@@ -919,6 +974,31 @@ function tebuto_handle_update_occurrence_sessions( Tebuto_API $api ): void {
 		}
 
 		$sessions[] = $session;
+	}
+
+	return $sessions;
+}
+
+/**
+ * Handle update occurrence sessions.
+ *
+ * @param Tebuto_API $api API instance.
+ * @return void
+ */
+function tebuto_handle_update_occurrence_sessions( Tebuto_API $api ): void {
+	// phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified by caller.
+	$occurrence_id = isset( $_POST['occurrence_id'] ) ? absint( $_POST['occurrence_id'] ) : 0;
+	// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+	if ( $occurrence_id < 1 ) {
+		tebuto_admin_notice( __( 'Ungültige Veranstaltungs-ID.', 'tebuto-online-terminbuchung' ), 'error' );
+		return;
+	}
+
+	$sessions = tebuto_parse_occurrence_sessions_from_post();
+	if ( is_wp_error( $sessions ) ) {
+		tebuto_admin_notice( $sessions->get_error_message(), 'error' );
+		return;
 	}
 
 	$result = $api->update_seminar_occurrence_sessions( $occurrence_id, $sessions );

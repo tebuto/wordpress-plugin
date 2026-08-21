@@ -421,6 +421,42 @@
 		}, 3000)
 	}
 
+	function handleOccurrenceActionDone($btn, response) {
+		if (response?.success) {
+			window.location.reload()
+			return
+		}
+		showNotice(response?.data || strings.actionError, 'error')
+		if ($btn) {
+			$btn.prop('disabled', false)
+		}
+	}
+
+	function handleOccurrenceActionFail($btn) {
+		showNotice(strings.actionError || 'Fehler bei der Aktion.', 'error')
+		if ($btn) {
+			$btn.prop('disabled', false)
+		}
+	}
+
+	function $contentRefresh($item, activeIds) {
+		const occurrences = ($item.data('occurrences') || []).slice()
+		const byId = {}
+		occurrences.forEach((occ) => {
+			byId[occ.id] = occ
+		})
+
+		const { past } = splitOccurrences(occurrences)
+		const orderedActive = activeIds.map((id) => byId[id]).filter(Boolean)
+		const ordered = orderedActive.concat(past)
+		$item.data('occurrences', ordered)
+		const isInherited = String($item.data('inherited')) === '1'
+		const pastVisible = Number.parseInt($item.data('past-visible'), 10) || PAST_PAGE_SIZE
+		$item
+			.find('.tebuto-accordion-content')
+			.html(renderOccurrences($item.data('seminar-id'), ordered, isInherited, pastVisible))
+	}
+
 	$(() => {
 		if (!$('.tebuto-page-seminars').length) {
 			return
@@ -580,18 +616,8 @@
 			const run = () => {
 				$btn.prop('disabled', true).text(strings.processing || 'Wird verarbeitet...')
 				occurrenceAction(action, { occurrence_id: occurrenceId })
-					.done((response) => {
-						if (response?.success) {
-							window.location.reload()
-							return
-						}
-						showNotice(response?.data || strings.actionError, 'error')
-						$btn.prop('disabled', false)
-					})
-					.fail(() => {
-						showNotice(strings.actionError || 'Fehler bei der Aktion.', 'error')
-						$btn.prop('disabled', false)
-					})
+					.done((response) => handleOccurrenceActionDone($btn, response))
+					.fail(() => handleOccurrenceActionFail($btn))
 			}
 
 			if (typeof window.tebutoConfirm === 'function') {
@@ -618,16 +644,8 @@
 
 			const run = (reason) => {
 				occurrenceAction('cancel', { occurrence_id: occurrenceId, reason: reason })
-					.done((response) => {
-						if (response?.success) {
-							window.location.reload()
-							return
-						}
-						showNotice(response?.data || strings.actionError, 'error')
-					})
-					.fail(() => {
-						showNotice(strings.actionError || 'Fehler bei der Aktion.', 'error')
-					})
+					.done((response) => handleOccurrenceActionDone(null, response))
+					.fail(() => handleOccurrenceActionFail(null))
 			}
 
 			if (typeof window.tebutoConfirm === 'function') {
@@ -722,23 +740,5 @@
 					loadOccurrences($item)
 				})
 		})
-
-		function $contentRefresh($item, activeIds) {
-			const occurrences = ($item.data('occurrences') || []).slice()
-			const byId = {}
-			occurrences.forEach((occ) => {
-				byId[occ.id] = occ
-			})
-
-			const { past } = splitOccurrences(occurrences)
-			const orderedActive = activeIds.map((id) => byId[id]).filter(Boolean)
-			const ordered = orderedActive.concat(past)
-			$item.data('occurrences', ordered)
-			const isInherited = String($item.data('inherited')) === '1'
-			const pastVisible = Number.parseInt($item.data('past-visible'), 10) || PAST_PAGE_SIZE
-			$item
-				.find('.tebuto-accordion-content')
-				.html(renderOccurrences($item.data('seminar-id'), ordered, isInherited, pastVisible))
-		}
 	})
 })(jQuery)
