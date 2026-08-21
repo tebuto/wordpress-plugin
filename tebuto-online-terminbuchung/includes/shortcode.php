@@ -143,7 +143,7 @@ function tebuto_widget_shortcode( $atts = array() ): string {
 					$configured_categories[] = array(
 						'id'            => $cat_id,
 						'name'          => $cat['displayName'] ?? ( $cat['name'] ?? '' ),
-						'color'         => $cat['color'] ?? '#009087',
+						'color'         => $cat['color'] ?? TEBUTO_COLOR_FALLBACK,
 						'therapistId'   => $cat['therapistId'] ?? 0,
 						'therapistName' => $cat['therapistName'] ?? '',
 					);
@@ -193,7 +193,7 @@ function tebuto_widget_shortcode( $atts = array() ): string {
 				$configured_categories[] = array(
 					'id'               => $cat_id,
 					'name'             => $cat['displayName'] ?? ( $cat['name'] ?? '' ),
-					'color'            => $cat['color'] ?? '#009087',
+					'color'            => $cat['color'] ?? TEBUTO_COLOR_FALLBACK,
 					'therapistId'      => $cat['therapistId'] ?? 0,
 					'therapistName'    => $cat['therapistName'] ?? '',
 					'isFromSubaccount' => ! empty( $cat['isFromSubaccount'] ),

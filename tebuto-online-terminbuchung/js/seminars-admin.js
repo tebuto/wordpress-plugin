@@ -76,7 +76,7 @@
 
 	function detailUrl(seminarId, occurrenceId) {
 		const base = admin.seminarsPageUrl || ''
-		const sep = base.indexOf('?') === -1 ? '?' : '&'
+		const sep = base.includes('?') ? '&' : '?'
 		return `${base + sep}seminar_id=${encodeURIComponent(seminarId)}&occurrence_id=${encodeURIComponent(occurrenceId)}`
 	}
 
@@ -106,6 +106,8 @@
 			const booked = occ.bookedSeats || 0
 			const capacity = occ.capacity || 0
 			const lifecycle = occ.lifecycleStatus || occ.status || ''
+			const upDisabled = index === 0 ? 'disabled' : ''
+			const downDisabled = index === occurrences.length - 1 ? 'disabled' : ''
 			rows +=
 				'<tr data-occurrence-id="' +
 				id +
@@ -129,12 +131,12 @@
 				'<div class="tebuto-action-buttons">' +
 				(reorderable && !isInherited
 					? '<button type="button" class="button button-small tebuto-btn tebuto-btn--outline tebuto-btn--neutral tebuto-btn--sm tebuto-move-occurrence" data-dir="up" ' +
-						(index === 0 ? 'disabled' : '') +
+						upDisabled +
 						' title="' +
 						(strings.moveUp || 'Nach oben') +
 						'"><span class="dashicons dashicons-arrow-up-alt2"></span></button>' +
 						'<button type="button" class="button button-small tebuto-btn tebuto-btn--outline tebuto-btn--neutral tebuto-btn--sm tebuto-move-occurrence" data-dir="down" ' +
-						(index === occurrences.length - 1 ? 'disabled' : '') +
+						downDisabled +
 						' title="' +
 						(strings.moveDown || 'Nach unten') +
 						'"><span class="dashicons dashicons-arrow-down-alt2"></span></button>'
@@ -272,7 +274,7 @@
 			})
 			.fail((xhr) => {
 				const payload = xhr.responseJSON
-				if (payload?.data && payload.data.code === 'session_expired') {
+				if (payload?.data?.code === 'session_expired') {
 					window.location.reload()
 					return
 				}
@@ -518,14 +520,25 @@
 			openModal($('#tebuto-occurrence-edit-modal'))
 		})
 
+		let newSessionRowIndex = 0
 		$(document).on('click', '#tebuto-add-session', () => {
 			const template = document.getElementById('tebuto-session-row-template')
 			if (!template) {
 				return
 			}
+			const row = template.content.cloneNode(true)
+			const index = `new-${newSessionRowIndex++}`
+			for (const el of row.querySelectorAll('[id], [for]')) {
+				if (el.id) {
+					el.id = el.id.replace('__INDEX__', index)
+				}
+				if (el.htmlFor) {
+					el.htmlFor = el.htmlFor.replace('__INDEX__', index)
+				}
+			}
 			const $list = $('#tebuto-sessions-list')
 			$list.find('.tebuto-empty').remove()
-			$list.append($(template.content.cloneNode(true)))
+			$list.append($(row))
 		})
 
 		$(document).on('click', '.tebuto-remove-session', function () {

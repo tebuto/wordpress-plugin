@@ -114,7 +114,7 @@ function tebuto_categories_page(): void {
 									</td>
 									<td>
 										<div class="tebuto-action-buttons">
-											<button type="button" class="button button-small tebuto-btn tebuto-btn--outline tebuto-btn--neutral tebuto-btn--sm tebuto-edit-category" 
+											<button type="button" class="button button-small tebuto-btn tebuto-btn--outline tebuto-btn--neutral tebuto-btn--sm tebuto-edit-category"
 												data-category="<?php echo esc_attr( wp_json_encode( $category ) ); ?>">
 												<?php esc_html_e( 'Bearbeiten', 'tebuto-online-terminbuchung' ); ?>
 											</button>
@@ -151,11 +151,11 @@ function tebuto_categories_page(): void {
 					<?php wp_nonce_field( 'tebuto_category_action', 'tebuto_category_nonce' ); ?>
 					<input type="hidden" name="tebuto_action" id="tebuto-category-action" value="create_category">
 					<input type="hidden" name="category_id" id="tebuto-category-id" value="">
-					
+
 					<div class="tebuto-modal-body">
 						<div class="tebuto-modal-section">
 							<h4><?php esc_html_e( 'Allgemein', 'tebuto-online-terminbuchung' ); ?></h4>
-							
+
 							<div class="tebuto-modal-row">
 								<div class="tebuto-modal-field tebuto-modal-field-grow">
 									<label for="category_name"><?php esc_html_e( 'Bezeichnung', 'tebuto-online-terminbuchung' ); ?> *</label>
@@ -165,8 +165,9 @@ function tebuto_categories_page(): void {
 								<div class="tebuto-modal-field tebuto-modal-field-auto">
 									<label for="category_color"><?php esc_html_e( 'Farbe', 'tebuto-online-terminbuchung' ); ?></label>
 									<div class="tebuto-color-input">
-										<input type="color" id="category_color" name="category_color" value="#009087">
-										<input type="text" id="category_color_hex" class="tebuto-color-hex" value="#009087" maxlength="7">
+										<input type="color" id="category_color" name="category_color" value="<?php echo esc_attr( TEBUTO_COLOR_FALLBACK ); ?>">
+										<label class="screen-reader-text" for="category_color_hex"><?php esc_html_e( 'Farbe als Hex-Wert', 'tebuto-online-terminbuchung' ); ?></label>
+										<input type="text" id="category_color_hex" class="tebuto-color-hex" value="<?php echo esc_attr( TEBUTO_COLOR_FALLBACK ); ?>" maxlength="7">
 									</div>
 								</div>
 							</div>
@@ -174,7 +175,7 @@ function tebuto_categories_page(): void {
 
 						<div class="tebuto-modal-section">
 							<h4><?php esc_html_e( 'Termin-Details', 'tebuto-online-terminbuchung' ); ?></h4>
-							
+
 							<div class="tebuto-modal-row tebuto-modal-row-3">
 								<div class="tebuto-modal-field">
 									<label for="category_duration"><?php esc_html_e( 'Dauer (Min.)', 'tebuto-online-terminbuchung' ); ?> *</label>
@@ -200,41 +201,44 @@ function tebuto_categories_page(): void {
 
 						<div class="tebuto-modal-section">
 							<h4><?php esc_html_e( 'Buchungsoptionen', 'tebuto-online-terminbuchung' ); ?></h4>
-							
+
 							<div class="tebuto-switch-option">
 								<div class="tebuto-switch-option-text">
 									<span class="tebuto-switch-option-label"><?php esc_html_e( 'Öffentliche Buchung', 'tebuto-online-terminbuchung' ); ?></span>
 									<span class="tebuto-switch-option-desc"><?php esc_html_e( 'Klienten können über das Widget auf deiner Website buchen', 'tebuto-online-terminbuchung' ); ?></span>
 								</div>
-								<label class="tebuto-switch">
+								<label class="tebuto-switch" for="category_public_booking">
 									<input type="checkbox" name="category_public_booking" id="category_public_booking" value="1">
 									<span class="tebuto-switch-slider"></span>
+									<span class="screen-reader-text"><?php esc_html_e( 'Öffentliche Buchung', 'tebuto-online-terminbuchung' ); ?></span>
 								</label>
 							</div>
-							
+
 							<div class="tebuto-switch-option">
 								<div class="tebuto-switch-option-text">
 									<span class="tebuto-switch-option-label"><?php esc_html_e( 'Portal Buchung', 'tebuto-online-terminbuchung' ); ?></span>
 									<span class="tebuto-switch-option-desc"><?php esc_html_e( 'Klienten können über termin.tebuto.de buchen', 'tebuto-online-terminbuchung' ); ?></span>
 								</div>
-								<label class="tebuto-switch">
+								<label class="tebuto-switch" for="category_private_booking">
 									<input type="checkbox" name="category_private_booking" id="category_private_booking" value="1" checked>
 									<span class="tebuto-switch-slider"></span>
+									<span class="screen-reader-text"><?php esc_html_e( 'Portal Buchung', 'tebuto-online-terminbuchung' ); ?></span>
 								</label>
 							</div>
 						</div>
 
 						<div class="tebuto-modal-section">
 							<h4><?php esc_html_e( 'Ausfallhonorar', 'tebuto-online-terminbuchung' ); ?></h4>
-							
+
 							<div class="tebuto-switch-option">
 								<div class="tebuto-switch-option-text">
 									<span class="tebuto-switch-option-label"><?php esc_html_e( 'Ausfallhonorar aktivieren', 'tebuto-online-terminbuchung' ); ?></span>
 									<span class="tebuto-switch-option-desc"><?php esc_html_e( 'Bei kurzfristiger Absage oder Nichterscheinen kann ein Ausfallhonorar berechnet werden', 'tebuto-online-terminbuchung' ); ?></span>
 								</div>
-								<label class="tebuto-switch">
+								<label class="tebuto-switch" for="category_outage_fee">
 									<input type="checkbox" name="category_outage_fee" id="category_outage_fee" value="1">
 									<span class="tebuto-switch-slider"></span>
+									<span class="screen-reader-text"><?php esc_html_e( 'Ausfallhonorar aktivieren', 'tebuto-online-terminbuchung' ); ?></span>
 								</label>
 							</div>
 
@@ -243,7 +247,7 @@ function tebuto_categories_page(): void {
 									<div class="tebuto-modal-field">
 										<label for="category_outage_fee_amount"><?php esc_html_e( 'Betrag', 'tebuto-online-terminbuchung' ); ?></label>
 										<div class="tebuto-input-suffix">
-											<input type="number" id="category_outage_fee_amount" name="category_outage_fee_amount" 
+											<input type="number" id="category_outage_fee_amount" name="category_outage_fee_amount"
 												min="0" step="0.01" value="0">
 											<span class="tebuto-suffix">€</span>
 										</div>
@@ -251,13 +255,13 @@ function tebuto_categories_page(): void {
 									<div class="tebuto-modal-field">
 										<label for="category_outage_fee_hours"><?php esc_html_e( 'Frist', 'tebuto-online-terminbuchung' ); ?></label>
 										<div class="tebuto-input-suffix">
-											<input type="number" id="category_outage_fee_hours" name="category_outage_fee_hours" 
+											<input type="number" id="category_outage_fee_hours" name="category_outage_fee_hours"
 												min="1" step="1" value="48">
 											<span class="tebuto-suffix"><?php esc_html_e( 'Stunden', 'tebuto-online-terminbuchung' ); ?></span>
 										</div>
 									</div>
 								</div>
-								
+
 								<div class="tebuto-outage-fee-warning">
 									<span class="dashicons dashicons-warning"></span>
 									<p><?php esc_html_e( 'Ausfallhonorare dürfen nicht den Charakter einer Strafzahlung annehmen. Wir empfehlen, das Ausfallhonorar auf maximal 80% des regulären Honorars festzusetzen. Andernfalls besteht das Risiko, dass die Forderung im Streitfall nicht anerkannt wird.', 'tebuto-online-terminbuchung' ); ?></p>
@@ -298,7 +302,7 @@ function tebuto_categories_page(): void {
 		colorPicker.on('input', function() {
 			colorHex.val($(this).val().toUpperCase());
 		});
-		
+
 		colorHex.on('input', function() {
 			let val = $(this).val();
 			if (!val.startsWith('#')) val = '#' + val;
@@ -332,12 +336,12 @@ function tebuto_categories_page(): void {
 		// Open modal for editing
 		$('.tebuto-edit-category').on('click', function() {
 			const category = $(this).data('category');
-			
+
 			modalTitle.text('<?php echo esc_js( __( 'Kategorie bearbeiten', 'tebuto-online-terminbuchung' ) ); ?>');
 			submitBtn.text('<?php echo esc_js( __( 'Änderungen speichern', 'tebuto-online-terminbuchung' ) ); ?>');
 			actionInput.val('update_category');
 			categoryIdInput.val(category.id);
-			
+
 			// Fill form
 			$('#category_name').val(category.name);
 			const color = category.color || '#009087';
@@ -349,18 +353,18 @@ function tebuto_categories_page(): void {
 			$('#category_public_booking').prop('checked', category.publicBookingEnabled);
 			$('#category_private_booking').prop('checked', category.privateBookingEnabled);
 			$('#category_outage_fee').prop('checked', category.outageFeeEnabled);
-			
+
 			// Outage fee options
 			$('#category_outage_fee_amount').val(category.outageFee || 0);
 			$('#category_outage_fee_hours').val(category.outageFeeHours || 48);
-			
+
 			// Show/hide outage fee options
 			if (category.outageFeeEnabled) {
 				outageFeeOptions.show();
 			} else {
 				outageFeeOptions.hide();
 			}
-			
+
 			durationHint.text('<?php echo esc_js( __( 'Kann nicht geändert werden', 'tebuto-online-terminbuchung' ) ); ?>');
 			modal.fadeIn(200);
 		});
@@ -425,6 +429,9 @@ function tebuto_handle_category_actions( Tebuto_API $api ): void {
 			break;
 		case 'delete_category':
 			tebuto_handle_delete_category( $api );
+			break;
+		default:
+			tebuto_admin_notice( __( 'Unbekannte Aktion.', 'tebuto-online-terminbuchung' ), 'error' );
 			break;
 	}
 }
@@ -541,7 +548,7 @@ function tebuto_get_category_form_data( bool $is_update = false ) {
 	// Nonce verified in tebuto_handle_category_actions() before this is called.
 	// phpcs:disable WordPress.Security.NonceVerification.Missing
 	$name               = isset( $_POST['category_name'] ) ? sanitize_text_field( wp_unslash( $_POST['category_name'] ) ) : '';
-	$color              = isset( $_POST['category_color'] ) ? sanitize_hex_color( wp_unslash( $_POST['category_color'] ) ) : '#009087';
+	$color              = isset( $_POST['category_color'] ) ? sanitize_hex_color( wp_unslash( $_POST['category_color'] ) ) : TEBUTO_COLOR_FALLBACK;
 	$duration           = isset( $_POST['category_duration'] ) ? absint( $_POST['category_duration'] ) : 50;
 	$price              = isset( $_POST['category_price'] ) ? floatval( $_POST['category_price'] ) : 0;
 	$location           = isset( $_POST['category_location'] ) ? sanitize_text_field( wp_unslash( $_POST['category_location'] ) ) : 'not-fixed';
@@ -562,7 +569,7 @@ function tebuto_get_category_form_data( bool $is_update = false ) {
 
 	$data = array(
 		'name'                  => $name,
-		'color'                 => $color ? $color : '#009087',
+		'color'                 => $color ? $color : TEBUTO_COLOR_FALLBACK,
 		'price'                 => (string) $price,
 		'location'              => $location,
 		'publicBookingEnabled'  => $public_booking,

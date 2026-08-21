@@ -414,6 +414,9 @@ function tebuto_handle_seminar_actions( Tebuto_API $api ): void {
 		case 'update_occurrence_sessions':
 			tebuto_handle_update_occurrence_sessions( $api );
 			break;
+		default:
+			tebuto_admin_notice( __( 'Unbekannte Aktion.', 'tebuto-online-terminbuchung' ), 'error' );
+			break;
 	}
 }
 

@@ -74,7 +74,7 @@ function tebuto_bookings_page(): void {
 		<div class="tebuto-filters-panel">
 			<form method="get" class="tebuto-filters-form" id="tebuto-bookings-filter-form">
 				<input type="hidden" name="page" value="tebuto-bookings">
-				
+
 				<!-- Quick Date Presets -->
 				<div class="tebuto-filter-section">
 					<div class="tebuto-filter-section-header">
@@ -125,10 +125,10 @@ function tebuto_bookings_page(): void {
 								),
 							);
 
-							foreach ( $presets as $key => $preset ) :
+							foreach ( $presets as $preset ) :
 								$is_active = ( $date_from === $preset['from'] && $date_to === $preset['to'] );
 								?>
-								<button type="button" 
+								<button type="button"
 									class="tebuto-date-preset <?php echo $is_active ? 'active' : ''; ?>"
 									data-from="<?php echo esc_attr( $preset['from'] ); ?>"
 									data-to="<?php echo esc_attr( $preset['to'] ); ?>">
@@ -265,7 +265,7 @@ function tebuto_bookings_page(): void {
 									</td>
 									<td>
 										<div class="tebuto-table .tebuto-category-info">
-											<span class="tebuto-category-color-dot" style="background-color: <?php echo esc_attr( $booking['event']['category']['color'] ?? '#009087' ); ?>"></span>
+											<span class="tebuto-category-color-dot" style="background-color: <?php echo esc_attr( $booking['event']['category']['color'] ?? TEBUTO_COLOR_FALLBACK ); ?>"></span>
 											<?php echo esc_html( $booking['event']['category']['name'] ?? '-' ); ?>
 										</div>
 									</td>
@@ -298,23 +298,23 @@ function tebuto_bookings_page(): void {
 										<div class="tebuto-booking-actions">
 											<?php if ( ! $is_past ) : ?>
 												<?php if ( $booking['event']['status'] === 'booked' && ! $booking['isConfirmed'] ) : ?>
-													<button type="button" class="button button-small button-primary tebuto-btn tebuto-btn--solid tebuto-btn--primary tebuto-btn--sm tebuto-confirm-booking" 
+													<button type="button" class="button button-small button-primary tebuto-btn tebuto-btn--solid tebuto-btn--primary tebuto-btn--sm tebuto-confirm-booking"
 														data-booking-id="<?php echo esc_attr( $booking['id'] ); ?>">
 														<?php esc_html_e( 'Bestätigen', 'tebuto-online-terminbuchung' ); ?>
 													</button>
-													<button type="button" class="button button-small tebuto-btn tebuto-btn--outline tebuto-btn--danger tebuto-btn--sm tebuto-reject-booking" 
+													<button type="button" class="button button-small tebuto-btn tebuto-btn--outline tebuto-btn--danger tebuto-btn--sm tebuto-reject-booking"
 														data-booking-id="<?php echo esc_attr( $booking['id'] ); ?>">
 														<?php esc_html_e( 'Ablehnen', 'tebuto-online-terminbuchung' ); ?>
 													</button>
 												<?php elseif ( $booking['event']['status'] === 'approved' ) : ?>
-													<button type="button" class="button button-small tebuto-btn tebuto-btn--outline tebuto-btn--danger tebuto-btn--sm tebuto-cancel-booking" 
+													<button type="button" class="button button-small tebuto-btn tebuto-btn--outline tebuto-btn--danger tebuto-btn--sm tebuto-cancel-booking"
 														data-booking-id="<?php echo esc_attr( $booking['id'] ); ?>">
 														<?php esc_html_e( 'Absagen', 'tebuto-online-terminbuchung' ); ?>
 													</button>
 												<?php endif; ?>
 											<?php endif; ?>
-											
-											<button type="button" class="button button-small tebuto-btn tebuto-btn--outline tebuto-btn--neutral tebuto-btn--sm tebuto-view-booking" 
+
+											<button type="button" class="button button-small tebuto-btn tebuto-btn--outline tebuto-btn--neutral tebuto-btn--sm tebuto-view-booking"
 												data-booking="<?php echo esc_attr( wp_json_encode( $booking ) ); ?>">
 												<?php esc_html_e( 'Details', 'tebuto-online-terminbuchung' ); ?>
 											</button>
@@ -397,20 +397,20 @@ function tebuto_bookings_page(): void {
 	<template id="tebuto-booking-details-template">
 		<div class="tebuto-booking-details">
 			<div class="tebuto-detail-section" data-section="client">
-				<h4 data-label="clientInfo"></h4>
+				<h4 data-label="clientInfo"><?php esc_html_e( 'Klient', 'tebuto-online-terminbuchung' ); ?></h4>
 				<p><strong data-label="name"></strong> <span data-field="clientName"></span></p>
 				<p><strong data-label="phone"></strong> <span data-field="clientPhone"></span></p>
 				<p data-field-row="email"><strong>E-Mail:</strong> <span data-field="clientEmail"></span></p>
 			</div>
 			<div class="tebuto-detail-section" data-section="appointment">
-				<h4 data-label="appointmentInfo"></h4>
+				<h4 data-label="appointmentInfo"><?php esc_html_e( 'Termin', 'tebuto-online-terminbuchung' ); ?></h4>
 				<p><strong data-label="category"></strong> <span data-field="category"></span></p>
 				<p><strong data-label="date"></strong> <span data-field="date"></span></p>
 				<p><strong data-label="time"></strong> <span data-field="time"></span></p>
 				<p><strong data-label="location"></strong> <span data-field="location"></span></p>
 			</div>
 			<div class="tebuto-detail-section" data-section="booking">
-				<h4 data-label="bookingInfo"></h4>
+				<h4 data-label="bookingInfo"><?php esc_html_e( 'Buchung', 'tebuto-online-terminbuchung' ); ?></h4>
 				<p><strong data-label="bookedOn"></strong> <span data-field="bookedOn"></span></p>
 				<p><strong data-label="price"></strong> <span data-field="price"></span></p>
 			</div>

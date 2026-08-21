@@ -140,7 +140,7 @@ function tebuto_dashboard_page(): void {
 					++$displayed;
 					$is_booked = isset( $event['details'] ) && ! empty( $event['details']['booking'] );
 					echo '<li class="tebuto-event-item ' . ( $is_booked ? 'tebuto-event-booked' : '' ) . '">';
-					echo '<div class="tebuto-event-color" style="background-color: ' . esc_attr( $event['color'] ?? '#009087' ) . '"></div>';
+					echo '<div class="tebuto-event-color" style="background-color: ' . esc_attr( $event['color'] ?? TEBUTO_COLOR_FALLBACK ) . '"></div>';
 					echo '<div class="tebuto-event-info">';
 					echo '<span class="tebuto-event-title">' . esc_html( $event['title'] ) . '</span>';
 					echo '<span class="tebuto-event-time">' . esc_html( tebuto_format_event_datetime( $event['start'], $event['end'] ) ) . '</span>';

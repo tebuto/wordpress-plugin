@@ -12,6 +12,7 @@
     "version:check": "./scripts/bump-version.sh --check",
     "build:block": "pnpm --filter tebuto-online-terminbuchung-block run build",
     "format": "biome check --write .",
+    "biome:migrate": "./scripts/biome-migrate.sh",
     "lint": "pnpm lint:js && pnpm lint:php",
     "lint:js": "biome lint .",
     "lint:php": "composer lint",

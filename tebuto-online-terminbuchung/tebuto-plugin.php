@@ -80,6 +80,13 @@ if ( ! defined( 'TEBUTO_SSL_VERIFY' ) ) {
 define( 'TEBUTO_META_PREFIX', 'tebuto_online_terminbuchung_' );
 
 /**
+ * Fallback colours used when the Tebuto API returns no colour for a category or event.
+ */
+define( 'TEBUTO_COLOR_FALLBACK', '#009087' );
+define( 'TEBUTO_COLOR_WHITE', '#ffffff' );
+define( 'TEBUTO_COLOR_GRAY', '#6b7280' );
+
+/**
  * Include required files.
  */
 require_once TEBUTO_PLUGIN_PATH . 'includes/helpers.php';

@@ -85,10 +85,10 @@ function syncHiddenInputs(attributes) {
 
 function WidgetSettingsApp() {
 	const [variant, setVariant] = useState('booking')
-	const [attributes, setAttributesState] = useState(readInitialAttributes)
+	const [attributes, setAttributes] = useState(readInitialAttributes)
 
-	const setAttributes = useCallback((next) => {
-		setAttributesState((prev) => ({ ...prev, ...next }))
+	const mergeAttributes = useCallback((next) => {
+		setAttributes((prev) => ({ ...prev, ...next }))
 	}, [])
 
 	useEffect(() => {
@@ -100,7 +100,7 @@ function WidgetSettingsApp() {
 			variant={variant}
 			surface="admin"
 			attributes={attributes}
-			setAttributes={setAttributes}
+			setAttributes={mergeAttributes}
 			onVariantChange={setVariant}
 		/>
 	)

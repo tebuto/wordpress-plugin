@@ -7,6 +7,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+const TEBUTO_BLOCK_EDITOR_CSS = 'block/build/block/index.css';
+
 /**
  * Enqueue global admin styles for menu icon.
  *
@@ -231,9 +233,17 @@ function tebuto_enqueue_widget_settings_assets(): void {
 		return;
 	}
 
-	$asset = include $asset_file;
-	$deps  = isset( $asset['dependencies'] ) && is_array( $asset['dependencies'] ) ? $asset['dependencies'] : array();
-	$ver   = isset( $asset['version'] ) ? (string) $asset['version'] : tebuto_asset_version( 'block/build/widget-settings/index.js' );
+	// Memoized because include_once returns true rather than the manifest on repeat calls.
+	static $asset = null;
+	if ( ! is_array( $asset ) ) {
+		$asset = include_once $asset_file;
+	}
+	if ( ! is_array( $asset ) ) {
+		return;
+	}
+
+	$deps = isset( $asset['dependencies'] ) && is_array( $asset['dependencies'] ) ? $asset['dependencies'] : array();
+	$ver  = isset( $asset['version'] ) ? (string) $asset['version'] : tebuto_asset_version( 'block/build/widget-settings/index.js' );
 
 	wp_enqueue_style( 'wp-components' );
 
@@ -255,13 +265,13 @@ function tebuto_enqueue_widget_settings_assets(): void {
 		);
 	}
 
-	$editor_css = TEBUTO_PLUGIN_PATH . 'block/build/block/index.css';
+	$editor_css = TEBUTO_PLUGIN_PATH . TEBUTO_BLOCK_EDITOR_CSS;
 	if ( file_exists( $editor_css ) ) {
 		wp_enqueue_style(
 			'tebuto-block-editor-style',
-			TEBUTO_PLUGIN_URL . 'block/build/block/index.css',
+			TEBUTO_PLUGIN_URL . TEBUTO_BLOCK_EDITOR_CSS,
 			array( 'wp-components' ),
-			tebuto_asset_version( 'block/build/block/index.css' )
+			tebuto_asset_version( TEBUTO_BLOCK_EDITOR_CSS )
 		);
 	}
 

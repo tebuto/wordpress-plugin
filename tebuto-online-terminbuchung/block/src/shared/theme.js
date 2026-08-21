@@ -14,7 +14,7 @@ export function getDefaults(variant = 'booking') {
 	const data = getTebutoData()
 	const shared = data.defaults || {}
 	if (variant === 'seminars') {
-		return { ...shared, ...(data.seminarsDefaults || {}) }
+		return { ...shared, ...data.seminarsDefaults }
 	}
 	return shared
 }

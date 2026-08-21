@@ -16,7 +16,7 @@ tebuto-online-terminbuchung/   # Plugin source — edit here
 ├── assets-wporg/              # WordPress.org SVN assets only — not synced to local WP
 ├── css/, js/                  # Admin UI assets
 └── readme.txt                 # WordPress.org readme (German, Stable tag + changelog)
-scripts/                       # build.sh, bump-version.sh, dev-setup.sh, dev-sync.sh
+scripts/                       # build.sh, bump-version.sh, biome-migrate.sh, dev-setup.sh, dev-sync.sh
 wordpress/                     # Local Docker WordPress volume — gitignored, do not commit
 ```
 
@@ -64,6 +64,7 @@ pnpm lint                 # Biome (JS) + PHPCS (PHP)
 pnpm lint:js              # Biome lint only
 pnpm lint:php             # PHPCS only
 pnpm lint:fix             # Format + autofix + lint entire codebase (also the pre-commit hook)
+pnpm biome:migrate        # Upgrade all biome.json / biome.jsonc files to the installed CLI schema
 pnpm version:check        # Verify version fields are in sync
 pnpm version:bump 2.3.0   # Bump version in all tracked files (or patch/minor/major)
 ```
@@ -87,7 +88,7 @@ Pre-commit (Husky): runs `pnpm lint:fix` on the whole codebase (Biome + PHPCS). 
 
 ### JavaScript (block + admin)
 
-- Lint/format with **Biome** (`pnpm lint:js` / `pnpm format`). Config: `biome.json`.
+- Lint/format with **Biome** (`pnpm lint:js` / `pnpm format`). Config: `biome.json` (and any nested `biome.json` / `biome.jsonc`). After upgrading `@biomejs/biome`, run `pnpm biome:migrate` so every config `$schema` matches the CLI (avoids the “schema version does not match” info).
 - Block build still uses `@wordpress/scripts` (webpack). Source in `block/src/` and `js/`; block output in `block/build/`.
 - WordPress packages: `@wordpress/i18n`, `@wordpress/block-editor`, `@wordpress/components`.
 - After editing `block/src/**`, run `pnpm build:block` (or `dev:build`) and commit updated `block/build/**` when preparing a release.

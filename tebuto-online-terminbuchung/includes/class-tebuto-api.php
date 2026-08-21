@@ -14,19 +14,19 @@ defined( 'ABSPATH' ) || exit;
  */
 class Tebuto_API {
 
+	private const HEADER_AUTH_PREFIX    = 'Bearer ';
+	private const PATH_THERAPISTS       = 'therapists/';
+	private const PATH_EVENT_CATEGORIES = '/event-categories/';
+	private const PATH_BOOKINGS         = '/bookings/';
+	private const PATH_SEMINARS         = '/seminars/';
+	private const PATH_OCCURRENCES      = '/seminars/occurrences/';
+
 	/**
 	 * Access token.
 	 *
 	 * @var string|null
 	 */
 	private ?string $access_token = null;
-
-	/**
-	 * Refresh token.
-	 *
-	 * @var string|null
-	 */
-	private ?string $refresh_token = null;
 
 	/**
 	 * Therapist ID.
@@ -107,7 +107,7 @@ class Tebuto_API {
 			TEBUTO_API_URL . '/who-am-i',
 			array(
 				'headers'   => array(
-					'Authorization' => 'Bearer ' . $this->access_token,
+					'Authorization' => self::HEADER_AUTH_PREFIX . $this->access_token,
 				),
 				'timeout'   => 30,
 				'sslverify' => TEBUTO_SSL_VERIFY,
@@ -255,7 +255,7 @@ class Tebuto_API {
 		$args = array(
 			'method'    => $method,
 			'headers'   => array(
-				'Authorization' => 'Bearer ' . $this->access_token,
+				'Authorization' => self::HEADER_AUTH_PREFIX . $this->access_token,
 				'Content-Type'  => 'application/json',
 			),
 			'timeout'   => 30,
@@ -409,7 +409,7 @@ class Tebuto_API {
 			TEBUTO_API_URL . '/who-am-i',
 			array(
 				'headers'   => array(
-					'Authorization' => 'Bearer ' . $this->access_token,
+					'Authorization' => self::HEADER_AUTH_PREFIX . $this->access_token,
 				),
 				'timeout'   => 30,
 				'sslverify' => TEBUTO_SSL_VERIFY,
@@ -470,7 +470,7 @@ class Tebuto_API {
 			return new WP_Error( 'no_therapist_id', __( 'Therapeuten-ID nicht gefunden.', 'tebuto-online-terminbuchung' ) );
 		}
 
-		return $this->request( 'GET', 'therapists/' . $resolved_therapist_id . '/event-categories' );
+		return $this->request( 'GET', self::PATH_THERAPISTS . $resolved_therapist_id . '/event-categories' );
 	}
 
 	/**
@@ -500,7 +500,7 @@ class Tebuto_API {
 				'id'                   => $category['id'] ?? 0,
 				'name'                 => $name,
 				'displayName'          => $display_name,
-				'color'                => $category['color'] ?? '#009087',
+				'color'                => $category['color'] ?? TEBUTO_COLOR_FALLBACK,
 				'therapistId'          => $therapist_id,
 				'therapistName'        => $therapist_name,
 				'isFromSubaccount'     => $is_from_subaccount,
@@ -632,7 +632,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function create_event_category( array $data ) {
-		return $this->request( 'POST', 'therapists/' . $this->therapist_id . '/event-categories', $data );
+		return $this->request( 'POST', self::PATH_THERAPISTS . $this->therapist_id . '/event-categories', $data );
 	}
 
 	/**
@@ -643,7 +643,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function update_event_category( int $category_id, array $data ) {
-		return $this->request( 'PUT', 'therapists/' . $this->therapist_id . '/event-categories/' . $category_id, $data );
+		return $this->request( 'PUT', self::PATH_THERAPISTS . $this->therapist_id . self::PATH_EVENT_CATEGORIES . $category_id, $data );
 	}
 
 	/**
@@ -653,7 +653,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function delete_event_category( int $category_id ) {
-		return $this->request( 'DELETE', 'therapists/' . $this->therapist_id . '/event-categories/' . $category_id );
+		return $this->request( 'DELETE', self::PATH_THERAPISTS . $this->therapist_id . self::PATH_EVENT_CATEGORIES . $category_id );
 	}
 
 	// =========================================================================
@@ -670,7 +670,7 @@ class Tebuto_API {
 	public function get_events( string $start, string $end ) {
 		return $this->request(
 			'GET',
-			'therapists/' . $this->therapist_id . '/events',
+			self::PATH_THERAPISTS . $this->therapist_id . '/events',
 			array(),
 			array(
 				'start' => $start,
@@ -686,7 +686,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function skip_event( array $data ) {
-		return $this->request( 'POST', 'therapists/' . $this->therapist_id . '/events/skip', $data );
+		return $this->request( 'POST', self::PATH_THERAPISTS . $this->therapist_id . '/events/skip', $data );
 	}
 
 	/**
@@ -696,7 +696,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function release_event( int $event_id ) {
-		return $this->request( 'POST', 'therapists/' . $this->therapist_id . '/events/' . $event_id . '/release' );
+		return $this->request( 'POST', self::PATH_THERAPISTS . $this->therapist_id . '/events/' . $event_id . '/release' );
 	}
 
 	// =========================================================================
@@ -726,7 +726,7 @@ class Tebuto_API {
 			fn( $v ) => $v !== null
 		);
 
-		return $this->request( 'GET', 'therapists/' . $this->therapist_id . '/bookings', array(), $query );
+		return $this->request( 'GET', self::PATH_THERAPISTS . $this->therapist_id . '/bookings', array(), $query );
 	}
 
 	/**
@@ -736,7 +736,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function confirm_booking( int $booking_id ) {
-		return $this->request( 'POST', 'therapists/' . $this->therapist_id . '/bookings/' . $booking_id . '/confirm' );
+		return $this->request( 'POST', self::PATH_THERAPISTS . $this->therapist_id . self::PATH_BOOKINGS . $booking_id . '/confirm' );
 	}
 
 	/**
@@ -749,7 +749,7 @@ class Tebuto_API {
 	public function reject_booking( int $booking_id, string $message = '' ) {
 		return $this->request(
 			'POST',
-			'therapists/' . $this->therapist_id . '/bookings/' . $booking_id . '/reject',
+			self::PATH_THERAPISTS . $this->therapist_id . self::PATH_BOOKINGS . $booking_id . '/reject',
 			array(
 				'message' => $message,
 			)
@@ -767,7 +767,7 @@ class Tebuto_API {
 	public function cancel_booking( int $booking_id, string $message = '', bool $bookable_again = true ) {
 		return $this->request(
 			'POST',
-			'therapists/' . $this->therapist_id . '/bookings/' . $booking_id . '/cancel',
+			self::PATH_THERAPISTS . $this->therapist_id . self::PATH_BOOKINGS . $booking_id . '/cancel',
 			array(
 				'message'       => $message,
 				'bookableAgain' => $bookable_again,
@@ -786,7 +786,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function get_event_rules( int $category_id ) {
-		return $this->request( 'GET', 'therapists/' . $this->therapist_id . '/event-categories/' . $category_id . '/event-rules' );
+		return $this->request( 'GET', self::PATH_THERAPISTS . $this->therapist_id . self::PATH_EVENT_CATEGORIES . $category_id . '/event-rules' );
 	}
 
 	/**
@@ -797,7 +797,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function create_event_rule( int $category_id, array $data ) {
-		return $this->request( 'POST', 'therapists/' . $this->therapist_id . '/event-categories/' . $category_id . '/event-rules', $data );
+		return $this->request( 'POST', self::PATH_THERAPISTS . $this->therapist_id . self::PATH_EVENT_CATEGORIES . $category_id . '/event-rules', $data );
 	}
 
 	/**
@@ -808,7 +808,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function delete_event_rule( int $category_id, int $rule_id ) {
-		return $this->request( 'DELETE', 'therapists/' . $this->therapist_id . '/event-categories/' . $category_id . '/event-rules/' . $rule_id );
+		return $this->request( 'DELETE', self::PATH_THERAPISTS . $this->therapist_id . self::PATH_EVENT_CATEGORIES . $category_id . '/event-rules/' . $rule_id );
 	}
 
 	// =========================================================================
@@ -821,7 +821,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function get_seminars() {
-		return $this->request( 'GET', 'therapists/' . $this->therapist_id . '/seminars' );
+		return $this->request( 'GET', self::PATH_THERAPISTS . $this->therapist_id . '/seminars' );
 	}
 
 	/**
@@ -831,7 +831,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function get_seminar( int $seminar_id ) {
-		return $this->request( 'GET', 'therapists/' . $this->therapist_id . '/seminars/' . $seminar_id );
+		return $this->request( 'GET', self::PATH_THERAPISTS . $this->therapist_id . self::PATH_SEMINARS . $seminar_id );
 	}
 
 	/**
@@ -841,7 +841,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function create_seminar( array $data ) {
-		return $this->request( 'POST', 'therapists/' . $this->therapist_id . '/seminars', $data );
+		return $this->request( 'POST', self::PATH_THERAPISTS . $this->therapist_id . '/seminars', $data );
 	}
 
 	/**
@@ -852,7 +852,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function update_seminar( int $seminar_id, array $data ) {
-		return $this->request( 'PATCH', 'therapists/' . $this->therapist_id . '/seminars/' . $seminar_id, $data );
+		return $this->request( 'PATCH', self::PATH_THERAPISTS . $this->therapist_id . self::PATH_SEMINARS . $seminar_id, $data );
 	}
 
 	/**
@@ -862,7 +862,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function delete_seminar( int $seminar_id ) {
-		return $this->request( 'DELETE', 'therapists/' . $this->therapist_id . '/seminars/' . $seminar_id );
+		return $this->request( 'DELETE', self::PATH_THERAPISTS . $this->therapist_id . self::PATH_SEMINARS . $seminar_id );
 	}
 
 	/**
@@ -891,7 +891,7 @@ class Tebuto_API {
 
 		return $this->request_multipart(
 			'POST',
-			'therapists/' . $this->therapist_id . '/seminars/' . $seminar_id . '/banner',
+			self::PATH_THERAPISTS . $this->therapist_id . self::PATH_SEMINARS . $seminar_id . '/banner',
 			$file
 		);
 	}
@@ -903,7 +903,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function get_seminar_occurrences( int $seminar_id ) {
-		return $this->request( 'GET', 'therapists/' . $this->therapist_id . '/seminars/' . $seminar_id . '/occurrences' );
+		return $this->request( 'GET', self::PATH_THERAPISTS . $this->therapist_id . self::PATH_SEMINARS . $seminar_id . '/occurrences' );
 	}
 
 	/**
@@ -914,7 +914,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function create_seminar_occurrence( int $seminar_id, array $data ) {
-		return $this->request( 'POST', 'therapists/' . $this->therapist_id . '/seminars/' . $seminar_id . '/occurrences', $data );
+		return $this->request( 'POST', self::PATH_THERAPISTS . $this->therapist_id . self::PATH_SEMINARS . $seminar_id . '/occurrences', $data );
 	}
 
 	/**
@@ -925,7 +925,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function update_seminar_occurrence( int $occurrence_id, array $data ) {
-		return $this->request( 'PATCH', 'therapists/' . $this->therapist_id . '/seminars/occurrences/' . $occurrence_id, $data );
+		return $this->request( 'PATCH', self::PATH_THERAPISTS . $this->therapist_id . self::PATH_OCCURRENCES . $occurrence_id, $data );
 	}
 
 	/**
@@ -938,7 +938,7 @@ class Tebuto_API {
 	public function update_seminar_occurrence_sessions( int $occurrence_id, array $sessions ) {
 		return $this->request(
 			'PUT',
-			'therapists/' . $this->therapist_id . '/seminars/occurrences/' . $occurrence_id . '/sessions',
+			self::PATH_THERAPISTS . $this->therapist_id . self::PATH_OCCURRENCES . $occurrence_id . '/sessions',
 			array(
 				'sessions' => $sessions,
 			)
@@ -955,7 +955,7 @@ class Tebuto_API {
 	public function set_seminar_occurrence_status( int $occurrence_id, string $status ) {
 		return $this->request(
 			'POST',
-			'therapists/' . $this->therapist_id . '/seminars/occurrences/' . $occurrence_id . '/status',
+			self::PATH_THERAPISTS . $this->therapist_id . self::PATH_OCCURRENCES . $occurrence_id . '/status',
 			array(
 				'status' => $status,
 			)
@@ -977,7 +977,7 @@ class Tebuto_API {
 
 		return $this->request(
 			'POST',
-			'therapists/' . $this->therapist_id . '/seminars/occurrences/' . $occurrence_id . '/cancel',
+			self::PATH_THERAPISTS . $this->therapist_id . self::PATH_OCCURRENCES . $occurrence_id . '/cancel',
 			$data
 		);
 	}
@@ -992,7 +992,7 @@ class Tebuto_API {
 	public function reorder_seminar_occurrences( int $seminar_id, array $occurrence_ids ) {
 		return $this->request(
 			'PUT',
-			'therapists/' . $this->therapist_id . '/seminars/' . $seminar_id . '/occurrences/order',
+			self::PATH_THERAPISTS . $this->therapist_id . self::PATH_SEMINARS . $seminar_id . '/occurrences/order',
 			array(
 				'occurrenceIds' => array_map( 'absint', $occurrence_ids ),
 			)
@@ -1006,7 +1006,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function get_seminar_registrations( int $occurrence_id ) {
-		return $this->request( 'GET', 'therapists/' . $this->therapist_id . '/seminars/occurrences/' . $occurrence_id . '/registrations' );
+		return $this->request( 'GET', self::PATH_THERAPISTS . $this->therapist_id . self::PATH_OCCURRENCES . $occurrence_id . '/registrations' );
 	}
 
 	/**
@@ -1083,7 +1083,7 @@ class Tebuto_API {
 		$args = array(
 			'method'    => $method,
 			'headers'   => array(
-				'Authorization' => 'Bearer ' . $this->access_token,
+				'Authorization' => self::HEADER_AUTH_PREFIX . $this->access_token,
 				'Content-Type'  => 'multipart/form-data; boundary=' . $boundary,
 			),
 			'body'      => $body,
@@ -1136,7 +1136,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function get_clients() {
-		return $this->request( 'GET', 'therapists/' . $this->therapist_id . '/clients' );
+		return $this->request( 'GET', self::PATH_THERAPISTS . $this->therapist_id . '/clients' );
 	}
 
 	/**
@@ -1146,7 +1146,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function get_client( int $client_id ) {
-		return $this->request( 'GET', 'therapists/' . $this->therapist_id . '/clients/' . $client_id );
+		return $this->request( 'GET', self::PATH_THERAPISTS . $this->therapist_id . '/clients/' . $client_id );
 	}
 
 	// =========================================================================
@@ -1159,7 +1159,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function get_therapist() {
-		return $this->request( 'GET', 'therapists/' . $this->therapist_id );
+		return $this->request( 'GET', self::PATH_THERAPISTS . $this->therapist_id );
 	}
 
 	/**
@@ -1168,7 +1168,7 @@ class Tebuto_API {
 	 * @return array|WP_Error
 	 */
 	public function get_branding() {
-		return $this->request( 'GET', 'therapists/' . $this->therapist_id . '/branding' );
+		return $this->request( 'GET', self::PATH_THERAPISTS . $this->therapist_id . '/branding' );
 	}
 
 	/**

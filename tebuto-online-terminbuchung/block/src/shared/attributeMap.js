@@ -68,14 +68,24 @@ function valuesEqual(a, b) {
 	return String(a ?? '') === String(b ?? '')
 }
 
+function toStringValue(value) {
+	if (value === null || value === undefined) {
+		return ''
+	}
+	if (typeof value === 'object') {
+		return JSON.stringify(value)
+	}
+	return String(value)
+}
+
 function formatShortcodeValue(key, value) {
 	if (BOOLEAN_ATTRS.has(key)) {
 		return value ? 'true' : 'false'
 	}
 	if (key === 'customCss') {
-		return String(value).replace(/"/g, '&quot;')
+		return toStringValue(value).replaceAll('"', '&quot;')
 	}
-	return String(value)
+	return toStringValue(value)
 }
 
 /**
@@ -116,7 +126,7 @@ export function toDataAttributes(attrs, _variant) {
 			continue
 		}
 
-		data[`data-${dataKey}`] = String(value)
+		data[`data-${dataKey}`] = toStringValue(value)
 	}
 
 	if (attrs.showProviderFilter) {
@@ -125,7 +135,7 @@ export function toDataAttributes(attrs, _variant) {
 	}
 
 	if (attrs.configuredCategoriesJson) {
-		data['data-configured-categories'] = String(attrs.configuredCategoriesJson)
+		data['data-configured-categories'] = toStringValue(attrs.configuredCategoriesJson)
 	}
 
 	return data
@@ -160,7 +170,7 @@ export function buildShortcode(attrs, tag = 'tebuto_online_terminbuchung_widget'
 		const defaultValue = defaults[camel]
 
 		if (camel === 'categories' || camel === 'seminars' || camel === 'customCss') {
-			if (!value || String(value).trim() === '') {
+			if (!value || toStringValue(value).trim() === '') {
 				continue
 			}
 			params.push(`${snake}="${formatShortcodeValue(camel, value)}"`)

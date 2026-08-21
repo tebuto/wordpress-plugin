@@ -7,6 +7,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+const TEBUTO_SEMINAR_TIMEZONE = 'Europe/Berlin';
+
 /**
  * Render the occurrence detail page.
  *
@@ -267,7 +269,7 @@ function tebuto_format_session_month_range( array $sessions ): string {
 		}
 		try {
 			$dt       = new DateTimeImmutable( (string) $session['start'] );
-			$dt       = $dt->setTimezone( new DateTimeZone( 'Europe/Berlin' ) );
+			$dt       = $dt->setTimezone( new DateTimeZone( TEBUTO_SEMINAR_TIMEZONE ) );
 			$starts[] = $dt;
 		} catch ( Exception $e ) {
 			continue;
@@ -309,8 +311,8 @@ function tebuto_format_session_month_range( array $sessions ): string {
  */
 function tebuto_month_and_year( DateTimeImmutable $dt ): array {
 	if ( class_exists( 'IntlDateFormatter' ) ) {
-		$month_fmt = new IntlDateFormatter( 'de_DE', IntlDateFormatter::NONE, IntlDateFormatter::NONE, 'Europe/Berlin', null, 'MMMM' );
-		$year_fmt  = new IntlDateFormatter( 'de_DE', IntlDateFormatter::NONE, IntlDateFormatter::NONE, 'Europe/Berlin', null, 'yyyy' );
+		$month_fmt = new IntlDateFormatter( 'de_DE', IntlDateFormatter::NONE, IntlDateFormatter::NONE, TEBUTO_SEMINAR_TIMEZONE, null, 'MMMM' );
+		$year_fmt  = new IntlDateFormatter( 'de_DE', IntlDateFormatter::NONE, IntlDateFormatter::NONE, TEBUTO_SEMINAR_TIMEZONE, null, 'yyyy' );
 		$month     = $month_fmt ? (string) $month_fmt->format( $dt ) : '';
 		$year      = $year_fmt ? (string) $year_fmt->format( $dt ) : '';
 		if ( $month !== '' && $year !== '' ) {
@@ -573,23 +575,24 @@ function tebuto_render_occurrence_sessions_card( array $occurrence, int $seminar
 				<p class="tebuto-empty"><?php esc_html_e( 'Noch keine Termine hinterlegt.', 'tebuto-online-terminbuchung' ); ?></p>
 			<?php else : ?>
 				<?php foreach ( $sessions as $index => $session ) : ?>
+					<?php $row_id = 'tebuto-session-' . (int) $index; ?>
 					<div class="tebuto-session-row">
 						<input type="hidden" name="session_ids[]" value="<?php echo esc_attr( (string) absint( $session['id'] ?? 0 ) ); ?>">
 						<div class="tebuto-modal-field">
-							<label><?php esc_html_e( 'Beginn', 'tebuto-online-terminbuchung' ); ?></label>
-							<input type="datetime-local" name="session_starts[]"
+							<label for="<?php echo esc_attr( $row_id . '-start' ); ?>"><?php esc_html_e( 'Beginn', 'tebuto-online-terminbuchung' ); ?></label>
+							<input type="datetime-local" id="<?php echo esc_attr( $row_id . '-start' ); ?>" name="session_starts[]"
 								value="<?php echo esc_attr( tebuto_iso_to_datetime_local( isset( $session['start'] ) ? (string) $session['start'] : null ) ); ?>"
 								<?php disabled( $is_inherited ); ?> required>
 						</div>
 						<div class="tebuto-modal-field">
-							<label><?php esc_html_e( 'Ende', 'tebuto-online-terminbuchung' ); ?></label>
-							<input type="datetime-local" name="session_ends[]"
+							<label for="<?php echo esc_attr( $row_id . '-end' ); ?>"><?php esc_html_e( 'Ende', 'tebuto-online-terminbuchung' ); ?></label>
+							<input type="datetime-local" id="<?php echo esc_attr( $row_id . '-end' ); ?>" name="session_ends[]"
 								value="<?php echo esc_attr( tebuto_iso_to_datetime_local( isset( $session['end'] ) ? (string) $session['end'] : null ) ); ?>"
 								<?php disabled( $is_inherited ); ?> required>
 						</div>
 						<div class="tebuto-modal-field">
-							<label><?php esc_html_e( 'Bezeichnung', 'tebuto-online-terminbuchung' ); ?></label>
-							<input type="text" name="session_labels[]" maxlength="120"
+							<label for="<?php echo esc_attr( $row_id . '-label' ); ?>"><?php esc_html_e( 'Bezeichnung', 'tebuto-online-terminbuchung' ); ?></label>
+							<input type="text" id="<?php echo esc_attr( $row_id . '-label' ); ?>" name="session_labels[]" maxlength="120"
 								value="<?php echo esc_attr( (string) ( $session['label'] ?? '' ) ); ?>"
 								<?php disabled( $is_inherited ); ?>>
 						</div>
@@ -618,16 +621,16 @@ function tebuto_render_occurrence_sessions_card( array $occurrence, int $seminar
 		<div class="tebuto-session-row">
 			<input type="hidden" name="session_ids[]" value="0">
 			<div class="tebuto-modal-field">
-				<label><?php esc_html_e( 'Beginn', 'tebuto-online-terminbuchung' ); ?></label>
-				<input type="datetime-local" name="session_starts[]" required>
+				<label for="tebuto-session-__INDEX__-start"><?php esc_html_e( 'Beginn', 'tebuto-online-terminbuchung' ); ?></label>
+				<input type="datetime-local" id="tebuto-session-__INDEX__-start" name="session_starts[]" required>
 			</div>
 			<div class="tebuto-modal-field">
-				<label><?php esc_html_e( 'Ende', 'tebuto-online-terminbuchung' ); ?></label>
-				<input type="datetime-local" name="session_ends[]" required>
+				<label for="tebuto-session-__INDEX__-end"><?php esc_html_e( 'Ende', 'tebuto-online-terminbuchung' ); ?></label>
+				<input type="datetime-local" id="tebuto-session-__INDEX__-end" name="session_ends[]" required>
 			</div>
 			<div class="tebuto-modal-field">
-				<label><?php esc_html_e( 'Bezeichnung', 'tebuto-online-terminbuchung' ); ?></label>
-				<input type="text" name="session_labels[]" maxlength="120">
+				<label for="tebuto-session-__INDEX__-label"><?php esc_html_e( 'Bezeichnung', 'tebuto-online-terminbuchung' ); ?></label>
+				<input type="text" id="tebuto-session-__INDEX__-label" name="session_labels[]" maxlength="120">
 			</div>
 			<button type="button" class="button tebuto-btn tebuto-btn--outline tebuto-btn--danger tebuto-btn--sm tebuto-remove-session" title="<?php esc_attr_e( 'Entfernen', 'tebuto-online-terminbuchung' ); ?>">
 				<span class="dashicons dashicons-trash"></span>
@@ -826,9 +829,10 @@ function tebuto_render_occurrence_edit_modal( array $occurrence, array $seminar 
 						<div class="tebuto-switch-option-text">
 							<span class="tebuto-switch-option-label"><?php esc_html_e( 'Ausfallgebühr aktivieren', 'tebuto-online-terminbuchung' ); ?></span>
 						</div>
-						<label class="tebuto-switch">
+						<label class="tebuto-switch" for="edit_outage_fee_enabled">
 							<input type="checkbox" name="outage_fee_enabled" id="edit_outage_fee_enabled" value="1" <?php checked( ! empty( $occurrence['outageFeeEnabled'] ) ); ?>>
 							<span class="tebuto-switch-slider"></span>
+							<span class="screen-reader-text"><?php esc_html_e( 'Ausfallgebühr aktivieren', 'tebuto-online-terminbuchung' ); ?></span>
 						</label>
 					</div>
 					<div id="tebuto-edit-outage-fields" class="tebuto-modal-row" <?php echo empty( $occurrence['outageFeeEnabled'] ) ? 'hidden' : ''; ?>>

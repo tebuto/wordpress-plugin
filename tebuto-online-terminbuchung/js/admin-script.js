@@ -54,7 +54,11 @@
 	}
 
 	function escapeHtml(value) {
-		return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+		return String(value)
+			.replaceAll('&', '&amp;')
+			.replaceAll('<', '&lt;')
+			.replaceAll('>', '&gt;')
+			.replaceAll('"', '&quot;')
 	}
 
 	/**
@@ -147,7 +151,7 @@
 
 	function initConfirmFormIntercept() {
 		$(document).on('submit', 'form[data-tebuto-confirm]', function (event) {
-			if (this.getAttribute('data-tebuto-confirmed') === '1') {
+			if (this.dataset.tebutoConfirmed === '1') {
 				return
 			}
 
@@ -155,15 +159,15 @@
 			event.stopImmediatePropagation()
 
 			tebutoConfirm({
-				title: this.getAttribute('data-tebuto-confirm-title') || strings().confirmTitle || 'Bitte bestätigen',
-				message: this.getAttribute('data-tebuto-confirm') || '',
-				confirmLabel: this.getAttribute('data-tebuto-confirm-label') || strings().deleteLabel || 'Löschen',
-				danger: this.getAttribute('data-tebuto-confirm-danger') !== '0'
+				title: this.dataset.tebutoConfirmTitle || strings().confirmTitle || 'Bitte bestätigen',
+				message: this.dataset.tebutoConfirm || '',
+				confirmLabel: this.dataset.tebutoConfirmLabel || strings().deleteLabel || 'Löschen',
+				danger: this.dataset.tebutoConfirmDanger !== '0'
 			}).then((result) => {
 				if (!result.confirmed) {
 					return
 				}
-				this.setAttribute('data-tebuto-confirmed', '1')
+				this.dataset.tebutoConfirmed = '1'
 				this.submit()
 			})
 		})
@@ -374,7 +378,7 @@
 		const s = strings()
 
 		node.querySelectorAll('[data-label]').forEach((el) => {
-			const key = el.getAttribute('data-label')
+			const key = el.dataset.label
 			const fallbacks = {
 				clientInfo: 'Klient',
 				appointmentInfo: 'Termin',
