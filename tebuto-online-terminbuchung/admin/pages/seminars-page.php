@@ -834,18 +834,12 @@ function tebuto_handle_create_occurrence( Tebuto_API $api ): void {
 }
 
 /**
- * Collect occurrence fields from POST for update flows.
+ * Sanitize price, tax, and outage override fields from POST into API payload values.
  *
- * @return array|WP_Error
+ * @return array{outageFeeEnabled: bool, priceOverride: string|null, taxRateOverride: string|null, outageFeeDays: int|null, outageFeePrice: string|null}
  */
-function tebuto_get_occurrence_update_form_data() {
-	$location = tebuto_sanitize_occurrence_location_fields();
-	$window   = tebuto_sanitize_occurrence_registration_window();
-
+function tebuto_sanitize_occurrence_update_overrides(): array {
 	// phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified by caller.
-	$label          = isset( $_POST['occurrence_label'] ) ? sanitize_text_field( wp_unslash( $_POST['occurrence_label'] ) ) : '';
-	$capacity       = isset( $_POST['occurrence_capacity'] ) ? absint( $_POST['occurrence_capacity'] ) : 0;
-	$additional     = isset( $_POST['occurrence_additional'] ) ? sanitize_textarea_field( wp_unslash( $_POST['occurrence_additional'] ) ) : '';
 	$price_override = isset( $_POST['price_override'] ) ? sanitize_text_field( wp_unslash( $_POST['price_override'] ) ) : '';
 	$tax_override   = isset( $_POST['tax_rate_override'] ) ? sanitize_text_field( wp_unslash( $_POST['tax_rate_override'] ) ) : '';
 	$outage_enabled = isset( $_POST['outage_fee_enabled'] );
@@ -853,36 +847,73 @@ function tebuto_get_occurrence_update_form_data() {
 	$outage_price   = isset( $_POST['outage_fee_price'] ) ? sanitize_text_field( wp_unslash( $_POST['outage_fee_price'] ) ) : '';
 	// phpcs:enable WordPress.Security.NonceVerification.Missing
 
+	return array(
+		'outageFeeEnabled' => $outage_enabled,
+		'priceOverride'    => $price_override !== '' ? tebuto_normalize_decimal( $price_override ) : null,
+		'taxRateOverride'  => $tax_override !== '' ? tebuto_normalize_decimal( $tax_override ) : null,
+		'outageFeeDays'    => $outage_enabled && $outage_days > 0 ? $outage_days : null,
+		'outageFeePrice'   => $outage_enabled && $outage_price !== '' ? tebuto_normalize_decimal( $outage_price ) : null,
+	);
+}
+
+/**
+ * Apply onsite address fields onto occurrence update payload.
+ *
+ * @param array  $data       Payload.
+ * @param array  $location   Sanitized location fields.
+ * @param string $additional Additional information.
+ * @return array
+ */
+function tebuto_apply_occurrence_onsite_address( array $data, array $location, string $additional ): array {
+	if ( $location['location_type'] !== 'onsite' ) {
+		return $data;
+	}
+
+	$data['locationName']          = $location['location_name'] !== '' ? $location['location_name'] : null;
+	$data['streetAndNumber']       = $location['street'] !== '' ? $location['street'] : null;
+	$data['cityZip']               = $location['city_zip'] !== '' ? $location['city_zip'] : null;
+	$data['additionalInformation'] = $additional !== '' ? $additional : null;
+
+	return $data;
+}
+
+/**
+ * Collect occurrence fields from POST for update flows.
+ *
+ * @return array|WP_Error
+ */
+function tebuto_get_occurrence_update_form_data() {
+	$location  = tebuto_sanitize_occurrence_location_fields();
+	$window    = tebuto_sanitize_occurrence_registration_window();
+	$overrides = tebuto_sanitize_occurrence_update_overrides();
+
+	// phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified by caller.
+	$label      = isset( $_POST['occurrence_label'] ) ? sanitize_text_field( wp_unslash( $_POST['occurrence_label'] ) ) : '';
+	$capacity   = isset( $_POST['occurrence_capacity'] ) ? absint( $_POST['occurrence_capacity'] ) : 0;
+	$additional = isset( $_POST['occurrence_additional'] ) ? sanitize_textarea_field( wp_unslash( $_POST['occurrence_additional'] ) ) : '';
+	// phpcs:enable WordPress.Security.NonceVerification.Missing
+
 	if ( $capacity < 1 ) {
 		return new WP_Error( 'invalid_capacity', __( 'Die Kapazität muss mindestens 1 betragen.', 'tebuto-online-terminbuchung' ) );
 	}
 
-	$data = array(
-		'label'                 => $label !== '' ? $label : null,
-		'locationType'          => $location['location_type'],
-		'capacity'              => $capacity,
-		'waitlistEnabled'       => false,
-		'outageFeeEnabled'      => $outage_enabled,
-		'registrationOpensAt'   => $window['opens_iso'],
-		'registrationClosesAt'  => $window['closes_iso'],
-		'priceOverride'         => $price_override !== '' ? tebuto_normalize_decimal( $price_override ) : null,
-		'taxRateOverride'       => $tax_override !== '' ? tebuto_normalize_decimal( $tax_override ) : null,
-		'outageFeeDays'         => $outage_enabled && $outage_days > 0 ? $outage_days : null,
-		'outageFeePrice'        => $outage_enabled && $outage_price !== '' ? tebuto_normalize_decimal( $outage_price ) : null,
-		'locationName'          => null,
-		'streetAndNumber'       => null,
-		'cityZip'               => null,
-		'additionalInformation' => null,
+	$data = array_merge(
+		array(
+			'label'                 => $label !== '' ? $label : null,
+			'locationType'          => $location['location_type'],
+			'capacity'              => $capacity,
+			'waitlistEnabled'       => false,
+			'registrationOpensAt'   => $window['opens_iso'],
+			'registrationClosesAt'  => $window['closes_iso'],
+			'locationName'          => null,
+			'streetAndNumber'       => null,
+			'cityZip'               => null,
+			'additionalInformation' => null,
+		),
+		$overrides
 	);
 
-	if ( $location['location_type'] === 'onsite' ) {
-		$data['locationName']          = $location['location_name'] !== '' ? $location['location_name'] : null;
-		$data['streetAndNumber']       = $location['street'] !== '' ? $location['street'] : null;
-		$data['cityZip']               = $location['city_zip'] !== '' ? $location['city_zip'] : null;
-		$data['additionalInformation'] = $additional !== '' ? $additional : null;
-	}
-
-	return $data;
+	return tebuto_apply_occurrence_onsite_address( $data, $location, $additional );
 }
 
 /**
@@ -924,53 +955,115 @@ function tebuto_handle_update_occurrence( Tebuto_API $api ): void {
 }
 
 /**
+ * Build one session row from parallel POST arrays, or null to skip.
+ *
+ * @param string $start_raw Raw start value.
+ * @param string $end_raw   Raw end value.
+ * @param string $label_raw Raw label value.
+ * @param int    $id_raw    Existing session ID.
+ * @return array|WP_Error|null
+ */
+function tebuto_build_occurrence_session_from_raw( string $start_raw, string $end_raw, string $label_raw, int $id_raw ) {
+	if ( $start_raw === '' && $end_raw === '' ) {
+		return null;
+	}
+
+	$start_iso = tebuto_datetime_local_to_iso( $start_raw );
+	$end_iso   = tebuto_datetime_local_to_iso( $end_raw );
+
+	if ( ! $start_iso || ! $end_iso ) {
+		return new WP_Error( 'invalid_session_times', __( 'Bitte gib für jede Sitzung Beginn und Ende an.', 'tebuto-online-terminbuchung' ) );
+	}
+
+	if ( strtotime( $end_iso ) <= strtotime( $start_iso ) ) {
+		return new WP_Error( 'invalid_session_order', __( 'Das Ende jeder Sitzung muss nach dem Beginn liegen.', 'tebuto-online-terminbuchung' ) );
+	}
+
+	$session = array(
+		'start' => $start_iso,
+		'end'   => $end_iso,
+	);
+
+	if ( $label_raw !== '' ) {
+		$session['label'] = $label_raw;
+	}
+
+	if ( $id_raw > 0 ) {
+		$session['id'] = $id_raw;
+	}
+
+	return $session;
+}
+
+/**
+ * Read parallel session POST arrays.
+ *
+ * @return array{starts: array, ends: array, labels: array, ids: array}
+ */
+function tebuto_get_occurrence_session_post_arrays(): array {
+	// phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified by caller.
+	// phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized per row below.
+	$starts = isset( $_POST['session_starts'] ) && is_array( $_POST['session_starts'] ) ? wp_unslash( $_POST['session_starts'] ) : array();
+	$ends   = isset( $_POST['session_ends'] ) && is_array( $_POST['session_ends'] ) ? wp_unslash( $_POST['session_ends'] ) : array();
+	$labels = isset( $_POST['session_labels'] ) && is_array( $_POST['session_labels'] ) ? wp_unslash( $_POST['session_labels'] ) : array();
+	$ids    = isset( $_POST['session_ids'] ) && is_array( $_POST['session_ids'] ) ? wp_unslash( $_POST['session_ids'] ) : array();
+	// phpcs:enable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+	// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+	return array(
+		'starts' => $starts,
+		'ends'   => $ends,
+		'labels' => $labels,
+		'ids'    => $ids,
+	);
+}
+
+/**
+ * Read one sanitized session row from parallel POST arrays.
+ *
+ * @param array $starts Starts.
+ * @param array $ends   Ends.
+ * @param array $labels Labels.
+ * @param array $ids    IDs.
+ * @param int   $index  Row index.
+ * @return array{0: string, 1: string, 2: string, 3: int}
+ */
+function tebuto_get_occurrence_session_row_raw( array $starts, array $ends, array $labels, array $ids, int $index ): array {
+	return array(
+		isset( $starts[ $index ] ) ? sanitize_text_field( $starts[ $index ] ) : '',
+		isset( $ends[ $index ] ) ? sanitize_text_field( $ends[ $index ] ) : '',
+		isset( $labels[ $index ] ) ? sanitize_text_field( $labels[ $index ] ) : '',
+		isset( $ids[ $index ] ) ? absint( $ids[ $index ] ) : 0,
+	);
+}
+
+/**
  * Parse occurrence sessions arrays from POST.
  *
  * @return array|WP_Error
  */
 function tebuto_parse_occurrence_sessions_from_post() {
-	// phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified by caller.
-	$starts = isset( $_POST['session_starts'] ) && is_array( $_POST['session_starts'] ) ? wp_unslash( $_POST['session_starts'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-	$ends   = isset( $_POST['session_ends'] ) && is_array( $_POST['session_ends'] ) ? wp_unslash( $_POST['session_ends'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-	$labels = isset( $_POST['session_labels'] ) && is_array( $_POST['session_labels'] ) ? wp_unslash( $_POST['session_labels'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-	$ids    = isset( $_POST['session_ids'] ) && is_array( $_POST['session_ids'] ) ? wp_unslash( $_POST['session_ids'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-	// phpcs:enable WordPress.Security.NonceVerification.Missing
-
+	$arrays   = tebuto_get_occurrence_session_post_arrays();
 	$sessions = array();
-	$count    = max( count( $starts ), count( $ends ) );
+	$count    = max( count( $arrays['starts'] ), count( $arrays['ends'] ) );
 
 	for ( $i = 0; $i < $count; $i++ ) {
-		$start_raw = isset( $starts[ $i ] ) ? sanitize_text_field( $starts[ $i ] ) : '';
-		$end_raw   = isset( $ends[ $i ] ) ? sanitize_text_field( $ends[ $i ] ) : '';
-		$label_raw = isset( $labels[ $i ] ) ? sanitize_text_field( $labels[ $i ] ) : '';
-		$id_raw    = isset( $ids[ $i ] ) ? absint( $ids[ $i ] ) : 0;
+		[ $start_raw, $end_raw, $label_raw, $id_raw ] = tebuto_get_occurrence_session_row_raw(
+			$arrays['starts'],
+			$arrays['ends'],
+			$arrays['labels'],
+			$arrays['ids'],
+			$i
+		);
 
-		if ( $start_raw === '' && $end_raw === '' ) {
+		$session = tebuto_build_occurrence_session_from_raw( $start_raw, $end_raw, $label_raw, $id_raw );
+
+		if ( null === $session ) {
 			continue;
 		}
 
-		$start_iso = tebuto_datetime_local_to_iso( $start_raw );
-		$end_iso   = tebuto_datetime_local_to_iso( $end_raw );
-
-		if ( ! $start_iso || ! $end_iso ) {
-			return new WP_Error( 'invalid_session_times', __( 'Bitte gib für jede Sitzung Beginn und Ende an.', 'tebuto-online-terminbuchung' ) );
-		}
-
-		if ( strtotime( $end_iso ) <= strtotime( $start_iso ) ) {
-			return new WP_Error( 'invalid_session_order', __( 'Das Ende jeder Sitzung muss nach dem Beginn liegen.', 'tebuto-online-terminbuchung' ) );
-		}
-
-		$session = array(
-			'start' => $start_iso,
-			'end'   => $end_iso,
-		);
-
-		if ( $label_raw !== '' ) {
-			$session['label'] = $label_raw;
-		}
-
-		if ( $id_raw > 0 ) {
-			$session['id'] = $id_raw;
+		if ( is_wp_error( $session ) ) {
+			return $session;
 		}
 
 		$sessions[] = $session;

@@ -439,6 +439,19 @@
 		}
 	}
 
+	function runOccurrenceStatusChange($btn, action, occurrenceId) {
+		$btn.prop('disabled', true).text(strings.processing || 'Wird verarbeitet...')
+		return occurrenceAction(action, { occurrence_id: occurrenceId })
+			.done((response) => handleOccurrenceActionDone($btn, response))
+			.fail(() => handleOccurrenceActionFail($btn))
+	}
+
+	function runOccurrenceCancel(occurrenceId, reason) {
+		return occurrenceAction('cancel', { occurrence_id: occurrenceId, reason })
+			.done((response) => handleOccurrenceActionDone(null, response))
+			.fail(() => handleOccurrenceActionFail(null))
+	}
+
 	function $contentRefresh($item, activeIds) {
 		const occurrences = ($item.data('occurrences') || []).slice()
 		const byId = {}
@@ -613,13 +626,6 @@
 			const confirmLabel =
 				action === 'publish' ? strings.publishLabel || 'Veröffentlichen' : strings.draftLabel || 'Als Entwurf speichern'
 
-			const run = () => {
-				$btn.prop('disabled', true).text(strings.processing || 'Wird verarbeitet...')
-				occurrenceAction(action, { occurrence_id: occurrenceId })
-					.done((response) => handleOccurrenceActionDone($btn, response))
-					.fail(() => handleOccurrenceActionFail($btn))
-			}
-
 			if (typeof window.tebutoConfirm === 'function') {
 				window
 					.tebutoConfirm({
@@ -630,23 +636,17 @@
 					})
 					.then((result) => {
 						if (result.confirmed) {
-							run()
+							runOccurrenceStatusChange($btn, action, occurrenceId)
 						}
 					})
 				return
 			}
 
-			run()
+			runOccurrenceStatusChange($btn, action, occurrenceId)
 		})
 
 		$(document).on('click', '.tebuto-occurrence-cancel-btn', function () {
 			const occurrenceId = $(this).data('occurrence-id')
-
-			const run = (reason) => {
-				occurrenceAction('cancel', { occurrence_id: occurrenceId, reason: reason })
-					.done((response) => handleOccurrenceActionDone(null, response))
-					.fail(() => handleOccurrenceActionFail(null))
-			}
 
 			if (typeof window.tebutoConfirm === 'function') {
 				window
@@ -662,13 +662,13 @@
 					})
 					.then((result) => {
 						if (result.confirmed) {
-							run(result.value || '')
+							runOccurrenceCancel(occurrenceId, result.value || '')
 						}
 					})
 				return
 			}
 
-			run('')
+			runOccurrenceCancel(occurrenceId, '')
 		})
 
 		$(document).on('click', '.tebuto-past-toggle', function () {

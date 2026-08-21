@@ -17,7 +17,7 @@ export function applyAjaxResult(payload, { setData, setError, setSessionExpired,
 	}
 
 	const errorPayload = payload.data
-	const errorCode = typeof errorPayload === 'object' && errorPayload !== null ? errorPayload.code : null
+	const errorCode = typeof errorPayload === 'object' ? errorPayload?.code : null
 
 	if (errorCode === 'session_expired') {
 		setSessionExpired(true)
@@ -25,10 +25,7 @@ export function applyAjaxResult(payload, { setData, setError, setSessionExpired,
 		return
 	}
 
-	const errorMessage =
-		typeof errorPayload === 'object' && errorPayload !== null && errorPayload.message
-			? errorPayload.message
-			: errorPayload
+	const errorMessage = typeof errorPayload === 'object' && errorPayload?.message ? errorPayload.message : errorPayload
 	setError(errorMessage || fallbackError)
 }
 
