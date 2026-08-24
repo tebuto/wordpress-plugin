@@ -71,9 +71,13 @@ pnpm version:bump 2.3.0   # Bump version in all tracked files (or patch/minor/ma
 
 Local WordPress: http://localhost:8000 — plugin path `wordpress/wp-content/plugins/tebuto-online-terminbuchung/`.
 
-CI (`.github/workflows/branch.yaml`): `pnpm install --frozen-lockfile`, `composer install`, `lint`, `build:block`, `version:check`, `build.sh`.
+CI (`.github/workflows/branch.yaml`): `pnpm install --frozen-lockfile`, `composer install`, `lint`, `build:block`, `version:check`, `build.sh` → SonarQube scan + quality gate on `ubuntu-latest`. See [`docs/ci.md`](docs/ci.md).
 
-Pre-commit (Husky): runs `pnpm lint:fix` on the whole codebase (Biome + PHPCS). Requires `pnpm install` and `composer install`.
+**Lefthook** formats/lints staged JS/JSON/CSS on commit (`lefthook.yml`). Run `pnpm lint` / `pnpm lint:php` for PHP before committing PHP changes.
+
+**SonarQube:** `sonar-project.properties`, SonarLint, Cursor MCP `analyze_code_snippet` on changed JS/TS/PHP before agent commits. See `.cursor/rules/sonarqube_mcp_instructions.mdc`. Lefthook/Biome/PHPCS is not a substitute.
+
+**Dependabot** runs yearly; weekly updates via Cursor Automation. Cross-project guide: Artus portal wiki **Repository Tooling (SonarQube, CI, Cursor Agents)**.
 
 ## Coding conventions
 
