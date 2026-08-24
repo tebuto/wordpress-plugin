@@ -17,6 +17,11 @@ vendor/
 
 # Local tooling
 .playwright-mcp/
+.scannerwork/
+
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
 
 # npm lockfiles (this repo uses pnpm)
 package-lock.json

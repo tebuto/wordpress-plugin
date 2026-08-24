@@ -18,7 +18,7 @@
     "lint:php": "composer lint",
     "lint:php:fix": "composer fix || [ $? -eq 1 ]",
     "lint:fix": "pnpm format && pnpm lint:php:fix && pnpm lint",
-    "prepare": "husky",
+    "prepare": "node -e \"const on=v=>!!v&&v!=='0'&&v!=='false';if(on(process.env.CI)&&!on(process.env.LEFTHOOK))process.exit(0);try{require('child_process').execSync('lefthook install --reset-hooks-path',{stdio:'inherit'})}catch{}\"",
     "start": "pnpm --filter tebuto-online-terminbuchung-block run start",
     "dev:setup": "./scripts/dev-setup.sh",
     "dev:up": "docker compose up -d",
@@ -53,6 +53,6 @@
     "@biomejs/biome": "2.5.10",
     "chokidar-cli": "^3",
     "concurrently": "^10.0.5",
-    "husky": "^9"
+    "lefthook": "^2.1.10"
   }
 }

@@ -20,4 +20,5 @@ allowBuilds:
   core-js: false
   core-js-pure: false
   fsevents: false
+  lefthook: true
   unrs-resolver: false

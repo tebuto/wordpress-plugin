@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "sonarqube": {
+      "command": "sonar",
+      "args": [
+        "run",
+        "mcp",
+        "--project",
+        "tebuto_wordpress-plugin_d85838b5-fae9-48e3-9636-0ec145a330f3",
+        "--toolsets",
+        "analysis,ide,issues,quality-gates,rules,duplications,measures,security-hotspots,coverage"
+      ],
+      "env": {
+        "SONARQUBE_IDE_PORT": "64120"
+      }
+    }
+  }
+}
