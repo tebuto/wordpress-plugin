@@ -29,10 +29,10 @@ fi
 stamp_file="$root/.git/sonar-agent-analyzed"
 if [[ ! -f "$stamp_file" ]]; then
   node -e '
-    const msg = "Sonar before commit: staged JS/TS/PHP files require SonarQube MCP analyze_code_snippet on each changed file first (see AGENTS.md). Fix any issues, then retry the commit. Lefthook/Biome is not a substitute.";
+    const msg = "Sonar before commit: staged JS/TS/PHP require SonarQube MCP analyze_file_list (preferred), run_advanced_code_analysis if available, or analyze_code_snippet as last resort. See AGENTS.md. Lefthook/Biome/PHPCS is not a substitute.";
     console.log(JSON.stringify({
       permission: "deny",
-      user_message: "Blocked: run SonarQube MCP analyze_code_snippet on staged JS/TS/PHP before committing.",
+      user_message: "Blocked: run SonarQube MCP analysis on staged JS/TS/PHP before committing.",
       agent_message: msg
     }));
   '
@@ -48,7 +48,7 @@ if ! node -e '
   process.exit(ageMs <= 60 * 60 * 1000 ? 0 : 1);
 ' "$stamp_file"; then
   node -e '
-    const msg = "Sonar before commit: previous analyze_code_snippet stamp is stale (>1h). Re-run SonarQube MCP analyze_code_snippet on each staged JS/TS/PHP file, then retry the commit.";
+    const msg = "Sonar before commit: analysis stamp is stale (>1h). Re-run SonarQube MCP analyze_file_list (or fallback tools) on staged JS/TS/PHP, then retry the commit.";
     console.log(JSON.stringify({
       permission: "deny",
       user_message: "Blocked: Sonar analysis stamp is stale. Re-analyze staged JS/TS/PHP before committing.",

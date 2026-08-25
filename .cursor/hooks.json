@@ -4,13 +4,13 @@
     "afterMCPExecution": [
       {
         "command": ".cursor/hooks/sonar-track-analysis.sh",
-        "matcher": "analyze_file_list|analyze_code_snippet"
+        "matcher": "analyze_file_list|run_advanced_code_analysis|analyze_code_snippet"
       }
     ],
     "postToolUse": [
       {
         "command": ".cursor/hooks/sonar-track-analysis.sh",
-        "matcher": "CallDynamicTool|MCP:.*(analyze_file_list|analyze_code_snippet)"
+        "matcher": "CallDynamicTool|MCP:.*(analyze_file_list|run_advanced_code_analysis|analyze_code_snippet)"
       }
     ],
     "beforeShellExecution": [

@@ -75,7 +75,7 @@ CI (`.github/workflows/branch.yaml`): `pnpm install --frozen-lockfile`, `compose
 
 **Lefthook** formats/lints staged JS/JSON/CSS on commit (`lefthook.yml`). Run `pnpm lint` / `pnpm lint:php` for PHP before committing PHP changes.
 
-**SonarQube:** `sonar-project.properties`, SonarLint, Cursor MCP `analyze_code_snippet` on changed JS/TS/PHP before agent commits. See `.cursor/rules/sonarqube_mcp_instructions.mdc`. Lefthook/Biome/PHPCS is not a substitute.
+**SonarQube:** `sonar-project.properties`, SonarLint, Cursor MCP analysis on changed JS/TS/PHP before agent commits (tool priority: `analyze_file_list` → `run_advanced_code_analysis` if present → `analyze_code_snippet` last resort; see `.cursor/rules/sonarqube_mcp_instructions.mdc`). Lefthook/Biome/PHPCS is not a substitute.
 
 **Dependabot** runs yearly; weekly updates via Cursor Automation. Cross-project guide: Artus portal wiki **Repository Tooling (SonarQube, CI, Cursor Agents)**.
 
