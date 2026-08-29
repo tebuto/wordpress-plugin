@@ -14,12 +14,12 @@
 	},
 	"dependencies": {
 		"@wordpress/block-editor": "^16.2.0",
-		"@wordpress/blocks": "^15.26.0",
+		"@wordpress/blocks": "^15.27.0",
 		"@wordpress/components": "^39.0.0",
-		"@wordpress/i18n": "^6.26.0"
+		"@wordpress/i18n": "^6.27.0"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "^34.1.0",
+		"@wordpress/scripts": "^34.2.0",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8"
 	}
