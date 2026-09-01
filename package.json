@@ -44,14 +44,14 @@
     "gutenberg",
     "terminbuchung"
   ],
-  "packageManager": "pnpm@11.23.0+sha512.f00082e5b283a199b74e079da28d155c008fe232f44c8a06ea7ddfa014ecf719fc362f790ecc67b28106ddac2afb24c49a9a079159da560b2ce7d1e98efd11af",
+  "packageManager": "pnpm@11.24.0",
   "engines": {
     "node": ">=22.13",
     "pnpm": "^11.0.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.10",
-    "chokidar-cli": "^3",
+    "@biomejs/biome": "2.5.11",
+    "chokidar-cli": "^3.0.0",
     "concurrently": "^10.0.5",
     "lefthook": "^2.1.10"
   }
