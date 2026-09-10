@@ -6,8 +6,8 @@
 
 <div align="center">
   <a href="https://wordpress.org/plugins/tebuto-online-terminbuchung/"><img alt="WordPress Plugin" src="https://img.shields.io/wordpress/plugin/v/tebuto-online-terminbuchung?label=wordpress.org"></a>
-  <a href="https://github.com/tebuto/wordpress-plugin/blob/main/LICENSE"><img alt="GPLv2 License" src="https://img.shields.io/github/license/tebuto/wordpress-plugin"></a>
-  <a href="https://github.com/tebuto/wordpress-plugin/actions/workflows/branch.yaml"><img alt="CI Status" src="https://img.shields.io/github/actions/workflow/status/tebuto/wordpress-plugin/.github%2Fworkflows%2Fbranch.yaml?label=CI&logo=GitHub"></a>
+  <a href="https://github.com/artus-engineering/tebuto-wordpress-plugin/blob/main/LICENSE"><img alt="GPLv2 License" src="https://img.shields.io/github/license/artus-engineering/tebuto-wordpress-plugin"></a>
+  <a href="https://github.com/artus-engineering/tebuto-wordpress-plugin/actions/workflows/branch.yaml"><img alt="CI Status" src="https://img.shields.io/github/actions/workflow/status/artus-engineering/tebuto-wordpress-plugin/.github%2Fworkflows%2Fbranch.yaml?label=CI&logo=GitHub"></a>
   <a href="https://sonar.artus-engineering.de/dashboard?id=tebuto_wordpress-plugin_d85838b5-fae9-48e3-9636-0ec145a330f3"><img alt="Quality Gate Status" src="https://sonar.artus-engineering.de/api/project_badges/measure?project=tebuto_wordpress-plugin_d85838b5-fae9-48e3-9636-0ec145a330f3&metric=alert_status&token=sqb_d19c45be2051785f85a16b0d50ee03c3bad2a894"></a>
 </div>
 
@@ -60,8 +60,8 @@
 ### From Source
 
 ```bash
-git clone https://github.com/tebuto/wordpress-plugin.git
-cd wordpress-plugin
+git clone https://github.com/artus-engineering/tebuto-wordpress-plugin.git
+cd tebuto-wordpress-plugin
 pnpm install
 pnpm build
 ```
@@ -117,7 +117,7 @@ Defaults can be configured globally under **Tebuto → Shortcode**. The live sho
 
 Search for **Tebuto** in the block inserter to add the booking widget. All shortcode settings are available in the block sidebar, including theme presets, category filters, and live preview.
 
-The block uses the same underlying [Tebuto booking widget](https://github.com/tebuto/react-booking-widget) as the shortcode.
+The block uses the same underlying [Tebuto booking widget](https://github.com/artus-engineering/tebuto-react-booking-widget) as the shortcode.
 
 ## Admin Features
 
@@ -209,7 +209,7 @@ pnpm build        # Create tebuto-online-terminbuchung.zip
 
 | Project | Description |
 | --- | --- |
-| [@tebuto/react-booking-widget](https://github.com/tebuto/react-booking-widget) | React component for embedding Tebuto booking outside WordPress |
+| [@tebuto/react-booking-widget](https://github.com/artus-engineering/tebuto-react-booking-widget) | React component for embedding Tebuto booking outside WordPress |
 | [Tebuto](https://tebuto.de) | Online appointment booking platform for therapists and coaches |
 
 ## Contributing

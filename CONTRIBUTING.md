@@ -15,8 +15,8 @@ Thank you for your interest in contributing to the Tebuto WordPress plugin!
 ### Clone and Install
 
 ```bash
-git clone https://github.com/tebuto/wordpress-plugin.git
-cd wordpress-plugin
+git clone https://github.com/artus-engineering/tebuto-wordpress-plugin.git
+cd tebuto-wordpress-plugin
 pnpm install
 composer install
 ```
@@ -219,8 +219,8 @@ Existing WordPress.org SVN tags are never modified; only new version tags are cr
 
 ## Related Projects
 
-- [@tebuto/react-booking-widget](https://github.com/tebuto/react-booking-widget) — React component for embedding the Tebuto booking widget outside of WordPress
+- [@tebuto/react-booking-widget](https://github.com/artus-engineering/tebuto-react-booking-widget) — React component for embedding the Tebuto booking widget outside of WordPress
 
 ## Questions?
 
-Open a [GitHub issue](https://github.com/tebuto/wordpress-plugin/issues) or reach out at hello@tebuto.de.
+Open a [GitHub issue](https://github.com/artus-engineering/tebuto-wordpress-plugin/issues) or reach out at hello@tebuto.de.

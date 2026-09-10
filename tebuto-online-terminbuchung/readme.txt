@@ -4,7 +4,7 @@ Tags: Praxissoftware, Terminbuchung, Therapie, Buchungswidget, Kalender
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.4.1
+Stable tag: 2.4.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -120,6 +120,9 @@ Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter
 
 == Changelog ==
 
+= 2.4.2 =
+* **Wartung** – Repository nach GitHub `artus-engineering/tebuto-wordpress-plugin` umgezogen; Clone-URLs, Issue-Links, Badges und Verweis auf das Buchungs-Widget-Repo aktualisiert
+
 = 2.4.1 =
 * **Verbesserung: Barrierefreiheit** – Formularfelder und Schalter im Admin (u. a. Kategorien, Seminar-Termine) sowie Überschriften in der Buchungsdetailansicht sind für Screenreader korrekt beschriftet und verknüpft
 * **Wartung** – Code-Qualität und Wartbarkeit verbessert; Abhängigkeiten aktualisiert
@@ -198,6 +201,9 @@ Unter **Tebuto → Shortcode** kannst du Farben, Theme-Presets, Kategorienfilter
 * Professionelles Admin-Interface
 
 == Upgrade Notice ==
+
+= 2.4.2 =
+Wartungs-Update: Quellcode-Repository ist jetzt unter github.com/artus-engineering/tebuto-wordpress-plugin.
 
 = 2.4.1 =
 Wartungs-Update: bessere Barrierefreiheit im Admin und interne Code-Qualität.

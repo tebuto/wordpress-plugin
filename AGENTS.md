@@ -144,7 +144,7 @@ Release flow: bump → edit changelog stubs in `readme.txt` → merge `main` →
 1. User meta key in `admin/save-settings.php` + defaults in `block/block.php` (`tebuto_enqueue_block_editor_assets`).
 2. Shortcode attribute in `includes/shortcode.php` + generator in `admin/shortcode-page.php`.
 3. Block attribute in `block/src/block/block.json`, `edit.js`, and `save.js`.
-4. Map to `data-*` attributes on the booking script tag per [@tebuto/react-booking-widget](https://github.com/tebuto/react-booking-widget).
+4. Map to `data-*` attributes on the booking script tag per [@tebuto/react-booking-widget](https://github.com/artus-engineering/tebuto-react-booking-widget).
 
 ### New Tebuto API usage
 

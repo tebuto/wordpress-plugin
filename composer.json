@@ -3,6 +3,11 @@
 	"description": "WordPress plugin for integrating Tebuto appointment booking",
 	"type": "wordpress-plugin",
 	"license": "GPL-2.0-or-later",
+	"homepage": "https://github.com/artus-engineering/tebuto-wordpress-plugin",
+	"support": {
+		"issues": "https://github.com/artus-engineering/tebuto-wordpress-plugin/issues",
+		"source": "https://github.com/artus-engineering/tebuto-wordpress-plugin"
+	},
 	"require": {
 		"php": ">=7.4"
 	},
