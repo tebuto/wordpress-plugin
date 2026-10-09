@@ -35,7 +35,7 @@
 ## Features
 
 - **OAuth Integration** — Connect your Tebuto account with one click
-- **Drop-in Widget** — Embed the Tebuto booking widget via shortcode or Gutenberg block
+- **Booking and Seminars Widgets** — Embed appointments and public seminars via shortcode or Gutenberg block (seminars require the account feature)
 - **Multiple Widgets** — Use several booking widgets with different settings on the same page
 - **Theming** — Customize colors, fonts, borders, and CSS to match your brand
 - **Admin Dashboard** — View upcoming appointments, manage bookings, and edit categories from WordPress
@@ -71,8 +71,8 @@ Upload the `tebuto-online-terminbuchung/` directory (or the generated `tebuto-on
 ## Quick Start
 
 1. Activate the plugin
-2. Go to **Tebuto → Settings** in the WordPress admin
-3. Click **Connect with Tebuto** and sign in
+2. Open the **Tebuto → Dashboard** in the WordPress admin
+3. Click **Mit Tebuto verbinden** and sign in
 4. Add the shortcode or Gutenberg block to any page:
 
 ```
@@ -104,18 +104,34 @@ Override default settings per instance:
 | `text_primary` | hex color | `#374151` | Primary text color |
 | `text_secondary` | hex color | `#6b7280` | Secondary/muted text color |
 | `border_color` | hex color | `#E9E9E9` | Border color |
-| `border` | `true` / `false` | `false` | Show border around the widget |
+| `border` | `true` / `false` | `true` | Show border around the widget |
 | `inherit_font` | `true` / `false` | `false` | Use the parent page font |
 | `categories` | comma-separated IDs | all | Filter to specific category IDs |
 | `show_quick_filters` | `true` / `false` | `false` | Show quick filter buttons for time slots |
 | `show_provider_filter` | `true` / `false` | `false` | Show provider selector (multi-user accounts) |
+| `show_location_quick_filter` | `true` / `false` | `false` | Show location quick filters |
+| `show_category_selection_first` | `true` / `false` | `true` | Start with category selection |
 | `custom_css` | CSS string | — | Custom CSS scoped to this widget instance |
 
-Defaults can be configured globally under **Tebuto → Shortcode**. The live shortcode generator on that page updates automatically as you change settings.
+The table lists initial defaults; saved account settings apply unless a shortcode explicitly overrides them. Defaults can be configured under **Tebuto → Shortcode & Widget**. The live shortcode generator on that page updates automatically as you change settings.
+
+### Seminars
+
+When the connected account has seminars enabled, use:
+
+```
+[tebuto_seminare_widget]
+[tebuto_seminare_widget seminars="achtsamkeit,stressbewaeltigung" show_list_first="true"]
+```
+
+The seminars widget supports the same color, border, font, and custom CSS settings.
+`seminars` restricts the displayed seminars by their comma-separated slugs; the default is all public
+seminars. `show_list_first` defaults to `true`. The **Seminare** tab in
+**Shortcode & Widget** provides selection, appearance controls, and a live preview.
 
 ## Gutenberg Block
 
-Search for **Tebuto** in the block inserter to add the booking widget. All shortcode settings are available in the block sidebar, including theme presets, category filters, and live preview.
+Search for **Tebuto** in the block inserter to add **Tebuto Terminbuchung** or, when enabled, **Tebuto Seminare**. The block sidebar includes appearance settings, category or seminar selection, and a live preview.
 
 The block uses the same underlying [Tebuto booking widget](https://github.com/artus-engineering/tebuto-react-booking-widget) as the shortcode.
 
@@ -126,10 +142,12 @@ Once connected, the **Tebuto** menu provides:
 | Page | Description |
 | --- | --- |
 | **Dashboard** | Overview of upcoming appointments |
-| **Bookings** | View, confirm, and cancel appointments |
-| **Categories** | Manage appointment categories |
-| **Shortcode** | Configure widget appearance with live preview |
-| **Settings** | Connect or disconnect your Tebuto account |
+| **Buchungen** | View, confirm, reject, and cancel appointments |
+| **Kategorien** | Manage appointment categories |
+| **Seminare** | Manage seminars, occurrences, and registrations when enabled |
+| **Shortcode & Widget** | Configure booking and seminars widgets with live preview |
+
+Connect from the Dashboard; disconnect using **Verbindung trennen** in its header.
 
 ## Local Development
 
@@ -152,6 +170,23 @@ This will:
 4. Create `wordpress/wp-config.local.php` with Tebuto API URL overrides for local development
 
 Complete the WordPress installation in your browser, then activate **Tebuto - Online-Terminbuchung** under **Plugins**.
+
+### Isolated Local Preview
+
+In the Tebuto monorepo checkout, run:
+
+```bash
+(cd ../webapp && node build-widget.mjs local)
+pnpm dev:preview
+pnpm test:e2e:install
+pnpm test:e2e
+```
+
+This installs actual local WordPress with test accounts and pages. It renders the
+real compiled widgets against a separate synthetic local API. Read generated login
+credentials from `.local-preview/credentials.json`; never publish that file.
+See [the preview guide](CONTRIBUTING.md#isolated-preview-and-browser-tests) for
+service boundaries, fixture controls, and restart commands.
 
 ### Development Commands
 

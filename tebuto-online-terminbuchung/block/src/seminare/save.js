@@ -12,7 +12,7 @@ export default function save({ attributes }) {
 		customCss
 	} = attributes
 
-	const uuid = window.tebutoData?.uuid || ''
+	const uuid = attributes.savedTherapistUuid ?? window.tebutoData?.uuid ?? ''
 	const widgetUrl = 'https://tebuto.de/widget/seminars.js'
 
 	const widgetAttributes = {

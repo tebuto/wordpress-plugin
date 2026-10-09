@@ -23,6 +23,14 @@ function tebuto_handle_oauth_callback(): void {
 		return;
 	}
 
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die(
+			esc_html__( 'Keine Berechtigung.', 'tebuto-online-terminbuchung' ),
+			esc_html__( 'Fehler', 'tebuto-online-terminbuchung' ),
+			array( 'response' => 403 )
+		);
+	}
+
     // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$state = sanitize_text_field( wp_unslash( $_GET['state'] ) );
 	if ( ! wp_verify_nonce( $state, 'tebuto_auth' ) ) {

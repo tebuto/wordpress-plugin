@@ -38,7 +38,7 @@ function tebuto_parse_seminars_widget_settings( $parsed, $theme_defaults ): arra
 		'inherit_font'     => $parsed['inherit_font'] === 'true' ? 'true' : 'false',
 		'show_list_first'  => $parsed['show_list_first'] === 'false' ? 'false' : 'true',
 		'seminars'         => preg_replace( '/[^a-zA-Z0-9_\-,]/', '', $parsed['seminars'] ),
-		'custom_css'       => wp_strip_all_tags( $parsed['custom_css'] ),
+		'custom_css'       => wp_strip_all_tags( html_entity_decode( $parsed['custom_css'], ENT_QUOTES, 'UTF-8' ) ),
 	);
 }
 
@@ -111,8 +111,9 @@ function tebuto_render_seminars_widget_html( string $widget_id, int $instance_id
 	$output .= '<script src="' . esc_url( TEBUTO_SEMINARS_WIDGET_URL ) . '"' . $attr_string . ' async></script>';
 
 	if ( ! empty( $custom_css ) ) {
-		$style_id = 'tebuto-seminars-custom-css' . ( $instance_id > 1 ? '-' . $instance_id : '' );
-		$output  .= '<style id="' . esc_attr( $style_id ) . '">' . $custom_css . '</style>';
+		$style_id   = 'tebuto-seminars-custom-css' . ( $instance_id > 1 ? '-' . $instance_id : '' );
+		$custom_css = str_replace( '#tebuto-seminars-widget', ':scope', $custom_css );
+		$output    .= '<style id="' . esc_attr( $style_id ) . '">@scope (#' . esc_attr( $widget_id ) . ') {' . $custom_css . '}</style>';
 	}
 
 	return $output;
@@ -159,7 +160,8 @@ function tebuto_seminars_widget_shortcode( $atts = array() ): string {
 	$instance_id = $tebuto_seminars_widget_instance_count;
 	$widget_id   = 'tebuto-seminars-widget' . ( $instance_id > 1 ? '-' . $instance_id : '' );
 
-	$widget_attrs = tebuto_build_seminars_widget_attrs( $therapist_uuid, $settings, $theme_defaults );
+	$widget_attrs                      = tebuto_build_seminars_widget_attrs( $therapist_uuid, $settings, $theme_defaults );
+	$widget_attrs['data-container-id'] = esc_attr( $widget_id );
 
 	return tebuto_render_seminars_widget_html( $widget_id, $instance_id, $widget_attrs, $settings['custom_css'] );
 }

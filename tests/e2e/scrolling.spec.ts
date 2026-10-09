@@ -1,0 +1,43 @@
+import { assertNaturalVerticalFlow, assertNoOverflow, expect, login, preview, settings, test } from './helpers'
+
+for (const width of [1440, 390]) {
+	test(`public booking uses page scrolling through category, calendar and details at ${width}px`, async ({ page }) => {
+		await page.setViewportSize({ width, height: 720 })
+		await page.goto(preview().pages.blocks.url)
+		const widget = page.locator('[id="tebuto-booking-widget"]')
+		await expect(widget.getByRole('button', { name: /Beratung/ })).toBeVisible()
+		await assertNaturalVerticalFlow(widget)
+		await widget.getByRole('button', { name: /Erstgespräch/ }).click()
+		const slot = widget.getByRole('button', { name: /^\d{2}:\d{2} Uhr/ }).first()
+		await expect(slot).toBeVisible()
+		await assertNaturalVerticalFlow(widget)
+		await slot.click()
+		await expect(widget.locator('[name="firstName"]')).toBeVisible()
+		await expect(widget.locator('[name="lastName"]')).toBeVisible()
+		await assertNaturalVerticalFlow(widget)
+		await assertNoOverflow(page)
+		await widget.getByRole('button', { name: 'Zurück', exact: true }).click()
+		await expect(slot).toBeVisible()
+		await assertNaturalVerticalFlow(widget)
+	})
+
+	test(`admin Shortcode preview and controls use page scrolling at ${width}px`, async ({ page }) => {
+		await page.setViewportSize({ width, height: 720 })
+		await login(page)
+		await settings(page)
+		await page.getByRole('checkbox', { name: /Erstgespräch/ }).check()
+		await page.getByRole('checkbox', { name: /Beratung/ }).check()
+		const previewPanel = page.locator('.tebuto-widget-settings-preview')
+		const adminContent = page.locator('#wpbody-content')
+		await expect(previewPanel.getByRole('button', { name: /Beratung/ })).toBeVisible()
+		await assertNaturalVerticalFlow(adminContent)
+		await previewPanel.getByRole('button', { name: /Erstgespräch/ }).click()
+		const slot = previewPanel.getByRole('button', { name: /^\d{2}:\d{2} Uhr/ }).first()
+		await expect(slot).toBeVisible()
+		await assertNaturalVerticalFlow(adminContent)
+		await slot.click()
+		await expect(previewPanel.locator('[name="firstName"]')).toBeVisible()
+		await assertNaturalVerticalFlow(adminContent)
+		await assertNoOverflow(page)
+	})
+}

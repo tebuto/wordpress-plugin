@@ -20,7 +20,6 @@ function tebuto_ui_fullheight_pages(): array {
 		'tebuto-bookings',
 		'tebuto-categories',
 		'tebuto-seminars',
-		'tebuto-shortcode',
 	);
 }
 

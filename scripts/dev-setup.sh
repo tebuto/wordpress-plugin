@@ -16,7 +16,8 @@ for i in $(seq 1 30); do
 		break
 	fi
 	if [ "$i" -eq 30 ]; then
-		echo "Warning: WordPress did not respond on port 8000 yet. It may still be starting." >&2
+		echo "Error: WordPress did not respond on port 8000." >&2
+		exit 1
 	fi
 	sleep 2
 done
@@ -35,16 +36,7 @@ if [ ! -f "$WP_CONFIG_LOCAL" ] && [ -f "$WP_CONFIG_EXAMPLE" ]; then
 	echo "==> Created wordpress/wp-config.local.php from example."
 fi
 
-if [ -f "$WP_CONFIG" ] && ! grep -q 'wp-config.local.php' "$WP_CONFIG"; then
-	cat >> "$WP_CONFIG" <<'PHP'
-
-// Local Tebuto development overrides (auto-added by dev:setup)
-if ( file_exists( __DIR__ . '/wp-config.local.php' ) ) {
-	require_once __DIR__ . '/wp-config.local.php';
-}
-PHP
-	echo "==> Appended wp-config.local.php include to wordpress/wp-config.php"
-fi
+node "$ROOT_DIR/scripts/dev-config.mjs"
 
 cat <<EOF
 

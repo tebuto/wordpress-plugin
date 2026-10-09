@@ -22,6 +22,11 @@ vendor/
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
+playwright-report/
+test-results/
 
 # npm lockfiles (this repo uses pnpm)
 package-lock.json
+
+# Private local preview credentials and browser authentication
+.local-preview/

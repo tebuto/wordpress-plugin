@@ -24,7 +24,7 @@ function tebuto_shortcode_page(): void {
 		array(
 			'title'        => __( 'Shortcode & Widget', 'tebuto-online-terminbuchung' ),
 			'page_class'   => 'tebuto-page-shortcode',
-			'fullheight'   => true,
+			'fullheight'   => false,
 			'actions_html' => tebuto_ui_button(
 				array(
 					'label'   => __( '← Dashboard', 'tebuto-online-terminbuchung' ),

@@ -17,9 +17,6 @@ function tebuto_render_not_connected_notice( bool $just_disconnected = false ): 
 	$title = $just_disconnected
 		? __( 'Verbindung getrennt', 'tebuto-online-terminbuchung' )
 		: __( 'Verbindung erforderlich', 'tebuto-online-terminbuchung' );
-	$body  = $just_disconnected
-		? __( 'Die Verbindung zu Tebuto wurde getrennt. Verbinde dein Konto erneut, um das Plugin weiter zu nutzen.', 'tebuto-online-terminbuchung' )
-		: __( 'Du musst dein Tebuto-Konto verbinden, um diese Funktionen nutzen zu können.', 'tebuto-online-terminbuchung' );
 
 	$actions = tebuto_ui_button(
 		array(
@@ -42,7 +39,6 @@ function tebuto_render_not_connected_notice( bool $just_disconnected = false ): 
 	echo tebuto_ui_admonition( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		array(
 			'title'        => $title,
-			'body'         => $body,
 			'tone'         => 'warning',
 			'icon'         => 'dashicons-admin-plugins',
 			'actions_html' => $actions,
@@ -78,7 +74,6 @@ function tebuto_render_session_expired_notice(): void {
 	echo tebuto_ui_admonition( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		array(
 			'title'        => __( 'Sitzung abgelaufen', 'tebuto-online-terminbuchung' ),
-			'body'         => __( 'Deine Verbindung zu Tebuto ist abgelaufen. Bitte melde dich erneut an, um Termine, Kategorien und Widget-Einstellungen zu verwalten.', 'tebuto-online-terminbuchung' ),
 			'tone'         => 'warning',
 			'icon'         => 'dashicons-update',
 			'class'        => 'tebuto-auth-notice-expired',

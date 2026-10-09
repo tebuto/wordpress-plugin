@@ -41,7 +41,7 @@ function tebuto_parse_booking_widget_settings( $parsed, $theme_defaults ): array
 		'show_location_quick_filter'    => $parsed['show_location_quick_filter'] === 'true' ? 'true' : 'false',
 		'show_category_selection_first' => $parsed['show_category_selection_first'] === 'false' ? 'false' : 'true',
 		'categories'                    => preg_replace( '/[^0-9,]/', '', $parsed['categories'] ),
-		'custom_css'                    => wp_strip_all_tags( $parsed['custom_css'] ),
+		'custom_css'                    => wp_strip_all_tags( html_entity_decode( $parsed['custom_css'], ENT_QUOTES, 'UTF-8' ) ),
 	);
 }
 
@@ -241,8 +241,9 @@ function tebuto_render_booking_widget_html( string $widget_id, int $instance_id,
 	$output .= '<script src="' . esc_url( TEBUTO_WIDGET_URL ) . '"' . $attr_string . ' async></script>';
 
 	if ( ! empty( $custom_css ) ) {
-		$style_id = 'tebuto-custom-css' . ( $instance_id > 1 ? '-' . $instance_id : '' );
-		$output  .= '<style id="' . esc_attr( $style_id ) . '">' . $custom_css . '</style>';
+		$style_id   = 'tebuto-custom-css' . ( $instance_id > 1 ? '-' . $instance_id : '' );
+		$custom_css = str_replace( '#tebuto-booking-widget', ':scope', $custom_css );
+		$output    .= '<style id="' . esc_attr( $style_id ) . '">@scope (#' . esc_attr( $widget_id ) . ') {' . $custom_css . '}</style>';
 	}
 
 	return $output;

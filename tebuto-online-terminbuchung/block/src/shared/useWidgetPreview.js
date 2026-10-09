@@ -1,14 +1,11 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useId, useRef } from 'react'
+import { getPreviewThemeDataset } from './previewTheme'
 
-function applyCommonDataset(script, therapistUuid, attributes) {
-	const { primaryColor, backgroundColor, textPrimary, textSecondary, borderColor, border, inheritFont } = attributes
+function applyCommonDataset(script, therapistUuid, attributes, surface) {
+	const { border, inheritFont } = attributes
 
 	script.dataset.therapistUuid = therapistUuid
-	script.dataset.primaryColor = primaryColor
-	script.dataset.backgroundColor = backgroundColor
-	script.dataset.textPrimary = textPrimary
-	script.dataset.textSecondary = textSecondary
-	script.dataset.borderColor = borderColor
+	Object.assign(script.dataset, getPreviewThemeDataset(attributes, surface))
 	script.dataset.border = border ? 'true' : 'false'
 	script.dataset.inheritFont = inheritFont ? 'true' : 'false'
 }
@@ -16,6 +13,9 @@ function applyCommonDataset(script, therapistUuid, attributes) {
 function applyBookingDataset(script, attributes, selectedCategories, shouldUseConfiguredCategories) {
 	const { showLocationQuickFilter, showCategorySelectionFirst, categories } = attributes
 
+	if (attributes.showQuickFilters) {
+		script.dataset.showQuickFilters = 'true'
+	}
 	if (shouldUseConfiguredCategories) {
 		script.dataset.includeSubusers = 'true'
 		script.dataset.showQuickFilters = 'true'
@@ -67,6 +67,7 @@ function applySeminarsDataset(script, attributes) {
  *   therapistUuid: string,
  *   widgetUrl: string,
  *   attributes: Record<string, unknown>,
+ *   surface?: 'inspector'|'admin',
  *   selectedCategories?: Array<Record<string, unknown>>,
  *   shouldUseConfiguredCategories?: boolean,
  * }} options
@@ -77,19 +78,30 @@ export default function useWidgetPreview(containerRef, options) {
 		therapistUuid,
 		widgetUrl,
 		attributes,
+		surface = 'inspector',
 		selectedCategories = [],
 		shouldUseConfiguredCategories = false
 	} = options
 
 	const widgetScriptRef = useRef(null)
+	const previewId = useId().replace(/[^a-zA-Z0-9_-]/g, '')
 
 	const loadWidgetPreview = useCallback(() => {
 		if (!containerRef.current || !therapistUuid || !widgetUrl) {
 			return
 		}
 
-		const containerId = variant === 'seminars' ? 'tebuto-seminars-widget' : 'tebuto-booking-widget'
-		containerRef.current.innerHTML = `<div id="${containerId}"></div>`
+		const legacyId = variant === 'seminars' ? 'tebuto-seminars-widget' : 'tebuto-booking-widget'
+		const containerId = `${legacyId}-preview-${previewId}`
+		const mount = document.createElement('div')
+		mount.id = containerId
+		containerRef.current.replaceChildren(mount)
+		if (attributes.customCss) {
+			const style = document.createElement('style')
+			const css = attributes.customCss.replaceAll(`#${legacyId}`, ':scope')
+			style.textContent = `@scope (#${containerId}) { ${css} }`
+			containerRef.current.appendChild(style)
+		}
 
 		if (widgetScriptRef.current) {
 			widgetScriptRef.current.remove()
@@ -97,7 +109,8 @@ export default function useWidgetPreview(containerRef, options) {
 
 		const script = document.createElement('script')
 		script.src = widgetUrl
-		applyCommonDataset(script, therapistUuid, attributes)
+		script.dataset.containerId = containerId
+		applyCommonDataset(script, therapistUuid, attributes, surface)
 
 		if (variant === 'booking') {
 			applyBookingDataset(script, attributes, selectedCategories, shouldUseConfiguredCategories)
@@ -108,7 +121,17 @@ export default function useWidgetPreview(containerRef, options) {
 		script.async = true
 		widgetScriptRef.current = script
 		containerRef.current.appendChild(script)
-	}, [containerRef, variant, therapistUuid, widgetUrl, attributes, selectedCategories, shouldUseConfiguredCategories])
+	}, [
+		containerRef,
+		previewId,
+		variant,
+		therapistUuid,
+		widgetUrl,
+		attributes,
+		surface,
+		selectedCategories,
+		shouldUseConfiguredCategories
+	])
 
 	useEffect(() => {
 		const timer = setTimeout(() => {

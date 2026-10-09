@@ -85,7 +85,7 @@ function tebuto_build_occurrence_page_actions( int $occurrence_id, string $statu
 			array(
 				'label'   => __( 'Absagen', 'tebuto-online-terminbuchung' ),
 				'type'    => 'button',
-				'variant' => 'solid',
+				'variant' => 'outline',
 				'color'   => 'danger',
 				'class'   => 'tebuto-occurrence-cancel-btn',
 				'attrs'   => array(
@@ -764,7 +764,6 @@ function tebuto_render_occurrence_participants_card( array $registrations ): voi
 			array(
 				'icon'  => 'dashicons-groups',
 				'title' => __( 'Noch keine Anmeldungen', 'tebuto-online-terminbuchung' ),
-				'body'  => __( 'Sobald sich Teilnehmer anmelden, erscheinen sie hier.', 'tebuto-online-terminbuchung' ),
 			)
 		);
 		tebuto_ui_card_close();

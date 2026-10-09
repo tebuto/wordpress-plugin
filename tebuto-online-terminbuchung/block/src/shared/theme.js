@@ -1,5 +1,13 @@
 export function getTebutoData() {
-	return window.tebutoData || {}
+	const data = window.tebutoData || {}
+	const flag = (value) => value === true || value === 1 || value === '1' || value === 'true'
+	// wp_localize_script stringifies top-level scalar values, including booleans.
+	return {
+		...data,
+		seminarsFeatureEnabled: flag(data.seminarsFeatureEnabled),
+		hasManagedUsers: flag(data.hasManagedUsers),
+		isManagingUser: flag(data.isManagingUser)
+	}
 }
 
 export function getPresets() {
