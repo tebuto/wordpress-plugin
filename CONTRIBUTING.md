@@ -40,6 +40,80 @@ This single command:
 
 Complete the WordPress installation in your browser, then activate the plugin under **Plugins → Installed Plugins**.
 
+#### Isolated preview and browser tests
+
+From the Tebuto monorepo checkout, build the actual widgets once:
+
+```bash
+(cd ../webapp && node build-widget.mjs local)
+./scripts/dev-preview.sh
+```
+
+The Compose images are pinned to tested multi-architecture image digests:
+WordPress 6.9.1 with PHP 8.3.30, WP-CLI 2.12.0, and MariaDB 10.11. Docker chooses
+the native ARM64 or AMD64 image; no emulation override is required.
+The preview disables automatic core updates. Existing `wordpress/` files are
+persistent and may differ from the pinned image. Check the actual core with
+`./scripts/local-wp.sh core version` before comparing browser results. If an
+existing installation requires a database update, back up its database before
+running `./scripts/local-wp.sh core update-db`.
+
+The preview runs actual WordPress, MariaDB, the PHP plugin and Gutenberg on
+`http://localhost:8000`. A separate local service on `http://localhost:8001`
+supplies synthetic therapist/category/seminar data and serves the real compiled
+booking and seminars widgets. Only service origins in the bundles are replaced;
+widget rendering code is unchanged. OAuth, email delivery, payments, and final
+booking completion are not implemented by the adapter and are not verified here.
+Unknown API endpoints fail with HTTP 501 instead of simulating success.
+
+The setup creates a connected administrator, a disconnected administrator, an
+editor, a subscriber, and sample pages. Generated credentials and page URLs are in
+`.local-preview/credentials.json` (ignored, mode 0600, outside the web document
+root). Read that file locally for login; never paste it into logs or screenshots.
+An existing custom Tebuto configuration or WordPress installation without preview
+credentials is preserved; use a separate checkout for an isolated preview.
+
+```bash
+./scripts/local-wp.sh core version
+./scripts/local-wp.sh plugin status tebuto-online-terminbuchung
+./scripts/local-wp.sh eval-file /scripts/local-seed.php
+curl -fsS http://localhost:8001/health
+curl -fsS -H 'Content-Type: application/json' -d '{"reset":true}' http://localhost:8001/__control
+```
+
+The seed operation creates missing sample pages and accounts; it does not replace
+existing page content or reset widget settings. Tests reset their own settings.
+For API error tests POST `{"categories":"error"}`, `{"seminars":"error"}`, or
+`{"bookingActions":"error"}` to
+`/__control`; POST `{"reset":true}` restores normal fixtures. These endpoints are
+available only on loopback and must never be deployed. Confirm/reject/cancel actions
+change synthetic fixture state only.
+
+`docker compose down` stops the preview while preserving local WordPress files,
+`.local-preview/mysql-data`, and `.local-preview/service-state`. Database and
+adapter state use host directories so a full Docker Desktop VM disk cannot block
+session or fixture writes. Start it again with
+`docker compose --profile preview up -d wordpress tebuto-mock`.
+Do not delete those directories unless you intend to discard local data. When
+migrating from the earlier named database volume, keep that volume unchanged as
+a rollback copy; stop WordPress and MariaDB before copying a database datadir.
+
+Run the browser suite after setup:
+
+```bash
+pnpm test:e2e:install
+pnpm test:e2e
+```
+
+The suite requires the actual bundles in `../webapp/public/widget`. The standalone
+plugin repository CI does not check out that sibling project, so it cannot run this
+full browser suite as currently configured. A CI job must first obtain/build those
+bundles from the matching Tebuto revision; do not substitute dummy widgets and
+report that as the same integration coverage.
+
+Local configuration is included **before** `wp-settings.php`, so plugin constants
+actually take effect. `dev:setup` also relocates the old auto-appended include.
+
 #### Development Commands
 
 | Command | Description |

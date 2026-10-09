@@ -103,18 +103,8 @@ function tebuto_render_seminars_list_card( $seminars, Tebuto_API $api ): void {
 				<?php
 				echo tebuto_ui_empty_state( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					array(
-						'icon'         => 'dashicons-welcome-learn-more',
-						'title'        => __( 'Noch keine Seminare', 'tebuto-online-terminbuchung' ),
-						'body'         => __( 'Erstelle dein erstes Seminar, um Veranstaltungen und Anmeldungen zu verwalten.', 'tebuto-online-terminbuchung' ),
-						'actions_html' => tebuto_ui_button(
-							array(
-								'label'   => __( 'Erstes Seminar erstellen', 'tebuto-online-terminbuchung' ),
-								'type'    => 'button',
-								'variant' => 'solid',
-								'color'   => 'primary',
-								'attrs'   => array( 'id' => 'tebuto-add-seminar-btn-empty' ),
-							)
-						),
+						'icon'  => 'dashicons-welcome-learn-more',
+						'title' => __( 'Noch keine Seminare', 'tebuto-online-terminbuchung' ),
 					)
 				);
 				?>
@@ -178,7 +168,7 @@ function tebuto_render_seminar_accordion_item( array $seminar ): void {
 										<?php wp_nonce_field( 'tebuto_seminar_action', 'tebuto_seminar_nonce' ); ?>
 										<input type="hidden" name="tebuto_action" value="delete_seminar">
 										<input type="hidden" name="seminar_id" value="<?php echo esc_attr( (string) $sid ); ?>">
-										<button type="submit" class="button button-small tebuto-btn tebuto-btn--solid tebuto-btn--danger tebuto-btn--sm">
+										<button type="submit" class="button button-small tebuto-btn tebuto-btn--outline tebuto-btn--danger tebuto-btn--sm">
 											<?php esc_html_e( 'Löschen', 'tebuto-online-terminbuchung' ); ?>
 										</button>
 									</form>

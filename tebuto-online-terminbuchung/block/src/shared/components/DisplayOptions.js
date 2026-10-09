@@ -44,7 +44,6 @@ export default function DisplayOptions({
 			>
 				<ToggleControl
 					label={__('Rahmen anzeigen', 'tebuto-online-terminbuchung')}
-					help={__('Zeigt einen Rahmen um das Widget', 'tebuto-online-terminbuchung')}
 					checked={border}
 					onChange={(value) => setAttributes({ border: value })}
 				/>
@@ -108,7 +107,6 @@ export default function DisplayOptions({
 				>
 					<ToggleControl
 						label={__('Ortsfilter anzeigen', 'tebuto-online-terminbuchung')}
-						help={__('Zeigt einen Schnellfilter nach Standort im Widget', 'tebuto-online-terminbuchung')}
 						checked={showLocationQuickFilter}
 						onChange={(value) =>
 							setAttributes({

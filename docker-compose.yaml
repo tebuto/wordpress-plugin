@@ -1,19 +1,20 @@
-# Local WordPress development environment.
-# See README.md and CONTRIBUTING.md for setup instructions.
-
+# Local WordPress. The preview profile uses synthetic API data only.
 services:
   wordpress:
-    image: wordpress:latest
-    platform: linux/arm64
+    # WordPress 6.9.1 / PHP 8.3.30; verified multi-architecture index.
+    image: wordpress@sha256:1b5fee9f90d12c7fcba8b0bcb0f9d94166daa1086b7559def66d62e5c9b7c947
     ports:
-      - "8000:80"
+      - "127.0.0.1:8000:80"
     volumes:
       - ./wordpress:/var/www/html
-    environment:
+    environment: &wordpress-environment
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: root
       WORDPRESS_DB_PASSWORD: example
       WORDPRESS_DB_NAME: wordpress
+    depends_on:
+      db:
+        condition: service_healthy
     extra_hosts:
       - "tebuto.local:host-gateway"
       - "auth.tebuto.local:host-gateway"
@@ -21,8 +22,43 @@ services:
       - "therapists.api.tebuto.local:host-gateway"
 
   db:
-    image: mariadb:latest
-    platform: linux/arm64
+    image: mariadb:10.11@sha256:7f22313fc130a377a44999965bcb0a08dd5b21e8502824c1b864f792f9bc66ab
     environment:
       MYSQL_ROOT_PASSWORD: example
       MYSQL_DATABASE: wordpress
+    volumes:
+      # Host storage avoids filling the small Docker Desktop VM disk.
+      - ./.local-preview/mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  wpcli:
+    # WP-CLI 2.12.0; verified multi-architecture index.
+    image: wordpress@sha256:36243da432a0f0a3b56dc3240ecee9b159108d71305e7c064d987a20a465bfde
+    profiles: [tools]
+    user: "0:0"
+    volumes:
+      - ./wordpress:/var/www/html
+      - ./scripts:/scripts:ro
+      - ./.local-preview:/local-preview
+    environment:
+      <<: *wordpress-environment
+      WP_CLI_ALLOW_ROOT: "1"
+
+  tebuto-mock:
+    # WordPress 6.9.1 / PHP 8.3.30; verified multi-architecture index.
+    image: wordpress@sha256:1b5fee9f90d12c7fcba8b0bcb0f9d94166daa1086b7559def66d62e5c9b7c947
+    profiles: [preview]
+    entrypoint: [php, -S, "0.0.0.0:8001", /scripts/local-service.php]
+    environment:
+      PHP_CLI_SERVER_WORKERS: "4"
+    ports:
+      - "127.0.0.1:8001:8001"
+    volumes:
+      - ./scripts:/scripts:ro
+      - ../webapp/public/widget:/widgets:ro
+      - ./.local-preview/assets:/local-assets:ro
+      - ./.local-preview/service-state:/state

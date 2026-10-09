@@ -120,7 +120,7 @@ export function buildBookingWidgetDataAttributes(attributes, uuid) {
 export default function save({ attributes }) {
 	const { customCss } = attributes
 
-	const uuid = window.tebutoData?.uuid || ''
+	const uuid = attributes.savedTherapistUuid ?? window.tebutoData?.uuid ?? ''
 	const widgetUrl = 'https://tebuto.de/widget/booking.js'
 	const widgetAttributes = buildBookingWidgetDataAttributes(attributes, uuid)
 

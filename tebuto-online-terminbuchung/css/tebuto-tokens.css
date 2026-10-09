@@ -6,48 +6,50 @@
 
 :root,
 .tebuto-admin-wrap {
-    --tebuto-primary-brand: #009087;
-    --tebuto-primary-hover: #006665;
-    --tebuto-primary-muted: #00B4A9;
-    --tebuto-primary-light: #99e1dd;
-    --tebuto-primary-50: #E9F9F8;
-    --tebuto-primary-subtle: rgba(0, 144, 135, 0.08);
+    --tebuto-primary-brand: hsl(176.842 100% 26.078%);
+    --tebuto-primary-ink: hsl(175.814 100% 16.863%);
+    --tebuto-primary-hover: hsl(176.842 100% 23%);
+    --tebuto-primary-muted: var(--tebuto-primary-brand);
+    --tebuto-primary-light: hsl(175.814 35% 93.333%);
+    --tebuto-primary-50: var(--tebuto-primary-light);
+    --tebuto-primary-subtle: hsl(175.814 30% 95%);
 
     /* Legacy aliases so gradual migration works */
-    --tebuto-primary: var(--tebuto-primary-brand);
+    --tebuto-primary: var(--tebuto-primary-ink);
     --tebuto-primary-dark: var(--tebuto-primary-hover);
     --tebuto-primary-light-legacy: var(--tebuto-primary-muted);
 
-    --tebuto-foreground: #1f2937;
-    --tebuto-foreground-secondary: #374151;
-    --tebuto-foreground-tertiary: #6b7280;
-    --tebuto-foreground-muted: #9ca3af;
+    --tebuto-foreground: hsl(220 18% 18%);
+    --tebuto-foreground-secondary: var(--tebuto-foreground);
+    --tebuto-foreground-tertiary: hsl(220 8% 42%);
+    --tebuto-foreground-muted: var(--tebuto-foreground-tertiary);
     --tebuto-text: var(--tebuto-foreground);
     --tebuto-text-secondary: var(--tebuto-foreground-tertiary);
     --tebuto-text-muted: var(--tebuto-foreground-muted);
 
-    --tebuto-surface: #f3f4f6;
-    --tebuto-surface-muted: #e5e7eb;
-    --tebuto-surface-subtle: #f9fafb;
+    --tebuto-surface: hsl(175.814 30% 95%);
+    --tebuto-surface-muted: var(--tebuto-surface);
+    --tebuto-surface-subtle: hsl(175.814 30% 97%);
     --tebuto-bg: var(--tebuto-surface-subtle);
     --tebuto-bg-dark: var(--tebuto-surface);
     --tebuto-white: #ffffff;
 
-    --tebuto-border: #e5e7eb;
-    --tebuto-border-secondary: #d1d5db;
+    --tebuto-border: hsl(175.814 18% 89%);
+    --tebuto-border-secondary: var(--tebuto-border);
+    --tebuto-input: hsl(175.814 12% 51%);
     --tebuto-border-light: var(--tebuto-surface-subtle);
 
-    --tebuto-success: #16a34a;
+    --tebuto-success: #15803d;
     --tebuto-success-subtle: #dcfce7;
     --tebuto-success-border: #22c55e;
     --tebuto-success-light: var(--tebuto-success-subtle);
 
-    --tebuto-warning: #d97706;
+    --tebuto-warning: #b45309;
     --tebuto-warning-subtle: #fef3c7;
     --tebuto-warning-border: #f59e0b;
     --tebuto-warning-light: var(--tebuto-warning-subtle);
 
-    --tebuto-danger: #ef4444;
+    --tebuto-danger: #b91c1c;
     --tebuto-danger-subtle: #fef2f2;
     --tebuto-danger-border: #ef4444;
     --tebuto-danger-light: var(--tebuto-danger-subtle);
@@ -55,17 +57,34 @@
     --tebuto-info: #3b82f6;
     --tebuto-info-light: #dbeafe;
 
-    --tebuto-radius: 0.5rem;
-    --tebuto-radius-sm: calc(var(--tebuto-radius) - 2px);
-    --tebuto-radius-xs: calc(var(--tebuto-radius) - 4px);
+    --tebuto-radius: 12px;
+    --tebuto-radius-sm: 8px;
+    --tebuto-radius-xs: 8px;
     --tebuto-radius-lg: 0.75rem;
 
-    --tebuto-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --tebuto-shadow: none;
     --tebuto-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
     --tebuto-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
     --tebuto-transition: 0.2s ease;
 
-    --tebuto-font: var(--tebuto-font-montserrat), "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    --tebuto-font: "InterVariable", ui-sans-serif, system-ui, sans-serif;
+    --tebuto-font-regular: 450;
+}
+
+@font-face {
+    font-family: "InterVariable";
+    src: url("../assets/fonts/InterVariable.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "InterVariable";
+    src: url("../assets/fonts/InterVariable-Italic.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
 }
 
 @font-face {
@@ -76,16 +95,20 @@
     font-display: swap;
 }
 
-.tebuto-admin-wrap {
-    --tebuto-font-montserrat: "Montserrat";
+.tebuto-admin-wrap,
+.tebuto-modal {
+    --tebuto-font-montserrat: "InterVariable";
     font-family: var(--tebuto-font);
+    font-weight: var(--tebuto-font-regular);
+    font-feature-settings: "liga" 1, "calt" 1;
+    color: var(--tebuto-foreground);
 
     /* WordPress / Gutenberg component accents (toggles, primary buttons, focus) */
     --wp-admin-theme-color: var(--tebuto-primary-brand);
-    --wp-admin-theme-color--rgb: 0, 144, 135;
+    --wp-admin-theme-color--rgb: 0, 133, 126;
     --wp-admin-theme-color-darker-10: var(--tebuto-primary-hover);
-    --wp-admin-theme-color-darker-20: #004d4c;
+    --wp-admin-theme-color-darker-20: var(--tebuto-primary-ink);
     --wp-components-color-accent: var(--tebuto-primary-brand);
     --wp-components-color-accent-darker-10: var(--tebuto-primary-hover);
-    --wp-components-color-accent-darker-20: #004d4c;
+    --wp-components-color-accent-darker-20: var(--tebuto-primary-ink);
 }

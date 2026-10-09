@@ -13,6 +13,24 @@
     margin: 24px 24px 40px 2px;
 }
 
+.tebuto-admin-wrap :where(button, input, select, textarea),
+.tebuto-modal :where(button, input, select, textarea) {
+    font-family: var(--tebuto-font);
+}
+
+.tebuto-admin-wrap :is(input, select, textarea),
+.tebuto-modal :is(input, select, textarea) {
+    font-weight: var(--tebuto-font-regular);
+    caret-color: var(--tebuto-primary-ink);
+}
+
+.tebuto-admin-wrap ::selection,
+.tebuto-modal ::selection {
+    background: var(--tebuto-primary-light);
+    color: var(--tebuto-foreground);
+}
+
+
 .tebuto-header {
     display: flex;
     align-items: center;
@@ -30,9 +48,9 @@
 .tebuto-header h1 {
     margin: 0;
     font-size: 28px;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--tebuto-text);
-    letter-spacing: -0.02em;
+    letter-spacing: normal;
 }
 
 .tebuto-header-actions {
@@ -175,7 +193,7 @@
 .wp-core-ui .tebuto-btn--outline.tebuto-btn--primary {
     background: var(--tebuto-white);
     border-color: var(--tebuto-primary-brand);
-    color: var(--tebuto-primary-brand);
+    color: var(--tebuto-primary-ink);
 }
 
 .wp-core-ui .tebuto-btn--outline.tebuto-btn--primary:hover,
@@ -233,15 +251,15 @@
 .wp-core-ui .tebuto-btn--outline.tebuto-btn--danger:hover,
 .wp-core-ui .tebuto-btn--outline.tebuto-btn--danger:focus {
     background: var(--tebuto-danger-subtle);
-    border-color: #dc2626;
-    color: #dc2626;
+    border-color: var(--tebuto-danger);
+    color: var(--tebuto-danger);
 }
 
 /* Ghost */
 .wp-core-ui .tebuto-btn--ghost.tebuto-btn--primary {
     background: transparent;
     border-color: transparent;
-    color: var(--tebuto-primary-brand);
+    color: var(--tebuto-primary-ink);
 }
 
 .wp-core-ui .tebuto-btn--ghost.tebuto-btn--primary:hover,
@@ -386,7 +404,7 @@
 .tebuto-modal .button-link,
 .wp-core-ui .tebuto-admin-wrap .button-link,
 .wp-core-ui .tebuto-modal .button-link {
-    color: var(--tebuto-primary-brand);
+    color: var(--tebuto-primary-ink);
     box-shadow: none;
 }
 
@@ -685,12 +703,6 @@
     border: 1px solid var(--tebuto-border);
     border-radius: var(--tebuto-radius);
     box-shadow: var(--tebuto-shadow);
-    transition: transform var(--tebuto-transition), box-shadow var(--tebuto-transition);
-}
-
-.tebuto-stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--tebuto-shadow-md);
 }
 
 .tebuto-stat-icon {
@@ -707,23 +719,14 @@
     width: 28px;
     height: 28px;
     font-size: 28px;
-    color: var(--tebuto-white);
+    color: var(--tebuto-primary-ink);
 }
 
-.tebuto-stat-icon-primary {
-    background: linear-gradient(135deg, var(--tebuto-primary-brand) 0%, var(--tebuto-primary-hover) 100%);
-}
-
-.tebuto-stat-icon-success {
-    background: linear-gradient(135deg, var(--tebuto-success-border) 0%, var(--tebuto-success) 100%);
-}
-
-.tebuto-stat-icon-warning {
-    background: linear-gradient(135deg, var(--tebuto-warning-border) 0%, var(--tebuto-warning) 100%);
-}
-
+.tebuto-stat-icon-primary,
+.tebuto-stat-icon-success,
+.tebuto-stat-icon-warning,
 .tebuto-stat-icon-info {
-    background: linear-gradient(135deg, var(--tebuto-info) 0%, #2563eb 100%);
+    background: var(--tebuto-primary-subtle);
 }
 
 .tebuto-stat-content {
@@ -734,16 +737,16 @@
 
 .tebuto-stat-number {
     font-size: 32px;
-    font-weight: 700;
+    font-weight: 500;
     color: var(--tebuto-text);
     line-height: 1;
-    letter-spacing: -0.02em;
+    letter-spacing: normal;
 }
 
 .tebuto-stat-label {
     font-size: 14px;
     color: var(--tebuto-text-secondary);
-    font-weight: 500;
+    font-weight: 450;
 }
 
 /* ==========================================================================
@@ -792,7 +795,6 @@
 }
 
 .tebuto-category-item--unavailable {
-    opacity: 0.55;
     cursor: default;
 }
 
@@ -805,8 +807,7 @@
     font-size: 11px;
     font-weight: 600;
     color: var(--tebuto-text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
+    letter-spacing: normal;
 }
 
 .tebuto-event-color {
@@ -885,9 +886,7 @@
     align-items: center;
     padding: 6px 12px;
     font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-weight: 450;
     border-radius: 20px;
     white-space: nowrap;
 }
@@ -942,10 +941,8 @@
 
 .tebuto-table th {
     background: var(--tebuto-bg);
-    font-weight: 600;
+    font-weight: 500;
     font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
     color: var(--tebuto-text-secondary);
     white-space: nowrap;
 }
@@ -1160,7 +1157,7 @@
 }
 
 .tebuto-form-group label {
-    font-weight: 600;
+    font-weight: 500;
     color: var(--tebuto-text);
     font-size: 13px;
 }
@@ -1171,7 +1168,7 @@
 .tebuto-form-group textarea,
 .tebuto-form-group select {
     padding: 12px 16px;
-    border: 1px solid var(--tebuto-border);
+    border: 1px solid var(--tebuto-input);
     border-radius: var(--tebuto-radius-xs);
     font-size: 14px;
     transition: border-color var(--tebuto-transition), box-shadow var(--tebuto-transition);
@@ -1439,9 +1436,8 @@
     gap: 8px;
     margin-bottom: 8px;
     font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
+    font-weight: 500;
+    letter-spacing: normal;
     color: var(--tebuto-text-secondary);
 }
 
@@ -1449,7 +1445,7 @@
     font-size: 16px;
     width: 16px;
     height: 16px;
-    color: var(--tebuto-primary-brand);
+    color: var(--tebuto-primary-ink);
 }
 
 .tebuto-date-controls {
@@ -1487,7 +1483,7 @@
 .tebuto-date-preset:hover {
     background: var(--tebuto-primary-subtle);
     border-color: var(--tebuto-primary-brand);
-    color: var(--tebuto-primary-brand);
+    color: var(--tebuto-primary-ink);
 }
 
 .tebuto-date-preset.active {
@@ -1521,7 +1517,7 @@
 
 .tebuto-date-input-group label {
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--tebuto-text-secondary);
     margin: 0;
     white-space: nowrap;
@@ -1896,9 +1892,7 @@ body.tebuto-modal-open {
     margin: 0 0 16px;
     font-size: 13px;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--tebuto-primary-brand);
+    color: var(--tebuto-primary-ink);
     border-bottom: 1px solid var(--tebuto-border);
     padding-bottom: 12px;
 }
@@ -1935,8 +1929,6 @@ body.tebuto-modal-open {
     margin: 0;
     font-size: 13px;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
     color: var(--tebuto-text-secondary);
 }
 
@@ -1980,7 +1972,7 @@ body.tebuto-modal-open {
 
 .tebuto-modal-field label {
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--tebuto-text);
 }
 
@@ -1996,7 +1988,7 @@ body.tebuto-modal-open {
     max-width: none;
     box-sizing: border-box;
     padding: 10px 12px;
-    border: 1px solid var(--tebuto-border);
+    border: 1px solid var(--tebuto-input);
     border-radius: var(--tebuto-radius-xs);
     font-size: 14px;
     line-height: 1.4;
@@ -2265,4 +2257,11 @@ body.tebuto-modal-open {
         width: 100%;
         max-height: calc(100vh - 40px);
     }
+}
+
+body.wp-core-ui .tebuto-admin-wrap :is(button, a, input, select, textarea):focus-visible,
+body.wp-core-ui .tebuto-modal :is(button, a, input, select, textarea):focus-visible,
+.tebuto-admin-wrap .tebuto-status-chip:has(input:focus-visible) {
+    outline: 2px solid var(--tebuto-primary-ink);
+    outline-offset: 2px;
 }

@@ -63,6 +63,12 @@
 		"customCss": {
 			"type": "string",
 			"default": ""
+		},
+		"savedTherapistUuid": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "script",
+			"attribute": "data-therapist-uuid"
 		}
 	},
 	"supports": {

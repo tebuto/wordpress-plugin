@@ -47,6 +47,9 @@ jobs:
       - name: Lint
         run: pnpm run lint
 
+      - name: Widget contract unit tests
+        run: pnpm test:unit
+
       - name: Build Gutenberg block
         run: pnpm run build:block
 

@@ -115,6 +115,7 @@
 			confirmResolver = resolve
 			$('body').addClass('tebuto-modal-open')
 			$modal.fadeIn(200, () => {
+				if (confirmResolver !== resolve) return
 				if (opts.prompt) {
 					$input.trigger('focus')
 				} else {
@@ -129,7 +130,7 @@
 		const resolver = confirmResolver
 		confirmResolver = null
 
-		$modal.fadeOut(200, () => {
+		$modal.stop(true, false).fadeOut(200, () => {
 			if ($('.tebuto-modal:visible').length === 0) {
 				$('body').removeClass('tebuto-modal-open')
 			}
@@ -241,6 +242,18 @@
 	function performBookingAction(action, bookingId, $button) {
 		const $row = $button.closest('.tebuto-booking-item, .tebuto-booking-row')
 		const $actions = $row.find('.tebuto-booking-actions')
+		let $actionContents
+
+		const restoreAfterError = (response) => {
+			$actions.empty().append($actionContents)
+			const data = response?.data
+			const message = typeof data === 'string' ? data : data?.message
+			showNotice(
+				typeof message === 'string' && message ? message : tebutoAdmin?.strings?.actionError || 'Fehler',
+				'error'
+			)
+			$button.trigger('focus')
+		}
 
 		$.ajax({
 			url: tebutoAdmin.ajaxUrl,
@@ -252,6 +265,7 @@
 				booking_id: bookingId
 			},
 			beforeSend() {
+				$actionContents = $actions.contents().detach()
 				$actions.html(
 					`<span class="tebuto-spinner"></span> ${tebutoAdmin?.strings?.processing || 'Wird verarbeitet...'}`
 				)
@@ -263,13 +277,11 @@
 						window.location.reload()
 					}, 800)
 				} else {
-					showNotice(response.data?.message || tebutoAdmin?.strings?.actionError || 'Fehler', 'error')
-					window.location.reload()
+					restoreAfterError(response)
 				}
 			},
-			error() {
-				showNotice(tebutoAdmin?.strings?.actionError || 'Fehler', 'error')
-				window.location.reload()
+			error(xhr) {
+				restoreAfterError(xhr.responseJSON)
 			}
 		})
 	}
@@ -454,9 +466,16 @@
 	}
 
 	function showNotice(message, type) {
-		const $notice = $(`<div class="notice notice-${type} is-dismissible"><p></p></div>`)
+		$('.tebuto-action-notice').remove()
+		const $notice = $(
+			`<div class="notice notice-${type} is-dismissible tebuto-action-notice" role="alert"><p></p></div>`
+		)
 		$notice.find('p').text(message)
+		const $dismiss = $('<button type="button" class="notice-dismiss"></button>')
+		$dismiss.attr('aria-label', strings().close || 'Schließen').on('click', () => $notice.remove())
+		$notice.append($dismiss)
 		$('.tebuto-admin-wrap .tebuto-header').after($notice)
+		if (type === 'error') return
 
 		setTimeout(() => {
 			$notice.fadeOut(300, function () {
